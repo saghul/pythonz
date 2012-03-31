@@ -16,7 +16,7 @@ class InstallCommand(Command):
             dest="force",
             action="store_true",
             default=False,
-            help="Force installation of python."
+            help="Force installation of python even if tests fail."
         )
         self.parser.add_option(
             "-n", "--no-test",
