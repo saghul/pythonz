@@ -11,6 +11,7 @@ import urllib
 import subprocess
 import shlex
 import select
+from urllib2 import urlparse
 from pythonz.define import PATH_BIN, PATH_HOME_ETC_CURRENT, PATH_PYTHONS
 from pythonz.exceptions import ShellCommandException
 from pythonz.log import logger
@@ -26,16 +27,20 @@ def size_format(b):
     return "%.0fbytes" % (b)
 
 def is_url(name):
-    if ':' not in name:
+    try:
+        result = urlparse.urlparse(name)
+    except Exception:
         return False
-    scheme = name.split(':', 1)[0].lower()
-    return scheme in ['http', 'https', 'file', 'ftp']
+    else:
+        return result.scheme in ('http', 'https', 'file', 'ftp')
 
 def is_file(name):
-    if ':' not in name:
+    try:
+        result = urlparse.urlparse(name)
+    except Exception:
         return False
-    scheme = name.split(':', 1)[0].lower()
-    return scheme == 'file'
+    else:
+        return result.scheme == 'file'
 
 def splitext(name):
     base, ext = os.path.splitext(name)
@@ -230,12 +235,8 @@ def get_installed_pythons_pkgname():
     """Get the installed python versions list."""
     return [d for d in sorted(os.listdir(PATH_PYTHONS))]
 
-def is_installed(name):
-    pkgname = Package(name).name
-    pkgdir = os.path.join(PATH_PYTHONS, pkgname)
-    if not os.path.isdir(pkgdir):
-        return False
-    return True
+def is_installed(pkg):
+    return os.path.isdir(os.path.join(PATH_PYTHONS, pkg.name))
     
 def set_current_path(path):
     with open(PATH_HOME_ETC_CURRENT, 'w') as f:

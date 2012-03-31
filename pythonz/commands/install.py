@@ -32,6 +32,18 @@ class InstallCommand(Command):
             help="Skip `make test`."
         )
         self.parser.add_option(
+            "--url",
+            dest="url",
+            default=None,
+            help="URL used to download the specified python version."
+        )
+        self.parser.add_option(
+            "--file",
+            dest="file",
+            default=None,
+            help="File pinting to the python version to be installed."
+        )
+        self.parser.add_option(
             "-v", "--verbose",
             dest="verbose",
             action="store_true",

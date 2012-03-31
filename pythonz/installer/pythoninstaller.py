@@ -21,35 +21,33 @@ class PythonInstaller(object):
     """
 
     def __init__(self, arg, options):
-        # TODO: fix for pypy
-        if is_archive_file(arg):
-            name = path_to_fileurl(arg)
-        elif os.path.isdir(arg):
-            name = path_to_fileurl(arg)
+        version = arg
+        if options.file is not None:
+            if not (is_archive_file(options.file) and os.path.isfile(options.file)):
+                logger.error('invalid file specified: %s' % options.file)
+                raise RuntimeError
+            self.download_url  = path_to_fileurl(options.file)
+        elif options.url is not None:
+            if not is_url(options.url):
+                logger.error('invalid URL specified: %s' % options.url)
+                raise RuntimeError
+            self.download_url = options.url
         else:
-            name = arg
-
-        if is_url(name):
-            self.download_url = name
-            filename = Link(self.download_url).filename
-            pkg = Package(filename, options.type)
-        else:
-            pkg = Package(name, options.type)
-            self.download_url = get_python_version_url(pkg.type, pkg.version)
+            self.download_url = get_python_version_url(options.type, version)
             if not self.download_url:
-                logger.error("Unknown python version: `%s`" % pkg.name)
+                logger.error("Unknown python version: `%s`" % version)
                 raise UnknownVersionException
-            filename = Link(self.download_url).filename
-        self.pkg = pkg
-        self.install_dir = os.path.join(PATH_PYTHONS, pkg.name)
-        self.build_dir = os.path.join(PATH_BUILD, pkg.name)
+        filename = Link(self.download_url).filename
+        self.pkg = Package(version, options.type)
+        self.install_dir = os.path.join(PATH_PYTHONS, self.pkg.name)
+        self.build_dir = os.path.join(PATH_BUILD, self.pkg.name)
         self.download_file = os.path.join(PATH_DISTS, filename)
 
         self.options = options
         self.logfile = os.path.join(PATH_LOG, 'build.log')
         self.patches = []
 
-        if Version(self.pkg.version) >= '3.1':
+        if self.pkg.type in ('cpython', 'stackless') and Version(self.pkg.version) >= '3.1':
             self.configure_options = ['--with-computed-gotos']
         else:
             self.configure_options = []
@@ -72,23 +70,26 @@ class PythonInstaller(object):
             return
 
         if os.path.isdir(self.install_dir):
-            logger.info("You are already installed `%s`" % self.pkg.name)
+            logger.info("You have already installed `%s`" % self.pkg.name)
             return
 
         self.download_and_extract()
         logger.info("\nThis could take a while. You can run the following command on another shell to track the status:")
         logger.info("  tail -f %s\n" % self.logfile)
-        self.patch()
         logger.info("Installing %s into %s" % (self.pkg.name, self.install_dir))
-        try:
-            self.configure()
-            self.make()
-            self.make_install()
-        except:
-            rm_r(self.install_dir)
-            logger.error("Failed to install %s. See %s to see why." % (self.pkg.name, self.logfile))
-            logger.log("  pythonz install --type %s --force %s" % (self.pkg.type, self.pkg.version))
-            sys.exit(1)
+        if self.pkg.type == 'pypy':
+            shutil.copytree(self.build_dir, self.install_dir)
+        else:
+            try:
+                self.patch()
+                self.configure()
+                self.make()
+                self.make_install()
+            except:
+                rm_r(self.install_dir)
+                logger.error("Failed to install %s. See %s to see why." % (self.pkg.name, self.logfile))
+                logger.log("  pythonz install --type %s --force %s" % (self.pkg.type, self.pkg.version))
+                sys.exit(1)
         self.symlink()
         logger.info("\nInstalled %(pkgname)s successfully." % {"pkgname":self.pkg.name})
 
@@ -189,6 +190,10 @@ class PythonInstaller(object):
 
     def symlink(self):
         install_dir = os.path.realpath(self.install_dir)
+        if self.pkg.type == 'pypy':
+            bin_dir = os.path.join(install_dir, 'bin')
+            symlink(os.path.join(bin_dir, 'pypy'), os.path.join(bin_dir, 'python'))
+            return
         if self.options.framework:
             # create symlink bin -> /path/to/Frameworks/Python.framework/Versions/?.?/bin
             bin_dir = os.path.join(install_dir, 'bin')
@@ -199,10 +204,8 @@ class PythonInstaller(object):
                 version = m.group(0)
             symlink(os.path.join(install_dir,'Frameworks','Python.framework','Versions',version,'bin'),
                     os.path.join(bin_dir))
-
         path_python = os.path.join(install_dir,'bin','python')
         if not os.path.isfile(path_python):
-            # TODO: fix for pypy
             src = None
             for d in os.listdir(os.path.join(install_dir,'bin')):
                 if re.match(r'python\d\.\d', d):

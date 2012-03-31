@@ -11,11 +11,20 @@ class UseCommand(Command):
     usage = "%prog VERSION"
     summary = "Use the specified python in current shell"
 
+    def __init__(self):
+        super(UseCommand, self).__init__()
+        self.parser.add_option(
+            "-t", "--type",
+            dest="type",
+            default="cpython",
+            help="Force installation of python even if tests fail."
+        )
+
     def run_command(self, options, args):
         if not args:
             self.parser.print_help()
             sys.exit(1)
-        pkg = Package(args[0])
+        pkg = Package(args[0], options.type)
         pkgname = pkg.name
         pkgdir = os.path.join(PATH_PYTHONS, pkgname)
         if not os.path.isdir(pkgdir):

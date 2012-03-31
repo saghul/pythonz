@@ -1,8 +1,8 @@
 
 import os
 from pythonz.basecommand import Command
-from pythonz.define import PATH_PYTHONS, PATH_BIN
-from pythonz.util import off, rm_r, Package, get_using_python_pkgname, unlink, is_installed
+from pythonz.define import PATH_PYTHONS
+from pythonz.util import off, rm_r, Package, get_using_python_pkgname, is_installed
 from pythonz.log import logger
 
 class UninstallCommand(Command):
@@ -10,27 +10,27 @@ class UninstallCommand(Command):
     usage = "%prog VERSION"
     summary = "Uninstall the given version of python"
 
+    def __init__(self):
+        super(UninstallCommand, self).__init__()
+        self.parser.add_option(
+            "-t", "--type",
+            dest="type",
+            default="cpython",
+            help="Force installation of python even if tests fail."
+        )
+
     def run_command(self, options, args):
         if args:
             # Uninstall pythons
             for arg in args:
-                pkg = Package(arg)
+                pkg = Package(arg, options.type)
                 pkgname = pkg.name
-                pkgpath = os.path.join(PATH_PYTHONS, pkgname)
-                if not is_installed(pkgname):
+                if not is_installed(pkg):
                     logger.error("`%s` is not installed." % pkgname)
                     continue
                 if get_using_python_pkgname() == pkgname:
                     off()
-                for d in os.listdir(PATH_BIN):
-                    # remove symlink
-                    path = os.path.join(PATH_BIN, d)
-                    if os.path.islink(path):
-                        basename = os.path.basename(os.path.realpath(path))
-                        tgtpath = os.path.join(pkgpath, 'bin', basename)
-                        if os.path.isfile(tgtpath) and os.path.samefile(path, tgtpath):
-                            unlink(path)
-                rm_r(pkgpath)
+                rm_r(os.path.join(PATH_PYTHONS, pkgname))
         else:
             self.parser.print_help()
 
