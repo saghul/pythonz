@@ -1,8 +1,8 @@
+
 import sys
-from pythonbrew.basecommand import Command
-from pythonbrew.installer.pythoninstaller import PythonInstaller,\
-    PythonInstallerMacOSX
-from pythonbrew.util import is_macosx
+from pythonz.basecommand import Command
+from pythonz.installer.pythoninstaller import PythonInstaller, PythonInstallerMacOSX
+from pythonz.util import is_macosx
 
 class InstallCommand(Command):
     name = "install"
@@ -97,3 +97,4 @@ class InstallCommand(Command):
                 continue
 
 InstallCommand()
+

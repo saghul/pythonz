@@ -7,10 +7,13 @@ class ShellCommandException(Exception):
 
 class UnknownVersionException(Exception):
     """General exception during installing"""
+
 class AlreadyInstalledException(Exception):
     """General exception during installing"""
+
 class NotSupportedVersionException(Exception):
     """General exception during installing"""
     
 class CurlFetchException(Exception):
     """Exception curl during fetching"""
+

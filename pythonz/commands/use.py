@@ -1,9 +1,10 @@
+
 import os
 import sys
-from pythonbrew.basecommand import Command
-from pythonbrew.define import PATH_PYTHONS, PATH_HOME_ETC_TEMP
-from pythonbrew.util import Package
-from pythonbrew.log import logger
+from pythonz.basecommand import Command
+from pythonz.define import PATH_PYTHONS, PATH_HOME_ETC_TEMP
+from pythonz.util import Package
+from pythonz.log import logger
 
 class UseCommand(Command):
     name = "use"
@@ -28,7 +29,8 @@ class UseCommand(Command):
 
     def _set_temp(self, path):
         fp = open(PATH_HOME_ETC_TEMP, 'w')
-        fp.write('PATH_PYTHONBREW_TEMP="%s"\n' % (path))
+        fp.write('PATH_PYTHONZ_TEMP="%s"\n' % (path))
         fp.close()
 
 UseCommand()
+

@@ -1,16 +1,17 @@
+
 import sys
 import re
 import subprocess
 from subprocess import Popen, PIPE
-from pythonbrew.log import logger
-from pythonbrew.util import to_str
-from pythonbrew.exceptions import CurlFetchException
+from pythonz.log import logger
+from pythonz.util import to_str
+from pythonz.exceptions import CurlFetchException
 
 class Curl(object):
     def __init__(self):
         returncode = subprocess.call("command -v curl > /dev/null", shell=True)
         if returncode:
-            logger.log("pythonbrew required curl. curl was not found in your path.")
+            logger.log("pythonz required curl. curl was not found in your path.")
             sys.exit(1)
     
     def read(self, url):
@@ -41,3 +42,4 @@ class Curl(object):
         p.wait()
         if p.returncode:
             raise CurlFetchException('Failed to fetch.')
+

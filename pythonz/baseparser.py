@@ -1,7 +1,8 @@
+
 from optparse import OptionParser
 
 parser = OptionParser(usage="%prog COMMAND [OPTIONS]",
-                      prog="pythonbrew",
+                      prog="pythonz",
                       add_help_option=False)
 parser.add_option(
     '-h', '--help',
@@ -9,3 +10,4 @@ parser.add_option(
     action='store_true',
     help='Show help')
 parser.disable_interspersed_args()
+

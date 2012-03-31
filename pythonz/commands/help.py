@@ -1,6 +1,7 @@
-from pythonbrew.basecommand import Command, command_dict
-from pythonbrew.baseparser import parser
-from pythonbrew.log import logger
+
+from pythonz.basecommand import Command, command_dict
+from pythonz.baseparser import parser
+from pythonz.log import logger
 
 class HelpCommand(Command):
     name = "help"
@@ -22,6 +23,7 @@ class HelpCommand(Command):
         for command in commands:
             logger.log("  %s: %s" % (command.name, command.summary))
         logger.log("\nFurther Instructions:")
-        logger.log("  https://github.com/utahta/pythonbrew")
+        logger.log("  https://github.com/saghul/pythonz")
 
 HelpCommand()
+

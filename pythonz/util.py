@@ -1,3 +1,4 @@
+
 import os
 import sys
 import errno
@@ -10,9 +11,9 @@ import urllib
 import subprocess
 import shlex
 import select
-from pythonbrew.define import PATH_BIN, PATH_HOME_ETC_CURRENT, PATH_PYTHONS
-from pythonbrew.exceptions import ShellCommandException
-from pythonbrew.log import logger
+from pythonz.define import PATH_BIN, PATH_HOME_ETC_CURRENT, PATH_PYTHONS
+from pythonz.exceptions import ShellCommandException
+from pythonz.log import logger
 
 def size_format(b):
     kb = 1000
@@ -76,12 +77,6 @@ def _py_version_cmp(v, v1, v2):
     if is_str(v):
         v = Version(v)
     return v >= v1 and v < v2
-
-def is_python24(version):
-    return _py_version_cmp(version, '2.4', '2.5')
-
-def is_python25(version):
-    return _py_version_cmp(version, '2.5', '2.6')
 
 def is_python26(version):
     return _py_version_cmp(version, '2.6', '2.7')
@@ -244,7 +239,7 @@ def is_installed(name):
     
 def set_current_path(path):
     fp = open(PATH_HOME_ETC_CURRENT, 'w')
-    fp.write('PATH_PYTHONBREW_CURRENT="%s"\n' % (path))
+    fp.write('PATH_PYTHONZ_CURRENT="%s"\n' % (path))
     fp.close()
 
 def path_to_fileurl(path):

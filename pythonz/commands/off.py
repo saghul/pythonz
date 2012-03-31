@@ -1,12 +1,14 @@
-from pythonbrew.basecommand import Command
-from pythonbrew.util import off
+
+from pythonz.basecommand import Command
+from pythonz.util import off
 
 class OffCommand(Command):
     name = "off"
     usage = "%prog"
-    summary = "Disable pythonbrew"
+    summary = "Disable pythonz"
     
     def run_command(self, options, args):
         off()
 
 OffCommand()
+

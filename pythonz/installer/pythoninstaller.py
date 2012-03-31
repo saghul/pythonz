@@ -1,21 +1,20 @@
+
 import os
 import sys
 import shutil
 import mimetypes
 import re
-from pythonbrew.util import makedirs, symlink, Package, is_url, Link,\
+from pythonz.util import symlink, Package, is_url, Link,\
     unlink, is_html, Subprocess, rm_r, is_python26, is_python27,\
     extract_downloadfile, is_archive_file, path_to_fileurl, is_file,\
     fileurl_to_path, is_python30, is_python31, is_python32,\
     get_macosx_deployment_target, Version
-from pythonbrew.define import PATH_BUILD, PATH_DISTS, PATH_PYTHONS,\
+from pythonz.define import PATH_BUILD, PATH_DISTS, PATH_PYTHONS,\
     ROOT, PATH_LOG, DISTRIBUTE_SETUP_DLSITE,\
     PATH_PATCHES_MACOSX_PYTHON26, PATH_PATCHES_MACOSX_PYTHON27, PATH_PATCHES_ALL
-from pythonbrew.downloader import get_python_version_url, Downloader,\
-    get_headerinfo_from_url
-from pythonbrew.log import logger
-from pythonbrew.exceptions import UnknownVersionException,\
-    NotSupportedVersionException
+from pythonz.downloader import get_python_version_url, Downloader, get_headerinfo_from_url
+from pythonz.log import logger
+from pythonz.exceptions import UnknownVersionException, NotSupportedVersionException
 
 class PythonInstaller(object):
     """Python installer
@@ -28,7 +27,7 @@ class PythonInstaller(object):
             name = path_to_fileurl(arg)
         else:
             name = arg
-        
+
         if is_url(name):
             self.download_url = name
             filename = Link(self.download_url).filename
@@ -74,7 +73,7 @@ class PythonInstaller(object):
         if os.path.isdir(self.install_dir):
             logger.info("You are already installed `%s`" % self.pkg.name)
             return
-        
+
         self.download_and_extract()
         logger.info("\nThis could take a while. You can run the following command on another shell to track the status:")
         logger.info("  tail -f %s\n" % self.logfile)
@@ -87,14 +86,12 @@ class PythonInstaller(object):
         except:
             rm_r(self.install_dir)
             logger.error("Failed to install %s. See %s to see why." % (self.pkg.name, self.logfile))
-            logger.log("  pythonbrew install --force %s" % self.pkg.version)
+            logger.log("  pythonz install --force %s" % self.pkg.version)
             sys.exit(1)
         self.symlink()
         self.install_setuptools()
-        logger.info("\nInstalled %(pkgname)s successfully. Run the following command to switch to %(pkgname)s."
-                    % {"pkgname":self.pkg.name})
-        logger.info("  pythonbrew switch %s" % self.pkg.alias)
-    
+        logger.info("\nInstalled %(pkgname)s successfully." % {"pkgname":self.pkg.name})
+
     def download_and_extract(self):
         if is_file(self.download_url):
             path = fileurl_to_path(self.download_url)
@@ -138,7 +135,7 @@ class PythonInstaller(object):
                 patch_dir = os.path.join(PATH_PATCHES_ALL, "python32")
                 self._add_patches_to_list(patch_dir, ['patch-setup.py.diff'])
         self._do_patch()
-    
+
     def _do_patch(self):
         try:
             s = Subprocess(log=self.logfile, cwd=self.build_dir, verbose=self.options.verbose)
@@ -153,7 +150,7 @@ class PythonInstaller(object):
         except:
             logger.error("Failed to patch `%s`.\n%s" % (self.build_dir, sys.exc_info()[1]))
             sys.exit(1)
-    
+
     def _add_patches_to_list(self, patch_dir, patch_files):
         for patch in patch_files:
             if type(patch) is dict:
@@ -164,7 +161,7 @@ class PythonInstaller(object):
                 self.patches.append(patch)
             else:
                 self.patches.append(os.path.join(patch_dir, patch))
-    
+
     def configure(self):
         s = Subprocess(log=self.logfile, cwd=self.build_dir, verbose=self.options.verbose)
         cmd = "./configure --prefix=%s %s %s" % (self.install_dir, self.options.configure, ' '.join(self.configure_options))
@@ -240,6 +237,7 @@ class PythonInstaller(object):
             logger.error("Failed to install setuptools. See %s/build.log to see why." % (ROOT))
             logger.log("Skip installation of setuptools.")
 
+
 class PythonInstallerMacOSX(PythonInstaller):
     """Python installer for MacOSX
     """
@@ -287,5 +285,6 @@ class PythonInstallerMacOSX(PythonInstaller):
         elif is_python27(version):
             patch_dir = PATH_PATCHES_MACOSX_PYTHON27
             self._add_patches_to_list(patch_dir, ['patch-Modules-posixmodule.diff'])
-            
+
         self._do_patch()
+

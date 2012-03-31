@@ -1,8 +1,9 @@
+
 import os
 import sys
 import re
 from optparse import OptionParser
-from pythonbrew import commands
+from pythonz import commands
 
 command_dict = {}
 
@@ -12,8 +13,7 @@ class Command(object):
     summary = ""
     
     def __init__(self):
-        self.parser = OptionParser(usage=self.usage,
-                                   prog='%s %s' % ("pythonbrew", self.name))
+        self.parser = OptionParser(usage=self.usage, prog='pythonz %s' % self.name)
         command_dict[self.name] = self
         
     def run(self, args):
@@ -21,7 +21,7 @@ class Command(object):
         self.run_command(options, args)
 
 def load_command(name):
-    full_name = 'pythonbrew.commands.%s' % name
+    full_name = 'pythonz.commands.%s' % name
     if full_name in sys.modules:
         return
     try:
@@ -35,3 +35,4 @@ def load_all_commands():
 
 def command_names():
     return [path[:-3] for path in os.listdir(commands.__path__[0]) if not re.match("(__init__\.py$|.*\.pyc$)", path)]
+

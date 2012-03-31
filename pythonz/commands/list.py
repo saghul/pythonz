@@ -1,10 +1,10 @@
+
 import os
 import re
-from pythonbrew.basecommand import Command
-from pythonbrew.define import PYTHON_VERSION_URL, LATEST_VERSIONS_OF_PYTHON,\
-    PATH_PYTHONS
-from pythonbrew.util import Package, get_using_python_pkgname
-from pythonbrew.log import logger
+from pythonz.basecommand import Command
+from pythonz.define import PYTHON_VERSION_URL, LATEST_VERSIONS_OF_PYTHON, PATH_PYTHONS
+from pythonz.util import Package, get_using_python_pkgname
+from pythonz.log import logger
 
 class ListCommand(Command):
     name = "list"
@@ -35,7 +35,7 @@ class ListCommand(Command):
             self.installed(options, args)
     
     def installed(self, options, args):
-        logger.log("# pythonbrew pythons")
+        logger.log("# pythonz pythons")
         cur = get_using_python_pkgname()
         for d in sorted(os.listdir(PATH_PYTHONS)):
             if cur and cur == d:
@@ -66,3 +66,4 @@ class ListCommand(Command):
                 if(options.all_versions or (not options.all_versions and version in LATEST_VERSIONS_OF_PYTHON))]
 
 ListCommand()
+

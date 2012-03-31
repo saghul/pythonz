@@ -1,10 +1,10 @@
+
 import sys
 import os
-from pythonbrew.basecommand import command_dict, load_all_commands
-from pythonbrew.baseparser import parser
-from pythonbrew.log import logger
-from pythonbrew.define import PATH_HOME_ETC
-from pythonbrew.util import makedirs
+from pythonz.basecommand import command_dict, load_all_commands
+from pythonz.baseparser import parser
+from pythonz.define import PATH_HOME_ETC
+from pythonz.util import makedirs
 
 def init_home():
     if not os.path.isdir(PATH_HOME_ETC):
@@ -16,7 +16,6 @@ def main():
         args = ['help']
     if not args:
         args = ['help'] # as default
-    
     init_home()
     load_all_commands()
     command = args[0].lower()
@@ -25,3 +24,4 @@ def main():
         return
     command = command_dict[command]
     command.run(args[1:])
+

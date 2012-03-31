@@ -1,6 +1,7 @@
-from pythonbrew.define import PYTHON_VERSION_URL
-from pythonbrew.log import logger
-from pythonbrew.curl import Curl
+
+from pythonz.define import PYTHON_VERSION_URL
+from pythonz.log import logger
+from pythonz.curl import Curl
 
 def get_headerinfo_from_url(url):
     c = Curl()
@@ -14,3 +15,4 @@ class Downloader(object):
 
 def get_python_version_url(version):
     return PYTHON_VERSION_URL.get(version)
+

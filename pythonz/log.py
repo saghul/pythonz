@@ -1,3 +1,4 @@
+
 import sys
 
 class Color(object):
@@ -41,3 +42,4 @@ class Logger(object):
         sys.stderr.flush()
 
 logger = Logger()
+

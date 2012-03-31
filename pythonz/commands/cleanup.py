@@ -1,7 +1,8 @@
+
 import os
-from pythonbrew.basecommand import Command
-from pythonbrew.define import PATH_BUILD, PATH_DISTS
-from pythonbrew.util import rm_r
+from pythonz.basecommand import Command
+from pythonz.define import PATH_BUILD, PATH_DISTS
+from pythonz.util import rm_r
 
 class CleanupCommand(Command):
     name = "cleanup"
@@ -17,3 +18,4 @@ class CleanupCommand(Command):
             rm_r(os.path.join(root, dir))
 
 CleanupCommand()
+
