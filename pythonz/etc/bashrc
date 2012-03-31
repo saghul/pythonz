@@ -104,12 +104,7 @@ pythonz()
     __pythonz_run "$@"
 }
 
-pybrew()
-{
-    pythonz "$@"
-}
-
-sudopybrew()
+sudo-pythonz()
 {
     pythonz="sudo PYTHONZ_ROOT=$PATH_ROOT PATH=$PATH_PYTHONZ:$PATH_WITHOUT_PYTHONZ $PY_PYTHONZ"
     __pythonz_run "$@"
