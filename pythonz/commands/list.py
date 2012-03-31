@@ -1,9 +1,11 @@
 
 import os
+
 from pythonz.basecommand import Command
 from pythonz.define import PYTHON_VERSIONS_URLS, PATH_PYTHONS
 from pythonz.util import get_using_python_pkgname
 from pythonz.log import logger
+
 
 class ListCommand(Command):
     name = "list"

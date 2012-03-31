@@ -3,6 +3,7 @@ from pythonz.installer.pythonzinstaller import PythonzInstaller
 from pythonz.log import logger
 from pythonz.define import INSTALLER_ROOT, ROOT, PATH_ETC
 
+
 def install_pythonz():
     PythonzInstaller.install(INSTALLER_ROOT)
     # for bash

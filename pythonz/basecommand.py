@@ -1,9 +1,11 @@
 
 import os
-import sys
 import re
+import sys
+
 from optparse import OptionParser
 from pythonz import commands
+
 
 command_dict = {}
 

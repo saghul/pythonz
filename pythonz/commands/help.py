@@ -3,6 +3,7 @@ from pythonz.basecommand import Command, command_dict
 from pythonz.baseparser import parser
 from pythonz.log import logger
 
+
 class HelpCommand(Command):
     name = "help"
     usage = "%prog [COMMAND]"

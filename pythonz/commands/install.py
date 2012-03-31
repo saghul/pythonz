@@ -1,8 +1,10 @@
 
 import sys
+
 from pythonz.basecommand import Command
 from pythonz.installer.pythoninstaller import PythonInstaller, PythonInstallerMacOSX
 from pythonz.util import is_macosx
+
 
 class InstallCommand(Command):
     name = "install"

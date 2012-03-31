@@ -5,6 +5,7 @@ import shutil
 import mimetypes
 import multiprocessing
 import re
+
 from pythonz.util import symlink, Package, is_url, Link,\
     unlink, is_html, Subprocess, rm_r, is_python26, is_python27,\
     extract_downloadfile, is_archive_file, path_to_fileurl, is_file,\
@@ -15,6 +16,7 @@ from pythonz.define import PATH_BUILD, PATH_DISTS, PATH_PYTHONS, PATH_LOG, \
 from pythonz.downloader import get_python_version_url, Downloader, get_headerinfo_from_url
 from pythonz.log import logger
 from pythonz.exceptions import UnknownVersionException
+
 
 class PythonInstaller(object):
     """Python installer

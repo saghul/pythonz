@@ -1,8 +1,10 @@
 
 import os
+
 from pythonz.basecommand import Command
 from pythonz.define import PATH_BUILD, PATH_DISTS
 from pythonz.util import rm_r
+
 
 class CleanupCommand(Command):
     name = "cleanup"

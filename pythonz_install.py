@@ -1,6 +1,6 @@
 
-from pythonz.installer import install_pythonz, upgrade_pythonz, systemwide_pythonz
 from optparse import OptionParser
+from pythonz.installer import install_pythonz, upgrade_pythonz, systemwide_pythonz
 
 if __name__ == "__main__":
     parser = OptionParser()

@@ -1,9 +1,11 @@
 
 import os
+
 from pythonz.basecommand import Command
 from pythonz.define import PATH_PYTHONS
 from pythonz.util import off, rm_r, Package, get_using_python_pkgname, is_installed
 from pythonz.log import logger
+
 
 class UninstallCommand(Command):
     name = "uninstall"

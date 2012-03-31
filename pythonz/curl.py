@@ -1,8 +1,10 @@
 
-import sys
 import re
+import sys
 import subprocess
+
 from subprocess import Popen, PIPE
+
 from pythonz.log import logger
 from pythonz.util import to_str
 from pythonz.exceptions import CurlFetchException

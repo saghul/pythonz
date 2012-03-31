@@ -1,11 +1,13 @@
 
 import os
 import sys
+
 from pythonz.basecommand import Command
 from pythonz.define import PATH_DISTS, ROOT, PATH_BUILD, PYTHONZ_UPDATE_URL, PYTHONZ_UPDATE_URL_CONFIG, PATH_ETC_CONFIG
 from pythonz.log import logger
 from pythonz.downloader import Downloader, get_headerinfo_from_url
 from pythonz.util import rm_r, extract_downloadfile, Link, unlink, Subprocess
+
 
 class UpdateCommand(Command):
     name = "update"

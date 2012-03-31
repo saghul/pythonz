@@ -1,10 +1,12 @@
 
-import sys
 import os
+import sys
+
 from pythonz.basecommand import command_dict, load_all_commands
 from pythonz.baseparser import parser
 from pythonz.define import PATH_HOME_ETC
 from pythonz.util import makedirs
+
 
 def init_home():
     if not os.path.isdir(PATH_HOME_ETC):

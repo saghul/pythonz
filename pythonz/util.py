@@ -11,10 +11,13 @@ import urllib
 import subprocess
 import shlex
 import select
+
 from urllib2 import urlparse
+
 from pythonz.define import PATH_BIN, PATH_HOME_ETC_CURRENT, PATH_PYTHONS
 from pythonz.exceptions import ShellCommandException
 from pythonz.log import logger
+
 
 def size_format(b):
     kb = 1000

@@ -5,12 +5,14 @@ import glob
 import shutil
 import stat
 import time
+
 from pythonz.util import makedirs, rm_r
 from pythonz.define import PATH_BUILD, PATH_BIN, PATH_DISTS, PATH_PYTHONS,\
     PATH_ETC, PATH_SCRIPTS, PATH_SCRIPTS_PYTHONZ,\
     PATH_SCRIPTS_PYTHONZ_COMMANDS, PATH_BIN_PYTHONZ,\
     PATH_LOG, PATH_PATCHES, PATH_ETC_CONFIG,\
     PATH_SCRIPTS_PYTHONZ_INSTALLER, PATH_HOME_ETC, ROOT
+
 
 class PythonzInstaller(object):
     """pythonz installer:
