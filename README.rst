@@ -1,6 +1,9 @@
 
+pythonz: a Python installation manager
+======================================
+
 Overview
-========
+--------
 
 pythonz is a program to automate the building and installation of Python in the users $HOME. This is
 a fork of the original project, `pythonbrew <https://github.com/utahta/pythonbrew>`_.
@@ -11,9 +14,8 @@ useful.
 
 CPython, Stackless and PyPy are supported.
 
-
 Installation
-============
+------------
 
 The recommended way to download and install pythonz is to run these statements in your shell::
 
@@ -43,9 +45,8 @@ After installing it, where you would normally use `sudo`, non-root users will ne
 
   sudo-pythonz install -n 2.7.2
 
-
 Usage
-=====
+-----
 
 pythonz command [options] version
 
@@ -96,10 +97,10 @@ Commands
 
 See available help fpr each command::
 
-  `pythonz help <command>`
+  pythonz help <command>
 
 To get help on each individual command run::
 
-  `pythonz command --help`
+  pythonz command --help
 
 
