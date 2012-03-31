@@ -1,6 +1,6 @@
 
 import os
-from distutils import setup
+from distutils.core import setup
 
 
 def find_packages(toplevel):
