@@ -249,11 +249,6 @@ class PythonInstallerMacOSX(PythonInstaller):
     def __init__(self, arg, options):
         super(PythonInstallerMacOSX, self).__init__(arg, options)
 
-        # check for version
-        version = Version(self.pkg.version)
-        if version < '2.6' and (version != '2.4.6' and version < '2.5.5'):
-            logger.error("`%s` is not supported on MacOSX Snow Leopard" % self.pkg.name)
-            raise NotSupportedVersionException
         # set configure options
         target = get_macosx_deployment_target()
         if target:
