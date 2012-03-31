@@ -238,9 +238,8 @@ def is_installed(name):
     return True
     
 def set_current_path(path):
-    fp = open(PATH_HOME_ETC_CURRENT, 'w')
-    fp.write('PATH_PYTHONZ_CURRENT="%s"\n' % (path))
-    fp.close()
+    with open(PATH_HOME_ETC_CURRENT, 'w') as f:
+        f.write('PATH_PYTHONZ_CURRENT="%s"\n' % (path))
 
 def path_to_fileurl(path):
     path = os.path.normcase(os.path.abspath(path))

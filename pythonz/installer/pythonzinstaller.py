@@ -47,19 +47,18 @@ class PythonzInstaller(object):
         shutil.copytree(os.path.join(installer_root,"patches"), PATH_PATCHES)
 
         # create a main file
-        fp = open("%s/pythonz_main.py" % PATH_SCRIPTS, "w")
-        fp.write("""import pythonz
+        with open("%s/pythonz_main.py" % PATH_SCRIPTS, "w") as f:
+            f.write("""import pythonz
 if __name__ == "__main__":
     pythonz.main()
 """)
-        fp.close()
 
         # create entry point file
-        fp = open(PATH_BIN_PYTHONZ, "w")
-        fp.write("""#!/usr/bin/env bash
+        with open(PATH_BIN_PYTHONZ, "w") as f:
+            f.write("""#!/usr/bin/env bash
 %s %s/pythonz_main.py "$@"
 """ % (sys.executable, PATH_SCRIPTS))
-        fp.close()
+
         # mode 0755
         os.chmod(PATH_BIN_PYTHONZ, stat.S_IRUSR|stat.S_IWUSR|stat.S_IXUSR|stat.S_IRGRP|stat.S_IXGRP|stat.S_IROTH|stat.S_IXOTH)
 
@@ -81,29 +80,26 @@ fi
 """ % {'root': ROOT}
 
         if os.path.isdir('/etc/profile.d'):
-            fp = open('/etc/profile.d/pythonz.sh', 'w')
-            fp.write(profile)
-            fp.close()
+            with open('/etc/profile.d/pythonz.sh', 'w') as f:
+                f.write(profile)
         elif os.path.isfile('/etc/profile'):
             # create backup
             shutil.copy('/etc/profile', '/tmp/profile.pythonz.%s' % int(time.time()))
 
             output = []
             is_copy = True
-            fp = open('/etc/profile', 'r')
-            for line in fp:
-                if line.startswith('#begin-pythonz'):
-                    is_copy = False
-                    continue
-                elif line.startswith('#end-pythonz'):
-                    is_copy = True
-                    continue
-                if is_copy:
-                    output.append(line)
-            fp.close()
+            with open('/etc/profile', 'r') as f:
+                for line in f:
+                    if line.startswith('#begin-pythonz'):
+                        is_copy = False
+                        continue
+                    elif line.startswith('#end-pythonz'):
+                        is_copy = True
+                        continue
+                    if is_copy:
+                        output.append(line)
             output.append(profile)
 
-            fp = open('/etc/profile', 'w')
-            fp.write(''.join(output))
-            fp.close()
+            with open('/etc/profile', 'w') as f:
+                f.write(''.join(output))
 

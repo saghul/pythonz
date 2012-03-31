@@ -10,7 +10,7 @@ class UseCommand(Command):
     name = "use"
     usage = "%prog VERSION"
     summary = "Use the specified python in current shell"
-    
+
     def run_command(self, options, args):
         if not args:
             self.parser.print_help()
@@ -22,15 +22,14 @@ class UseCommand(Command):
             logger.error("`%s` is not installed." % pkgname)
             sys.exit(1)
         pkgbin = os.path.join(pkgdir,'bin')
-        
+
         self._set_temp(pkgbin)
-        
+
         logger.info("Using `%s`" % pkgname)
 
     def _set_temp(self, path):
-        fp = open(PATH_HOME_ETC_TEMP, 'w')
-        fp.write('PATH_PYTHONZ_TEMP="%s"\n' % (path))
-        fp.close()
+        with open(PATH_HOME_ETC_TEMP, 'w') as f:
+            f.write('PATH_PYTHONZ_TEMP="%s"\n' % (path))
 
 UseCommand()
 
