@@ -1,10 +1,10 @@
 
-from pythonz.installer.pythonzinstaller import pythonzInstaller
+from pythonz.installer.pythonzinstaller import PythonzInstaller
 from pythonz.log import logger
 from pythonz.define import INSTALLER_ROOT, ROOT, PATH_ETC
 
 def install_pythonz():
-    pythonzInstaller.install(INSTALLER_ROOT)
+    PythonzInstaller.install(INSTALLER_ROOT)
     # for bash
     shrc = yourshrc = "bashrc"
     logger.log("""
@@ -34,11 +34,11 @@ Enjoy pythonz at %(ROOT)s!!
 """ % {'ROOT':ROOT, 'yourshrc':yourshrc, 'shrc':shrc, 'PATH_ETC':PATH_ETC})
 
 def upgrade_pythonz():
-    pythonzInstaller.install(INSTALLER_ROOT)
+    PythonzInstaller.install(INSTALLER_ROOT)
 
 def systemwide_pythonz():
-    pythonzInstaller.install(INSTALLER_ROOT)
-    pythonzInstaller.systemwide_install()
+    PythonzInstaller.install(INSTALLER_ROOT)
+    PythonzInstaller.systemwide_install()
     logger.log("""
 Well-done! Congratulations!
 
