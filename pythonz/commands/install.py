@@ -53,13 +53,6 @@ class InstallCommand(Command):
             help="Install a python under an alias."
         )
         self.parser.add_option(
-            '-j', "--jobs",
-            dest="jobs",
-            type='int',
-            default=0,
-            help="Enable parallel make."
-        )
-        self.parser.add_option(
             "--framework",
             dest="framework",
             action="store_true",

@@ -3,6 +3,7 @@ import os
 import sys
 import shutil
 import mimetypes
+import multiprocessing
 import re
 from pythonz.util import symlink, Package, is_url, Link,\
     unlink, is_html, Subprocess, rm_r, is_python26, is_python27,\
@@ -170,8 +171,12 @@ class PythonInstaller(object):
         s.check_call(cmd)
 
     def make(self):
-        jobs = self.options.jobs
-        make = ((jobs > 0 and 'make -j%s' % jobs) or 'make')
+        try:
+            jobs = multiprocessing.cpu_count()
+        except NotImplementedError:
+            make = 'make'
+        else:
+            make = 'make -j%s' % jobs
         s = Subprocess(log=self.logfile, cwd=self.build_dir, verbose=self.options.verbose)
         s.check_call(make)
         if not self.options.no_test:
