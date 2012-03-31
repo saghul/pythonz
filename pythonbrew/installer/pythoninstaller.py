@@ -4,14 +4,12 @@ import shutil
 import mimetypes
 import re
 from pythonbrew.util import makedirs, symlink, Package, is_url, Link,\
-    unlink, is_html, Subprocess, rm_r,\
-    is_python25, is_python24, is_python26, is_python27,\
+    unlink, is_html, Subprocess, rm_r, is_python26, is_python27,\
     extract_downloadfile, is_archive_file, path_to_fileurl, is_file,\
     fileurl_to_path, is_python30, is_python31, is_python32,\
     get_macosx_deployment_target, Version
 from pythonbrew.define import PATH_BUILD, PATH_DISTS, PATH_PYTHONS,\
     ROOT, PATH_LOG, DISTRIBUTE_SETUP_DLSITE,\
-    PATH_PATCHES_MACOSX_PYTHON25, PATH_PATCHES_MACOSX_PYTHON24,\
     PATH_PATCHES_MACOSX_PYTHON26, PATH_PATCHES_MACOSX_PYTHON27, PATH_PATCHES_ALL
 from pythonbrew.downloader import get_python_version_url, Downloader,\
     get_headerinfo_from_url
@@ -121,14 +119,7 @@ class PythonInstaller(object):
 
     def patch(self):
         version = Version(self.pkg.version)
-        # for ubuntu 11.04(Natty)
-        if is_python24(version):
-            patch_dir = os.path.join(PATH_PATCHES_ALL, "python24")
-            self._add_patches_to_list(patch_dir, ['patch-setup.py.diff'])
-        elif is_python25(version):
-            patch_dir = os.path.join(PATH_PATCHES_ALL, "python25")
-            self._add_patches_to_list(patch_dir, ['patch-setup.py.diff'])
-        elif is_python26(version):
+        if is_python26(version):
             patch_dir = os.path.join(PATH_PATCHES_ALL, "common")
             self._add_patches_to_list(patch_dir, ['patch-setup.py.diff'])
         elif is_python27(version):
@@ -194,9 +185,6 @@ class PythonInstaller(object):
                 s.check_call("make test")
 
     def make_install(self):
-        version = Version(self.pkg.version)
-        if version == "1.5.2" or version == "1.6.1":
-            makedirs(self.install_dir)
         s = Subprocess(log=self.logfile, cwd=self.build_dir, verbose=self.options.verbose)
         s.check_call("make install")
 
@@ -280,37 +268,10 @@ class PythonInstallerMacOSX(PythonInstaller):
             self.configure_options.append('--enable-universalsdk=/')
             self.configure_options.append('--with-universal-archs=intel')
 
-        # note: skip `make test` to avoid hanging test_threading.
-        if is_python25(version) or is_python24(version):
-            self.options.no_test = True
-    
     def patch(self):
         # note: want an interface to the source patching functionality. like a patchperl.
         version = Version(self.pkg.version)
-        if is_python24(version):
-            patch_dir = PATH_PATCHES_MACOSX_PYTHON24
-            self._add_patches_to_list(patch_dir, ['patch-configure', 'patch-Makefile.pre.in',
-                                                  'patch-Lib-cgi.py.diff', 'patch-Lib-site.py.diff',
-                                                  'patch-setup.py.diff', 'patch-Include-pyport.h',
-                                                  'patch-Mac-OSX-Makefile.in', 'patch-Mac-OSX-IDLE-Makefile.in',
-                                                  'patch-Mac-OSX-PythonLauncher-Makefile.in', 'patch-configure-badcflags.diff',
-                                                  'patch-configure-arch_only.diff', 'patch-macosmodule.diff',
-                                                  'patch-mactoolboxglue.diff', 'patch-pymactoolbox.diff',
-                                                  'patch-gestaltmodule.c.diff'])
-        elif is_python25(version):
-            patch_dir = PATH_PATCHES_MACOSX_PYTHON25
-            self._add_patches_to_list(patch_dir, ['patch-Makefile.pre.in.diff',
-                                                  'patch-Lib-cgi.py.diff',
-                                                  'patch-Lib-distutils-dist.py.diff',
-                                                  'patch-setup.py.diff',
-                                                  'patch-configure-badcflags.diff',
-                                                  'patch-configure-arch_only.diff',
-                                                  'patch-64bit.diff',
-                                                  'patch-pyconfig.h.in.diff',
-                                                  'patch-gestaltmodule.c.diff',
-                                                  {'_localemodule.c.ed': 'Modules/_localemodule.c'},
-                                                  {'locale.py.ed': 'Lib/locale.py'}])
-        elif is_python26(version):
+        if is_python26(version):
             patch_dir = PATH_PATCHES_MACOSX_PYTHON26
             self._add_patches_to_list(patch_dir, ['patch-Lib-cgi.py.diff',
                                                   'patch-Lib-distutils-dist.py.diff',

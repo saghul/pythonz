@@ -1,12 +1,11 @@
 import os
 import sys
 from pythonbrew.basecommand import Command
-from pythonbrew.define import PATH_DISTS, VERSION, ROOT,\
-    PATH_BUILD, PYTHONBREW_UPDATE_URL_CONFIG, PATH_ETC_CONFIG
+from pythonbrew.define import PATH_DISTS, ROOT,\
+    PATH_BUILD, PYTHONBREW_UPDATE_URL, PYTHONBREW_UPDATE_URL_CONFIG, PATH_ETC_CONFIG
 from pythonbrew.log import logger
-from pythonbrew.downloader import Downloader, get_pythonbrew_update_url,\
-    get_stable_version, get_headerinfo_from_url
-from pythonbrew.util import rm_r, extract_downloadfile, Link, is_gzip, Subprocess, Version
+from pythonbrew.downloader import Downloader, get_headerinfo_from_url
+from pythonbrew.util import rm_r, extract_downloadfile, Link, is_gzip, Subprocess
 
 class UpdateCommand(Command):
     name = "update"
@@ -16,32 +15,11 @@ class UpdateCommand(Command):
     def __init__(self):
         super(UpdateCommand, self).__init__()
         self.parser.add_option(
-            '--master',
-            dest='master',
-            action='store_true',
-            default=False,
-            help='Update the pythonbrew to the `master` branch on github.'
-        )
-        self.parser.add_option(
-            '--develop',
-            dest='develop',
-            action='store_true',
-            default=False,
-            help='Update the pythonbrew to the `develop` branch on github.'
-        )
-        self.parser.add_option(
             '--config',
             dest='config',
             action='store_true',
             default=False,
             help='Update config.cfg.'
-        )
-        self.parser.add_option(
-            '-f', '--force',
-            dest='force',
-            action='store_true',
-            default=False,
-            help='Force update the pythonbrew.'
         )
     
     def run_command(self, options, args):
@@ -68,21 +46,7 @@ class UpdateCommand(Command):
         logger.log("The config.cfg has been updated.")
     
     def _update_pythonbrew(self, options, args):
-        if options.master:
-            version = 'master'
-        elif options.develop:
-            version = 'develop'
-        else:
-            version = get_stable_version()
-            # check for version
-            if not options.force and Version(version) <= VERSION:
-                logger.info("You are already running the installed latest version of pythonbrew.")
-                return
-        
-        download_url = get_pythonbrew_update_url(version)
-        if not download_url:
-            logger.error("`pythonbrew-%s` was not found in pypi." % version)
-            sys.exit(1)
+        download_url = PYTHONBREW_UPDATE_URL
         headinfo = get_headerinfo_from_url(download_url)
         content_type = headinfo['content-type']
         if not options.master and not options.develop:
