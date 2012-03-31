@@ -5,7 +5,7 @@ from pythonz.basecommand import Command
 from pythonz.define import PATH_DISTS, ROOT, PATH_BUILD, PYTHONZ_UPDATE_URL, PYTHONZ_UPDATE_URL_CONFIG, PATH_ETC_CONFIG
 from pythonz.log import logger
 from pythonz.downloader import Downloader, get_headerinfo_from_url
-from pythonz.util import rm_r, extract_downloadfile, Link, is_gzip, Subprocess
+from pythonz.util import rm_r, extract_downloadfile, Link, unlink, Subprocess
 
 class UpdateCommand(Command):
     name = "update"
@@ -49,14 +49,11 @@ class UpdateCommand(Command):
         download_url = PYTHONZ_UPDATE_URL
         headinfo = get_headerinfo_from_url(download_url)
         content_type = headinfo['content-type']
-        if not options.master and not options.develop:
-            if not is_gzip(content_type, Link(download_url).filename):
-                logger.error("content type should be gzip. content-type:`%s`" % content_type)
-                sys.exit(1)
-        
-        filename = "pythonz-master"
+        filename = "pythonz-latest"
         distname = "%s.tgz" % filename
         download_file = os.path.join(PATH_DISTS, distname)
+        # Remove old tarball
+        unlink(download_file)
         try:
             d = Downloader()
             d.download(distname, download_url, download_file)

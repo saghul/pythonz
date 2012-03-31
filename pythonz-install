@@ -42,7 +42,7 @@ parse_arguments()
 parse_arguments $@
 
 if [[ ! -x $CURL ]] ; then
-    echo "pythonbrew required curl. curl was not found in your path."
+    echo "pythonz required curl. curl was not found in your path."
     exit
 fi
 
@@ -61,28 +61,28 @@ for PYTHON in $PYTHONS ; do
     fi
 done
 if [[ $PYTHON_FOUND != '1' ]] ; then
-    echo "pythonbrew requires Python 2.6, 2.7 or higher"
+    echo "pythonz requires Python 2.6, 2.7 or higher"
     exit
 fi
 
 systemwide_install=0
-if [[ -n "$PYTHONBREW_ROOT" ]] ; then
-    ROOT="$PYTHONBREW_ROOT"
+if [[ -n "$PYTHONZ_ROOT" ]] ; then
+    ROOT="$PYTHONZ_ROOT"
 else
     if (( UID == 0 )) ; then
         systemwide_install=1
-        ROOT="/usr/local/pythonbrew"
+        ROOT="/usr/local/pythonz"
     else
-        ROOT="$HOME/.pythonbrew"
+        ROOT="$HOME/.pythonz"
     fi
 fi
 PATH_DISTS="$ROOT/dists"
 
-TEMP_TARBALL="pythonbrew-master.tar.gz"
-DOWNLOAD_URL="https://github.com/utahta/pythonbrew/tarball/master"
+TEMP_TARBALL="pythonz-latest.tar.gz"
+DOWNLOAD_URL="https://github.com/saghul/pythonz/tarball/master"
 
 mkdir -p "$PATH_DISTS"
-rm -rf "$PATH_DISTS/pythonbrew*"
+rm -rf "$PATH_DISTS/pythonz*"
 
 echo "Downloading $DOWNLOAD_URL"
 builtin cd $PATH_DISTS ; curl --progress-bar -kL $DOWNLOAD_URL -o "$TEMP_TARBALL"
@@ -90,15 +90,16 @@ builtin cd $PATH_DISTS ; curl --progress-bar -kL $DOWNLOAD_URL -o "$TEMP_TARBALL
 echo "Extracting $PATH_DISTS/$TEMP_TARBALL"
 builtin cd $PATH_DISTS ; tar zxf $TEMP_TARBALL
 
-# TODO: get extracted path
+TEMP_FILE=`tar -tf $TEMP_TARBALL | head -n1 | sed 's/\///g'`
 
-echo "Installing pythonbrew into $ROOT"
+echo "Installing pythonz into $ROOT"
 if (( systemwide_install == 1 )) ; then
-    PYTHONBREW_ROOT="$ROOT" $PYTHON $PATH_DISTS/$TEMP_FILE/pythonbrew_install.py --systemwide
+    PYTHONZ_ROOT="$ROOT" $PYTHON $PATH_DISTS/$TEMP_FILE/pythonz_install.py --systemwide
 else
-    $PYTHON $PATH_DISTS/$TEMP_FILE/pythonbrew_install.py
+    $PYTHON $PATH_DISTS/$TEMP_FILE/pythonz_install.py
 fi
 if [[ $? == 1 ]] ; then
-    echo "Failed to install pythonbrew."
+    echo "Failed to install pythonz."
     exit
 fi
+

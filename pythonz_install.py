@@ -1,5 +1,7 @@
-from pythonbrew.installer import install_pythonbrew, upgrade_pythonbrew, systemwide_pythonbrew
+
+from pythonz.installer import install_pythonz, upgrade_pythonz, systemwide_pythonz
 from optparse import OptionParser
+
 if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option(
@@ -16,10 +18,11 @@ if __name__ == "__main__":
         default=False,
         help="systemwide install."
     )
-    (opt, arg) = parser.parse_args()
+    opt, arg = parser.parse_args()
     if opt.systemwide:
-        systemwide_pythonbrew()
+        systemwide_pythonz()
     elif opt.upgrade:
-        upgrade_pythonbrew()
+        upgrade_pythonz()
     else:
-        install_pythonbrew()
+        install_pythonz()
+
