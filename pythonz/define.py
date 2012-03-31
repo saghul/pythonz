@@ -69,13 +69,10 @@ PYTHONZ_UPDATE_URL = _get_or_default('pythonz', 'url')
 PYTHONZ_UPDATE_URL_CONFIG = _get_or_default('pythonz', 'config')
 
 # python download
-LATEST_VERSIONS_OF_PYTHON = []
 PYTHON_VERSION_URL = {}
 for section in sorted(config.sections()):
     m = re.search("^Python-(.*)$", section)
     if m:
         version = m.group(1)
         PYTHON_VERSION_URL[version] = config.get(section, 'url')
-        if config.has_option(section, 'latest') and config.getboolean(section, 'latest'):
-            LATEST_VERSIONS_OF_PYTHON.append(version)
 
