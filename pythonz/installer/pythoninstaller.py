@@ -10,18 +10,18 @@ from pythonz.util import symlink, Package, is_url, Link,\
     extract_downloadfile, is_archive_file, path_to_fileurl, is_file,\
     fileurl_to_path, is_python30, is_python31, is_python32,\
     get_macosx_deployment_target, Version
-from pythonz.define import PATH_BUILD, PATH_DISTS, PATH_PYTHONS,\
-    ROOT, PATH_LOG, DISTRIBUTE_SETUP_DLSITE,\
+from pythonz.define import PATH_BUILD, PATH_DISTS, PATH_PYTHONS, PATH_LOG, \
     PATH_PATCHES_MACOSX_PYTHON26, PATH_PATCHES_MACOSX_PYTHON27, PATH_PATCHES_ALL
 from pythonz.downloader import get_python_version_url, Downloader, get_headerinfo_from_url
 from pythonz.log import logger
-from pythonz.exceptions import UnknownVersionException, NotSupportedVersionException
+from pythonz.exceptions import UnknownVersionException
 
 class PythonInstaller(object):
     """Python installer
     """
 
     def __init__(self, arg, options):
+        # TODO: fix for pypy
         if is_archive_file(arg):
             name = path_to_fileurl(arg)
         elif os.path.isdir(arg):
@@ -32,10 +32,10 @@ class PythonInstaller(object):
         if is_url(name):
             self.download_url = name
             filename = Link(self.download_url).filename
-            pkg = Package(filename, options.alias)
+            pkg = Package(filename, options.type)
         else:
-            pkg = Package(name, options.alias)
-            self.download_url = get_python_version_url(pkg.version)
+            pkg = Package(name, options.type)
+            self.download_url = get_python_version_url(pkg.type, pkg.version)
             if not self.download_url:
                 logger.error("Unknown python version: `%s`" % pkg.name)
                 raise UnknownVersionException
@@ -87,10 +87,9 @@ class PythonInstaller(object):
         except:
             rm_r(self.install_dir)
             logger.error("Failed to install %s. See %s to see why." % (self.pkg.name, self.logfile))
-            logger.log("  pythonz install --force %s" % self.pkg.version)
+            logger.log("  pythonz install --type %s --force %s" % (self.pkg.type, self.pkg.version))
             sys.exit(1)
         self.symlink()
-        self.install_setuptools()
         logger.info("\nInstalled %(pkgname)s successfully." % {"pkgname":self.pkg.name})
 
     def download_and_extract(self):
@@ -117,20 +116,18 @@ class PythonInstaller(object):
 
     def patch(self):
         version = Version(self.pkg.version)
+        common_patch_dir = os.path.join(PATH_PATCHES_ALL, "common")
         if is_python26(version):
-            patch_dir = os.path.join(PATH_PATCHES_ALL, "common")
-            self._add_patches_to_list(patch_dir, ['patch-setup.py.diff'])
+            self._add_patches_to_list(common_patch_dir, ['patch-setup.py.diff'])
         elif is_python27(version):
             if version < '2.7.2':
-                patch_dir = os.path.join(PATH_PATCHES_ALL, "common")
-                self._add_patches_to_list(patch_dir, ['patch-setup.py.diff'])
+                self._add_patches_to_list(common_patch_dir, ['patch-setup.py.diff'])
         elif is_python30(version):
             patch_dir = os.path.join(PATH_PATCHES_ALL, "python30")
             self._add_patches_to_list(patch_dir, ['patch-setup.py.diff'])
         elif is_python31(version):
             if version < '3.1.4':
-                patch_dir = os.path.join(PATH_PATCHES_ALL, "common")
-                self._add_patches_to_list(patch_dir, ['patch-setup.py.diff'])
+                self._add_patches_to_list(common_patch_dir, ['patch-setup.py.diff'])
         elif is_python32(version):
             if version == '3.2':
                 patch_dir = os.path.join(PATH_PATCHES_ALL, "python32")
@@ -205,6 +202,7 @@ class PythonInstaller(object):
 
         path_python = os.path.join(install_dir,'bin','python')
         if not os.path.isfile(path_python):
+            # TODO: fix for pypy
             src = None
             for d in os.listdir(os.path.join(install_dir,'bin')):
                 if re.match(r'python\d\.\d', d):
@@ -213,34 +211,6 @@ class PythonInstaller(object):
             if src:
                 path_src = os.path.join(install_dir,'bin',src)
                 symlink(path_src, path_python)
-
-    def install_setuptools(self):
-        options = self.options
-        pkgname = self.pkg.name
-        if options.no_setuptools:
-            logger.log("Skip installation of setuptools.")
-            return
-        download_url = DISTRIBUTE_SETUP_DLSITE
-        filename = Link(download_url).filename
-        download_file = os.path.join(PATH_DISTS, filename)
-
-        dl = Downloader()
-        dl.download(filename, download_url, download_file)
-
-        install_dir = os.path.join(PATH_PYTHONS, pkgname)
-        path_python = os.path.join(install_dir,"bin","python")
-        try:
-            s = Subprocess(log=self.logfile, cwd=PATH_DISTS, verbose=self.options.verbose)
-            logger.info("Installing distribute into %s" % install_dir)
-            s.check_call([path_python, filename])
-            # installing pip
-            easy_install = os.path.join(install_dir, 'bin', 'easy_install')
-            if os.path.isfile(easy_install):
-                logger.info("Installing pip into %s" % install_dir)
-                s.check_call([easy_install, 'pip'])
-        except:
-            logger.error("Failed to install setuptools. See %s/build.log to see why." % (ROOT))
-            logger.log("Skip installation of setuptools.")
 
 
 class PythonInstallerMacOSX(PythonInstaller):

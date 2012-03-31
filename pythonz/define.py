@@ -58,21 +58,17 @@ def _get_or_default(section, option, default=''):
     except:
         return default
 
-# setuptools download
-DISTRIBUTE_SETUP_DLSITE = _get_or_default('distribute', 'url')
-
-# virtualenv download
-VIRTUALENV_DLSITE = _get_or_default('virtualenv', 'url')
-
 # pythonz download
 PYTHONZ_UPDATE_URL = _get_or_default('pythonz', 'url')
 PYTHONZ_UPDATE_URL_CONFIG = _get_or_default('pythonz', 'config')
 
 # python download
-PYTHON_VERSION_URL = {}
+PYTHON_VERSIONS_URLS = dict(cpython={}, stackless={}, pypy={})
 for section in sorted(config.sections()):
-    m = re.search("^Python-(.*)$", section)
+    m = re.search("^(?P<type>\w+)-(?P<version>.*)$", section)
     if m:
-        version = m.group(1)
-        PYTHON_VERSION_URL[version] = config.get(section, 'url')
+        data = m.groupdict()
+        type = data['type'].lower()
+        version = data['version']
+        PYTHON_VERSIONS_URLS[type][version] = config.get(section, 'url')
 

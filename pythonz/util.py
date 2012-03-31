@@ -343,22 +343,22 @@ class Subprocess(object):
             raise ShellCommandException('%s: failed to `%s`' % (returncode, cmd))
 
 class Package(object):
-    def __init__(self, name, alias=None):
-        self.name = None
-        self.version = None
-        self.alias = None
-        if is_archive_file(name):
-            name = splitext(name)[0]
-        m = re.search("^Python-(.*)$", name)
-        if m:
-            self.name = name
-            self.version = self.alias = m.group(1)
+    def __init__(self, version, type):
+        if type == 'cpython':
+            tag = 'CPython'
+        elif type == 'stackless':
+            tag = 'Stackless'
+        elif type == 'pypy':
+            tag = 'PyPy'
         else:
-            self.name = "Python-%s" % name
-            self.version = self.alias = name
-        if alias:
-            self.name = 'Python-%s' % alias
-            self.alias = alias
+            raise ValueError('invalid type: %s' % type)
+        self.type = type
+        self.tag = tag
+        self.version = version
+
+    @property
+    def name(self):
+        return '%s-%s' % (self.tag, self.version)
     
 class Link(object):
     def __init__(self, url):

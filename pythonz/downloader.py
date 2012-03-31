@@ -1,5 +1,5 @@
 
-from pythonz.define import PYTHON_VERSION_URL
+from pythonz.define import PYTHON_VERSIONS_URLS
 from pythonz.log import logger
 from pythonz.curl import Curl
 
@@ -13,6 +13,6 @@ class Downloader(object):
         c = Curl()
         c.fetch(url, path)
 
-def get_python_version_url(version):
-    return PYTHON_VERSION_URL.get(version)
+def get_python_version_url(type, version):
+    return PYTHON_VERSIONS_URLS[type].get(version)
 

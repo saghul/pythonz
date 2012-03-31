@@ -12,6 +12,12 @@ class InstallCommand(Command):
     def __init__(self):
         super(InstallCommand, self).__init__()
         self.parser.add_option(
+            "-t", "--type",
+            dest="type",
+            default="cpython",
+            help="Force installation of python even if tests fail."
+        )
+        self.parser.add_option(
             "-f", "--force",
             dest="force",
             action="store_true",
@@ -38,19 +44,6 @@ class InstallCommand(Command):
             default="",
             metavar="CONFIGURE_OPTIONS",
             help="Options passed directly to configure."
-        )
-        self.parser.add_option(
-            "--no-setuptools",
-            dest="no_setuptools",
-            action="store_true",
-            default=False,
-            help="Skip installation of setuptools."
-        )
-        self.parser.add_option(
-            "--as",
-            dest="alias",
-            default=None,
-            help="Install a python under an alias."
         )
         self.parser.add_option(
             "--framework",

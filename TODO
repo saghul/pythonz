@@ -1,5 +1,6 @@
 
-- Add stackless python support
 - Add pypy support
 - Fix test suite
+- Fix installing from specified URL or file
+- Fix Stackless 3.1
 

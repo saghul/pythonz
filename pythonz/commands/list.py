@@ -1,7 +1,7 @@
 
 import os
 from pythonz.basecommand import Command
-from pythonz.define import PYTHON_VERSION_URL, PATH_PYTHONS
+from pythonz.define import PYTHON_VERSIONS_URLS, PATH_PYTHONS
 from pythonz.util import get_using_python_pkgname
 from pythonz.log import logger
 
@@ -37,8 +37,11 @@ class ListCommand(Command):
     
     def all(self):
         logger.log('# Available Python versions')
-        for version in (version for version in sorted(PYTHON_VERSION_URL.keys())):
-            logger.log("Python-%s" % version)
-    
+        for type, versions in PYTHON_VERSIONS_URLS.iteritems():
+            if versions:
+                logger.log('  # %s:' % type)
+                for version in (version for version in sorted(versions.keys())):
+                    logger.log('     %s' % version)
+
 ListCommand()
 
