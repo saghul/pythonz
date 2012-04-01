@@ -95,12 +95,12 @@ Disable pythonz in the current shell::
 Commands
 --------
 
-See available help fpr each command::
+See the available commands::
 
-  pythonz help <command>
+  pythonz help
 
 To get help on each individual command run::
 
-  pythonz command --help
+  pythonz help <command>
 
 
