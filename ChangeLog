@@ -1,3 +1,13 @@
+* dev
+  - Forked the pythonbrew project
+  - Removed py, switch and venv options
+  - Added Stackless support
+  - Added PyPy support
+  - Don't install setuptools
+  - Use all cores when compiling
+  - Dropped support for Python < 2.6
+  - Added Python 3.2.2 to supported list
+
 * 1.1
   - Added --framework, --universal and --static options to install command.
 
