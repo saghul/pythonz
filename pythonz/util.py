@@ -108,7 +108,7 @@ def makedirs(path):
 def symlink(src, dst):
     try:
         os.symlink(src, dst)
-    except:
+    except OSError:
         pass
     
 def unlink(path):
@@ -262,7 +262,7 @@ def to_str(val):
         # python3
         if type(val) is bytes:
             return val.decode()
-    except:
+    except Exception:
         if type(val) is unicode:
             return val.encode("utf-8")
     return val

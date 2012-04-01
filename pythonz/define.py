@@ -3,7 +3,7 @@ import os
 import re
 try:
     import ConfigParser
-except:
+except ImportError:
     import configparser as ConfigParser
 
 # pythonz installer root path
@@ -55,7 +55,7 @@ config.read([PATH_ETC_CONFIG, os.path.join(INSTALLER_ROOT,'etc','config.cfg')])
 def _get_or_default(section, option, default=''):
     try:
         return config.get(section, option)
-    except:
+    except ConfigParser.Error:
         return default
 
 # pythonz download
