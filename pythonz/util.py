@@ -271,25 +271,15 @@ def is_str(val):
     try:
         # python2
         return isinstance(val, basestring)
-    except:
+    except NameError:
         # python3
         return isinstance(val, str)
-    return False
 
 def is_sequence(val):
     if is_str(val):
         return False
     return (hasattr(val, "__getitem__") or hasattr(val, "__iter__"))
 
-def bltin_any(iter):
-    try:
-        return any(iter)
-    except:
-        # python2.4
-        for it in iter:
-            if it:
-                return True
-        return False
 
 #-----------------------------
 # class
@@ -327,7 +317,7 @@ class Subprocess(object):
         fp = ((self._log and open(self._log, 'a')) or None)
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=self._cwd)
         while p.returncode is None:
-            while bltin_any(select.select([p.stdout], [], [])):
+            while any(select.select([p.stdout], [], [])):
                 line = to_str(p.stdout.readline())
                 if not line:
                     break
