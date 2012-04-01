@@ -11,7 +11,7 @@ from pythonz.util import rm_r, extract_downloadfile, Link, unlink, Subprocess
 
 class UpdateCommand(Command):
     name = "update"
-    usage = "%prog"
+    usage = "%prog [options]"
     summary = "Update pythonz to the latest version"
     
     def __init__(self):

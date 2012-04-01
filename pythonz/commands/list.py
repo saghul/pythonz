@@ -9,7 +9,7 @@ from pythonz.log import logger
 
 class ListCommand(Command):
     name = "list"
-    usage = "%prog"
+    usage = "%prog [options]"
     summary = "List the installed python versions"
     
     def __init__(self):

@@ -10,7 +10,7 @@ from pythonz.log import logger
 
 class UseCommand(Command):
     name = "use"
-    usage = "%prog VERSION"
+    usage = "%prog [options] VERSION"
     summary = "Use the specified python in current shell"
 
     def __init__(self):
@@ -19,7 +19,7 @@ class UseCommand(Command):
             "-t", "--type",
             dest="type",
             default="cpython",
-            help="Force installation of python even if tests fail."
+            help="Type of Python version: cpython, stackless or pypy."
         )
 
     def run_command(self, options, args):

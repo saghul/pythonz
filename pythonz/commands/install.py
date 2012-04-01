@@ -17,7 +17,7 @@ class InstallCommand(Command):
             "-t", "--type",
             dest="type",
             default="cpython",
-            help="Force installation of python even if tests fail."
+            help="Type of Python version: cpython, stackless or pypy."
         )
         self.parser.add_option(
             "-f", "--force",

@@ -9,7 +9,7 @@ from pythonz.log import logger
 
 class UninstallCommand(Command):
     name = "uninstall"
-    usage = "%prog VERSION"
+    usage = "%prog [options] VERSION"
     summary = "Uninstall the given version of python"
 
     def __init__(self):
@@ -18,7 +18,7 @@ class UninstallCommand(Command):
             "-t", "--type",
             dest="type",
             default="cpython",
-            help="Force installation of python even if tests fail."
+            help="Type of Python version: cpython, stackless or pypy."
         )
 
     def run_command(self, options, args):
