@@ -27,11 +27,11 @@ class InstallCommand(Command):
             help="Force installation of python even if tests fail."
         )
         self.parser.add_option(
-            "-n", "--no-test",
-            dest="no_test",
+            "--run-tests",
+            dest="run_tests",
             action="store_true",
             default=False,
-            help="Skip `make test`."
+            help="Run `make test` after compiling."
         )
         self.parser.add_option(
             "--url",

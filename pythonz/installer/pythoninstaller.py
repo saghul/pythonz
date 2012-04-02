@@ -176,7 +176,7 @@ class PythonInstaller(object):
             make = 'make -j%s' % jobs
         s = Subprocess(log=self.logfile, cwd=self.build_dir, verbose=self.options.verbose)
         s.check_call(make)
-        if not self.options.no_test:
+        if self.options.run_tests:
             if self.options.force:
                 # note: ignore tests failure error.
                 s.call("make test")
