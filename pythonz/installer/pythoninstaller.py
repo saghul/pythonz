@@ -140,14 +140,12 @@ class PythonInstaller(object):
     def _do_patch(self):
         try:
             s = Subprocess(log=self.logfile, cwd=self.build_dir, verbose=self.options.verbose)
-            if self.patches:
-                logger.info("Patching %s" % self.pkg.name)
-                for patch in self.patches:
-                    if type(patch) is dict:
-                        for (ed, source) in patch.items():
-                            s.shell('ed - %s < %s' % (source, ed))
-                    else:
-                        s.shell("patch -p0 < %s" % patch)
+            for patch in self.patches:
+                if type(patch) is dict:
+                    for (ed, source) in patch.items():
+                        s.shell('ed - %s < %s' % (source, ed))
+                else:
+                    s.shell("patch -p0 < %s" % patch)
         except:
             logger.error("Failed to patch `%s`.\n%s" % (self.build_dir, sys.exc_info()[1]))
             sys.exit(1)
