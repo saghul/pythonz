@@ -89,8 +89,7 @@ class PythonInstaller(object):
                 self.make_install()
             except:
                 rm_r(self.install_dir)
-                logger.error("Failed to install %s. See %s to see why." % (self.pkg.name, self.logfile))
-                logger.log("  pythonz install --type %s --force %s" % (self.pkg.type, self.pkg.version))
+                logger.error("Failed to install %s. Check %s to see why." % (self.pkg.name, self.logfile))
                 sys.exit(1)
         self.symlink()
         logger.info("\nInstalled %(pkgname)s successfully." % {"pkgname":self.pkg.name})
