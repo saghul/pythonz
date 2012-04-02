@@ -43,7 +43,7 @@ pythonz will be automatically configured for every user on the system if you ins
 
 After installing it, where you would normally use `sudo`, non-root users will need to use `sudo-pythonz`::
 
-  sudo-pythonz install -n 2.7.2
+  sudo-pythonz install 2.7.2
 
 Usage
 -----
@@ -56,8 +56,6 @@ Install some pythons::
   pythonz install -t stackless 2.7.2
   pythonz install -t pypy --url https://bitbucket.org/pypy/pypy/downloads/pypy-1.8-osx64.tar.bz2 1.8
   pythonz install --verbose 2.7.2
-  pythonz install --force 2.7.2
-  pythonz install --no-test 2.7.2
   pythonz install --configure="CC=gcc_4.1" 2.7.2
   pythonz install --url http://www.python.org/ftp/python/2.7/Python-2.7.2.tgz 2.7.2
   pythonz install --file /path/to/Python-2.7.2.tgz 2.7.2
