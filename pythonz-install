@@ -4,6 +4,7 @@ shopt -s extglob
 
 PYTHONS="/usr/bin/python /usr/bin/python2 `command -v python`"
 CURL=`command -v curl`
+FETCH=`command -v fetch`
 
 trim()
 {
@@ -41,8 +42,8 @@ parse_arguments()
 
 parse_arguments $@
 
-if [[ ! -x $CURL ]] ; then
-    echo "pythonz required curl. curl was not found in your path."
+if [[ ! -x $CURL ]] && [[ ! -x $FETCH ]] ; then
+    echo "pythonz required curl or fetch. Neigher of them were not found in your path."
     exit
 fi
 
@@ -85,7 +86,12 @@ mkdir -p "$PATH_DISTS"
 rm -rf "$PATH_DISTS/pythonz*"
 
 echo "Downloading $DOWNLOAD_URL"
-builtin cd $PATH_DISTS ; curl --progress-bar -kL $DOWNLOAD_URL -o "$TEMP_TARBALL"
+if [[ -x $CURL ]] ; then
+    builtin cd $PATH_DISTS ; curl --progress-bar -kL $DOWNLOAD_URL -o "$TEMP_TARBALL"
+elif [[ -x $FETCH ]] ; then
+    builtin cd $PATH_DISTS ; fetch -o "$TEMP_TARBALL" $DOWNLOAD_URL
+fi
+
 
 echo "Extracting $PATH_DISTS/$TEMP_TARBALL"
 builtin cd $PATH_DISTS ; tar zxf $TEMP_TARBALL
