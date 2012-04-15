@@ -21,6 +21,10 @@ The recommended way to download and install pythonz is to run these statements i
 
   curl -kL https://raw.github.com/saghul/pythonz/master/pythonz-install | bash
 
+or::
+
+  fetch -o - https://raw.github.com/saghul/pythonz/master/pythonz-install | bash
+
 After that, pythonz installs itself to ~/.pythonz.
 
 Please add the following line to the end of your ~/.bashrc::
