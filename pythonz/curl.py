@@ -1,6 +1,5 @@
 
 import re
-import sys
 import subprocess
 
 from subprocess import Popen, PIPE
@@ -10,11 +9,10 @@ from pythonz.util import to_str
 from pythonz.exceptions import CurlFetchException
 
 class Curl(object):
-    def __init__(self):
+    @classmethod
+    def can_use(cls):
         returncode = subprocess.call("command -v curl > /dev/null", shell=True)
-        if returncode:
-            logger.log("pythonz required curl. curl was not found in your path.")
-            sys.exit(1)
+        return not returncode
     
     def read(self, url):
         p = Popen("curl -skL %s" % url, stdout=PIPE, shell=True)
