@@ -7,9 +7,9 @@ from pythonz.genericdownloader import GenericDownloader
 
 def get_concrete_downloader():
     if Curl.can_use():
-        c = Curl()
+        return Curl()
     else:
-        c = GenericDownloader()
+        return GenericDownloader()
 
 def get_headerinfo_from_url(url):
     c = get_concrete_downloader()
