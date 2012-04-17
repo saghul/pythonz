@@ -4,8 +4,9 @@ import sys
 
 from pythonz.basecommand import Command
 from pythonz.define import PATH_DISTS, ROOT, PATH_BUILD, PYTHONZ_UPDATE_URL, PYTHONZ_UPDATE_URL_CONFIG, PATH_ETC_CONFIG
+from pythonz.downloader import Downloader
+from pythonz.exceptions import DownloadError
 from pythonz.log import logger
-from pythonz.downloader import Downloader, get_headerinfo_from_url
 from pythonz.util import rm_r, extract_downloadfile, Link, unlink, Subprocess
 
 
@@ -39,27 +40,27 @@ class UpdateCommand(Command):
             sys.exit(1)
         distname = Link(PYTHONZ_UPDATE_URL_CONFIG).filename
         download_file = PATH_ETC_CONFIG
+        logger.info("Downloading %s as %s" % (distname, download_file))
         try:
-            d = Downloader()
-            d.download(distname, download_url, download_file)
-        except:
+            Downloader.fetch(download_url, download_file)
+        except DownloadError:
             logger.error("Failed to download. `%s`" % download_url)
             sys.exit(1)
         logger.log("The config.cfg has been updated.")
     
     def _update_pythonz(self, options, args):
         download_url = PYTHONZ_UPDATE_URL
-        headinfo = get_headerinfo_from_url(download_url)
+        headinfo = Downloader.read_head_info(download_url)
         content_type = headinfo['content-type']
         filename = "pythonz-latest"
         distname = "%s.tgz" % filename
         download_file = os.path.join(PATH_DISTS, distname)
         # Remove old tarball
         unlink(download_file)
+        logger.info("Downloading %s as %s" % (distname, download_file))
         try:
-            d = Downloader()
-            d.download(distname, download_url, download_file)
-        except:
+            Downloader.fetch(download_url, download_file)
+        except DownloadError:
             logger.error("Failed to download. `%s`" % download_url)
             sys.exit(1)
         

@@ -13,9 +13,9 @@ from pythonz.util import symlink, Package, is_url, Link,\
     get_macosx_deployment_target, Version
 from pythonz.define import PATH_BUILD, PATH_DISTS, PATH_PYTHONS, PATH_LOG, \
     PATH_PATCHES_MACOSX_PYTHON26, PATH_PATCHES_MACOSX_PYTHON27, PATH_PATCHES_ALL
-from pythonz.downloader import get_python_version_url, Downloader, get_headerinfo_from_url
+from pythonz.downloader import get_python_version_url, Downloader
 from pythonz.log import logger
-from pythonz.exceptions import UnknownVersionException
+from pythonz.exceptions import DownloadError, UnknownVersionException
 
 
 class PythonInstaller(object):
@@ -64,7 +64,7 @@ class PythonInstaller(object):
             path = fileurl_to_path(self.download_url)
             self.content_type = mimetypes.guess_type(path)[0]
         else:
-            headerinfo = get_headerinfo_from_url(self.download_url)
+            headerinfo = Downloader.read_head_info(self.download_url)
             self.content_type = headerinfo['content-type']
         if is_html(self.content_type):
             # note: maybe got 404 or 503 http status code.
@@ -105,10 +105,10 @@ class PythonInstaller(object):
             logger.info("Use the previously fetched %s" % (self.download_file))
         else:
             base_url = Link(self.download_url).base_url
+            logger.info("Downloading %s as %s" % (base_url, self.download_file))
             try:
-                dl = Downloader()
-                dl.download(base_url, self.download_url, self.download_file)
-            except:
+                Downloader.fetch(self.download_url, self.download_file)
+            except DownloadError:
                 unlink(self.download_file)
                 logger.error("Failed to download.\n%s" % (sys.exc_info()[1]))
                 sys.exit(1)
