@@ -72,10 +72,6 @@ class Downloader(object):
             logger.log(traceback.format_exc())
             raise DownloadError('Failed to fetch.')
 
-    def download(self, msg, url, path):
-        logger.info("Downloading %s as %s" % (msg, path))
-        c = get_concrete_downloader()
-        c.fetch(url, path)
 
 def get_python_version_url(type, version):
     return PYTHON_VERSIONS_URLS[type].get(version)
