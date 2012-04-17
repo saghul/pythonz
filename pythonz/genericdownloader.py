@@ -16,8 +16,10 @@ class ProgressBar(object):
 
     def update_line(self, current):
         num_bar = int(current / 100.0 * (self._term_width - 5))
-        return '#' * num_bar + ' ' * (self._term_width - 5 - num_bar) + \
-               u' %3d' % int(current) + u'%\r'
+        bars = u'#' * num_bar
+        spaces = u' ' * (self._term_width - 5 - num_bar)
+        percentage = u'%3d' % int(current) + u'%\r'
+        return bars + spaces + u' ' + percentage
 
     def reporthook(self, blocknum, bs, size):
         current = (blocknum * bs * 100) / size
@@ -42,7 +44,7 @@ class GenericDownloader(object):
     def read(self, url):
         try:
             r = urllib.urlopen(url)
-        except:
+        except IOError:
             logger.log(traceback.format_exc())
             raise CurlFetchException('Failed to fetch.')
         return r.read()
@@ -51,7 +53,7 @@ class GenericDownloader(object):
         try:
             req = HEADRequest(url)
             res = urllib2.urlopen(req)
-        except:
+        except IOError:
             logger.log(traceback.format_exc())
             raise CurlFetchException('Failed to fetch.')
         if res.code != 200:
@@ -61,9 +63,9 @@ class GenericDownloader(object):
     def fetch(self, url, filename):
         b = ProgressBar()
         try:
-            r = urllib.urlretrieve(url, filename, b.reporthook)
+            urllib.urlretrieve(url, filename, b.reporthook)
             sys.stdout.write('\n')
-        except:
+        except IOError:
             sys.stdout.write('\n')
             logger.log(traceback.format_exc())
             raise CurlFetchException('Failed to fetch.')
