@@ -14,7 +14,7 @@ class UpdateCommand(Command):
     name = "update"
     usage = "%prog [options]"
     summary = "Update pythonz to the latest version"
-    
+
     def __init__(self):
         super(UpdateCommand, self).__init__()
         self.parser.add_option(
@@ -24,13 +24,13 @@ class UpdateCommand(Command):
             default=False,
             help='Update config.cfg.'
         )
-    
+
     def run_command(self, options, args):
         if options.config:
             self._update_config(options, args)
         else:
             self._update_pythonz(options, args)
-    
+
     def _update_config(self, options, args):
         # config.cfg update
         # TODO: Automatically create for config.cfg
@@ -47,7 +47,7 @@ class UpdateCommand(Command):
             logger.error("Failed to download. `%s`" % download_url)
             sys.exit(1)
         logger.log("The config.cfg has been updated.")
-    
+
     def _update_pythonz(self, options, args):
         download_url = PYTHONZ_UPDATE_URL
         headinfo = Downloader.read_head_info(download_url)
@@ -63,12 +63,12 @@ class UpdateCommand(Command):
         except DownloadError:
             logger.error("Failed to download. `%s`" % download_url)
             sys.exit(1)
-        
+
         extract_dir = os.path.join(PATH_BUILD, filename)
         rm_r(extract_dir)
         if not extract_downloadfile(content_type, download_file, extract_dir):
             sys.exit(1)
-        
+
         try:
             logger.info("Installing %s into %s" % (extract_dir, ROOT))
             s = Subprocess()
