@@ -14,7 +14,7 @@ import select
 
 from urllib2 import urlparse
 
-from pythonz.define import PATH_BIN, PATH_HOME_ETC_CURRENT, PATH_PYTHONS
+from pythonz.define import PATH_PYTHONS
 from pythonz.exceptions import ShellCommandException
 from pythonz.log import logger
 
@@ -125,9 +125,6 @@ def rm_r(path):
         shutil.rmtree(path)
     elif os.path.isfile(path):
         unlink(path)
-
-def off():
-    set_current_path(PATH_BIN)
 
 def split_leading_dir(path):
     path = str(path)
@@ -241,10 +238,6 @@ def get_installed_pythons_pkgname():
 def is_installed(pkg):
     return os.path.isdir(os.path.join(PATH_PYTHONS, pkg.name))
     
-def set_current_path(path):
-    with open(PATH_HOME_ETC_CURRENT, 'w') as f:
-        f.write('PATH_PYTHONZ_CURRENT="%s"\n' % (path))
-
 def path_to_fileurl(path):
     path = os.path.normcase(os.path.abspath(path))
     url = urllib.quote(path)

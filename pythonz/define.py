@@ -45,10 +45,6 @@ if not PATH_HOME:
 # directories
 PATH_HOME_ETC = os.path.join(PATH_HOME, 'etc')
 
-# files
-PATH_HOME_ETC_CURRENT = os.path.join(PATH_HOME_ETC,'current')
-PATH_HOME_ETC_TEMP = os.path.join(PATH_HOME_ETC,'temp')
-
 # read config.cfg
 config = ConfigParser.SafeConfigParser()
 config.read([PATH_ETC_CONFIG, os.path.join(INSTALLER_ROOT,'etc','config.cfg')])

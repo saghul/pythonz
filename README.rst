@@ -65,10 +65,6 @@ Install some pythons::
   pythonz install --file /path/to/Python-2.7.2.tgz 2.7.2
   pythonz install 2.7.2 3.2
 
-Use the specified python in current shell::
-
-  pythonz use 2.7.2
-
 List the installed pythons::
 
   pythonz list
@@ -89,10 +85,6 @@ Remove stale source folders and archives::
 Upgrades pythonz to the latest version::
 
   pythonz update
-
-Disable pythonz in the current shell::
-
-  pythonz off
 
 Commands
 --------

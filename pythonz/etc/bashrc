@@ -15,54 +15,16 @@ PATH_HOME_ETC="$PATH_HOME/etc"
 PY_PYTHONZ="$PATH_ROOT/bin/pythonz"
 
 # functions
-__pythonz_set_default()
-{
-    PATH_PYTHONZ="$PATH_ROOT/bin"
-}
-
 __pythonz_set_path()
 {
+    PATH_PYTHONZ="$PATH_ROOT/bin"
     PATH_WITHOUT_PYTHONZ=$(printf $PATH | awk -v RS=: -v ORS=: "/${PATH_ROOT//\//\/}/ {next} {print}" | sed -e 's#:$##')
     export PATH=$PATH_PYTHONZ:$PATH_WITHOUT_PYTHONZ
-}
-
-__pythonz_set_temp_path()
-{
-    if [[ -s "$PATH_HOME_ETC/temp" ]] ; then
-        source "$PATH_HOME_ETC/temp"
-        PATH_PYTHONZ="$PATH_ROOT/bin:$PATH_PYTHONZ_TEMP"
-    else
-        __pythonz_set_default
-    fi
-    __pythonz_set_path
-}
-
-__pythonz_set_current_path()
-{
-    if [[ -s "$PATH_HOME_ETC/current" ]] ; then
-        source "$PATH_HOME_ETC/current"
-        PATH_PYTHONZ="$PATH_ROOT/bin:$PATH_PYTHONZ_CURRENT"
-    else
-        __pythonz_set_default
-    fi
-    __pythonz_set_path
 }
 
 __pythonz_reload()
 {
     [[ -s "$PATH_ETC/bashrc" ]] && source "$PATH_ETC/bashrc"
-}
-
-__pythonz_use()
-{
-    $pythonz "$@"
-    [[ $? == 0 ]] && __pythonz_set_temp_path
-}
-
-__pythonz_off()
-{
-    $pythonz "$@"
-    [[ $? == 0 ]] && __pythonz_set_current_path
 }
 
 __pythonz_update()
@@ -90,8 +52,6 @@ __pythonz_run()
 {
     __pythonz_find_command "$@"
     case $command_name in
-        use) __pythonz_use "$@";;
-        off) __pythonz_off "$@" ;;
         update) __pythonz_update "$@" ;;
         *) $pythonz "$@" ;;
     esac
@@ -111,4 +71,4 @@ sudo-pythonz()
 }
 
 # main
-__pythonz_set_current_path
+__pythonz_set_path

@@ -3,7 +3,7 @@ import os
 
 from pythonz.basecommand import Command
 from pythonz.define import PATH_PYTHONS
-from pythonz.util import off, rm_r, Package, get_using_python_pkgname, is_installed
+from pythonz.util import rm_r, Package, is_installed
 from pythonz.log import logger
 
 
@@ -30,8 +30,6 @@ class UninstallCommand(Command):
                 if not is_installed(pkg):
                     logger.error("`%s` is not installed." % pkgname)
                     continue
-                if get_using_python_pkgname() == pkgname:
-                    off()
                 rm_r(os.path.join(PATH_PYTHONS, pkgname))
         else:
             self.parser.print_help()
