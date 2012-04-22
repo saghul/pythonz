@@ -18,7 +18,7 @@ PY_PYTHONZ="$PATH_ROOT/bin/pythonz"
 __pythonz_set_path()
 {
     PATH_PYTHONZ="$PATH_ROOT/bin"
-    PATH_WITHOUT_PYTHONZ=$(printf $PATH | awk -v RS=: -v ORS=: "/${PATH_ROOT//\//\/}/ {next} {print}" | sed -e 's#:$##')
+    PATH_WITHOUT_PYTHONZ=$(printf "$PATH" | awk -v RS=: -v ORS=: "/${PATH_ROOT//\//\/}/ {next} {print}" | sed -e 's#:$##')
     export PATH=$PATH_PYTHONZ:$PATH_WITHOUT_PYTHONZ
 }
 
