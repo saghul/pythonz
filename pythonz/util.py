@@ -218,23 +218,6 @@ def get_command_path(command):
     p = subprocess.Popen('command -v %s' % command, stdout=subprocess.PIPE, shell=True)
     return to_str(p.communicate()[0].strip())
 
-def get_using_python_path():
-    return get_command_path('python')
-
-def get_using_python_pkgname():
-    """return: Python-<VERSION> or None"""
-    path = get_using_python_path()
-    for d in sorted(os.listdir(PATH_PYTHONS)):
-        if not os.path.exists(os.path.join(PATH_PYTHONS, d, 'bin','python')):
-            continue
-        if path and os.path.samefile(path, os.path.join(PATH_PYTHONS, d, 'bin','python')):
-            return d
-    return None
-
-def get_installed_pythons_pkgname():
-    """Get the installed python versions list."""
-    return [d for d in sorted(os.listdir(PATH_PYTHONS))]
-
 def is_installed(pkg):
     return os.path.isdir(os.path.join(PATH_PYTHONS, pkg.name))
     

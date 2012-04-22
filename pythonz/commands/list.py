@@ -3,7 +3,6 @@ import os
 
 from pythonz.basecommand import Command
 from pythonz.define import PYTHON_VERSIONS_URLS, PATH_PYTHONS
-from pythonz.util import get_using_python_pkgname
 from pythonz.log import logger
 
 
@@ -30,12 +29,8 @@ class ListCommand(Command):
     
     def installed(self):
         logger.log("# Installed Python versions")
-        cur = get_using_python_pkgname()
         for d in sorted(os.listdir(PATH_PYTHONS)):
-            if cur and cur == d:
-                logger.log('  %s (*)' % d)
-            else:
-                logger.log('  %s' % d)
+            logger.log('  %s' % d)
     
     def all(self):
         logger.log('# Available Python versions')
