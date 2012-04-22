@@ -76,7 +76,7 @@ class UpdateCommand(Command):
         except:
             logger.error("Failed to update pythonz.")
             sys.exit(1)
-        logger.info("The pythonz has been updated.")
+        logger.info("pythonz has been updated.")
 
 UpdateCommand()
 
