@@ -19,16 +19,6 @@ from pythonz.exceptions import ShellCommandException
 from pythonz.log import logger
 
 
-def size_format(b):
-    kb = 1000
-    mb = kb*kb
-    b = float(b)
-    if b >= mb:
-        return "%.1fMb" % (b/mb)
-    if b >= kb:
-        return "%.1fKb" % (b/kb)
-    return "%.0fbytes" % (b)
-
 def is_url(name):
     try:
         result = urlparse.urlparse(name)
@@ -70,10 +60,6 @@ def is_gzip(content_type, filename):
        or splitext(filename)[1].lower() in ('.tar', '.tar.gz', '.tgz')):
         return True
     return False
-
-def is_macosx():
-    mac_ver = platform.mac_ver()[0]
-    return mac_ver >= '10.6'
 
 def get_macosx_deployment_target():
     m = re.search('^([0-9]+\.[0-9]+)', platform.mac_ver()[0])
@@ -213,10 +199,6 @@ def extract_downloadfile(content_type, download_file, target_dir):
         logger.error("Cannot determine archive format of %s" % download_file)
         return False
     return True
-
-def get_command_path(command):
-    p = subprocess.Popen('command -v %s' % command, stdout=subprocess.PIPE, shell=True)
-    return to_str(p.communicate()[0].strip())
 
 def is_installed(pkg):
     return os.path.isdir(os.path.join(PATH_PYTHONS, pkg.name))
