@@ -19,11 +19,20 @@ from pythonz.exceptions import DownloadError, UnknownVersionException
 
 
 class PythonInstaller(object):
-    """Python installer
-    """
 
-    def __init__(self, arg, options):
-        version = arg
+    @staticmethod
+    def get_installer(version, options):
+        type = options.type.lower()
+        if type == 'cpython':
+            return CPythonInstaller(version, options)
+        elif type == 'stackless':
+            return StacklessInstaller(version, options)
+        elif type == 'pypy':
+            return PyPyInstaller(version, options)
+
+
+class Installer(object):
+    def __init__(self, version, options):
         if options.file is not None:
             if not (is_archive_file(options.file) and os.path.isfile(options.file)):
                 logger.error('invalid file specified: %s' % options.file)
@@ -39,20 +48,82 @@ class PythonInstaller(object):
             if not self.download_url:
                 logger.error("Unknown python version: `%s`" % version)
                 raise UnknownVersionException
-        filename = Link(self.download_url).filename
         self.pkg = Package(version, options.type)
         self.install_dir = os.path.join(PATH_PYTHONS, self.pkg.name)
         self.build_dir = os.path.join(PATH_BUILD, self.pkg.name)
+        filename = Link(self.download_url).filename
         self.download_file = os.path.join(PATH_DISTS, filename)
 
         self.options = options
         self.logfile = os.path.join(PATH_LOG, 'build.log')
         self.patches = []
+        self.configure_options = []
 
-        if self.pkg.type in ('cpython', 'stackless') and Version(self.pkg.version) >= '3.1':
-            self.configure_options = ['--with-computed-gotos']
+    def download(self):
+        if os.path.isfile(self.download_file):
+            logger.info("Use the previously fetched %s" % (self.download_file))
         else:
-            self.configure_options = []
+            base_url = Link(self.download_url).base_url
+            logger.info("Downloading %s as %s" % (base_url, self.download_file))
+            try:
+                Downloader.fetch(self.download_url, self.download_file)
+            except DownloadError:
+                unlink(self.download_file)
+                logger.error("Failed to download.\n%s" % (sys.exc_info()[1]))
+                sys.exit(1)
+
+    def install(self):
+        raise NotImplementedError
+
+
+class CPythonInstaller(Installer):
+    def __init__(self, version, options):
+        super(CPythonInstaller, self).__init__(version, options)
+
+        if Version(self.pkg.version) >= '3.1':
+            self.configure_options.append('--with-computed-gotos')
+
+        if sys.platform == "darwin":
+            # set configure options
+            target = get_macosx_deployment_target()
+            if target:
+                self.configure_options.append('MACOSX_DEPLOYMENT_TARGET=%s' % target)
+
+            # set build options
+            if options.framework and options.static:
+                logger.error("Can't specify both framework and static.")
+                raise Exception
+            if options.framework:
+                self.configure_options.append('--enable-framework=%s' % os.path.join(self.install_dir, 'Frameworks'))
+            elif not options.static:
+                self.configure_options.append('--enable-shared')
+            if options.universal:
+                self.configure_options.append('--enable-universalsdk=/')
+                self.configure_options.append('--with-universal-archs=intel')
+
+    def _apply_patches(self):
+        try:
+            s = Subprocess(log=self.logfile, cwd=self.build_dir, verbose=self.options.verbose)
+            for patch in self.patches:
+                if type(patch) is dict:
+                    for (ed, source) in patch.items():
+                        s.shell('ed - %s < %s' % (source, ed))
+                else:
+                    s.shell("patch -p0 < %s" % patch)
+        except:
+            logger.error("Failed to patch `%s`.\n%s" % (self.build_dir, sys.exc_info()[1]))
+            sys.exit(1)
+
+    def _append_patch(self, patch_dir, patch_files):
+        for patch in patch_files:
+            if type(patch) is dict:
+                tmp = patch
+                patch = {}
+                for key in tmp.keys():
+                    patch[os.path.join(patch_dir, key)] = tmp[key]
+                self.patches.append(patch)
+            else:
+                self.patches.append(os.path.join(patch_dir, patch))
 
     def install(self):
         # cleanup
@@ -95,70 +166,54 @@ class PythonInstaller(object):
         logger.info("\nInstalled %(pkgname)s successfully." % {"pkgname":self.pkg.name})
 
     def download_and_extract(self):
-        if is_file(self.download_url):
-            path = fileurl_to_path(self.download_url)
-            if os.path.isdir(path):
-                logger.info('Copying %s into %s' % (path, self.build_dir))
-                shutil.copytree(path, self.build_dir)
-                return
-        if os.path.isfile(self.download_file):
-            logger.info("Use the previously fetched %s" % (self.download_file))
-        else:
-            base_url = Link(self.download_url).base_url
-            logger.info("Downloading %s as %s" % (base_url, self.download_file))
-            try:
-                Downloader.fetch(self.download_url, self.download_file)
-            except DownloadError:
-                unlink(self.download_file)
-                logger.error("Failed to download.\n%s" % (sys.exc_info()[1]))
-                sys.exit(1)
-        # extracting
+        self.download()
         if not extract_downloadfile(self.content_type, self.download_file, self.build_dir):
             sys.exit(1)
 
-    def patch(self):
+    def _patch(self):
         version = Version(self.pkg.version)
         common_patch_dir = os.path.join(PATH_PATCHES_ALL, "common")
         if is_python26(version):
-            self._add_patches_to_list(common_patch_dir, ['patch-setup.py.diff'])
+            self._append_patch(common_patch_dir, ['patch-setup.py.diff'])
         elif is_python27(version):
             if version < '2.7.2':
-                self._add_patches_to_list(common_patch_dir, ['patch-setup.py.diff'])
+                self._append_patch(common_patch_dir, ['patch-setup.py.diff'])
         elif is_python30(version):
             patch_dir = os.path.join(PATH_PATCHES_ALL, "python30")
-            self._add_patches_to_list(patch_dir, ['patch-setup.py.diff'])
+            self._append_patch(patch_dir, ['patch-setup.py.diff'])
         elif is_python31(version):
             if version < '3.1.4':
-                self._add_patches_to_list(common_patch_dir, ['patch-setup.py.diff'])
+                self._append_patch(common_patch_dir, ['patch-setup.py.diff'])
         elif is_python32(version):
             if version == '3.2':
                 patch_dir = os.path.join(PATH_PATCHES_ALL, "python32")
-                self._add_patches_to_list(patch_dir, ['patch-setup.py.diff'])
-        self._do_patch()
+                self._append_patch(patch_dir, ['patch-setup.py.diff'])
 
-    def _do_patch(self):
-        try:
-            s = Subprocess(log=self.logfile, cwd=self.build_dir, verbose=self.options.verbose)
-            for patch in self.patches:
-                if type(patch) is dict:
-                    for (ed, source) in patch.items():
-                        s.shell('ed - %s < %s' % (source, ed))
-                else:
-                    s.shell("patch -p0 < %s" % patch)
-        except:
-            logger.error("Failed to patch `%s`.\n%s" % (self.build_dir, sys.exc_info()[1]))
-            sys.exit(1)
+    def _patch_osx(self):
+        version = Version(self.pkg.version)
+        if is_python26(version):
+            patch_dir = PATH_PATCHES_MACOSX_PYTHON26
+            self._append_patch(patch_dir, ['patch-Lib-cgi.py.diff',
+                                           'patch-Lib-distutils-dist.py.diff',
+                                           'patch-Mac-IDLE-Makefile.in.diff',
+                                           'patch-Mac-Makefile.in.diff',
+                                           'patch-Mac-PythonLauncher-Makefile.in.diff',
+                                           'patch-Mac-Tools-Doc-setup.py.diff',
+                                           'patch-setup.py-db46.diff',
+                                           'patch-Lib-ctypes-macholib-dyld.py.diff',
+                                           'patch-setup_no_tkinter.py.diff',
+                                           {'_localemodule.c.ed': 'Modules/_localemodule.c'},
+                                           {'locale.py.ed': 'Lib/locale.py'}])
+        elif is_python27(version):
+            patch_dir = PATH_PATCHES_MACOSX_PYTHON27
+            self._append_patch(patch_dir, ['patch-Modules-posixmodule.diff'])
 
-    def _add_patches_to_list(self, patch_dir, patch_files):
-        for patch in patch_files:
-            if type(patch) is dict:
-                tmp = patch
-                patch = {}
-                for key in tmp.keys():
-                    patch[os.path.join(patch_dir, key)] = tmp[key]
-                self.patches.append(patch)
-            else:
-                self.patches.append(os.path.join(patch_dir, patch))
+    def patch(self):
+        if sys.platform == "darwin":
+            self._patch_osx()
+        else:
+            self._patch()
+        self._apply_patches()
 
     def configure(self):
         s = Subprocess(log=self.logfile, cwd=self.build_dir, verbose=self.options.verbose)
@@ -215,48 +270,48 @@ class PythonInstaller(object):
                 symlink(path_src, path_python)
 
 
-class PythonInstallerMacOSX(PythonInstaller):
-    """Python installer for MacOSX
-    """
-    def __init__(self, arg, options):
-        super(PythonInstallerMacOSX, self).__init__(arg, options)
+class StacklessInstaller(CPythonInstaller):
+    pass
 
-        # set configure options
-        target = get_macosx_deployment_target()
-        if target:
-            self.configure_options.append('MACOSX_DEPLOYMENT_TARGET=%s' % target)
+class PyPyInstaller(Installer):
 
-        # set build options
-        if options.framework and options.static:
-            logger.error("Can't specify both framework and static.")
-            raise Exception
-        if options.framework:
-            self.configure_options.append('--enable-framework=%s' % os.path.join(self.install_dir, 'Frameworks'))
-        elif not options.static:
-            self.configure_options.append('--enable-shared')
-        if options.universal:
-            self.configure_options.append('--enable-universalsdk=/')
-            self.configure_options.append('--with-universal-archs=intel')
+    def install(self):
+        # cleanup
+        if os.path.isdir(self.build_dir):
+            shutil.rmtree(self.build_dir)
 
-    def patch(self):
-        # note: want an interface to the source patching functionality. like a patchperl.
-        version = Version(self.pkg.version)
-        if is_python26(version):
-            patch_dir = PATH_PATCHES_MACOSX_PYTHON26
-            self._add_patches_to_list(patch_dir, ['patch-Lib-cgi.py.diff',
-                                                  'patch-Lib-distutils-dist.py.diff',
-                                                  'patch-Mac-IDLE-Makefile.in.diff',
-                                                  'patch-Mac-Makefile.in.diff',
-                                                  'patch-Mac-PythonLauncher-Makefile.in.diff',
-                                                  'patch-Mac-Tools-Doc-setup.py.diff',
-                                                  'patch-setup.py-db46.diff',
-                                                  'patch-Lib-ctypes-macholib-dyld.py.diff',
-                                                  'patch-setup_no_tkinter.py.diff',
-                                                  {'_localemodule.c.ed': 'Modules/_localemodule.c'},
-                                                  {'locale.py.ed': 'Lib/locale.py'}])
-        elif is_python27(version):
-            patch_dir = PATH_PATCHES_MACOSX_PYTHON27
-            self._add_patches_to_list(patch_dir, ['patch-Modules-posixmodule.diff'])
+        # get content type.
+        if is_file(self.download_url):
+            path = fileurl_to_path(self.download_url)
+            self.content_type = mimetypes.guess_type(path)[0]
+        else:
+            headerinfo = Downloader.read_head_info(self.download_url)
+            self.content_type = headerinfo['content-type']
+        if is_html(self.content_type):
+            # note: maybe got 404 or 503 http status code.
+            logger.error("Invalid content-type: `%s`" % self.content_type)
+            return
 
-        self._do_patch()
+        if os.path.isdir(self.install_dir):
+            logger.info("You have already installed `%s`" % self.pkg.name)
+            return
+
+        self.download_and_extract()
+        logger.info("\nThis could take a while. You can run the following command on another shell to track the status:")
+        logger.info("  tail -f %s\n" % self.logfile)
+        logger.info("Installing %s into %s" % (self.pkg.name, self.install_dir))
+        shutil.copytree(self.build_dir, self.install_dir)
+        self.symlink()
+        logger.info("\nInstalled %(pkgname)s successfully." % {"pkgname":self.pkg.name})
+
+    def download_and_extract(self):
+        self.download()
+        if not extract_downloadfile(self.content_type, self.download_file, self.build_dir):
+            sys.exit(1)
+
+    def symlink(self):
+        install_dir = os.path.realpath(self.install_dir)
+        bin_dir = os.path.join(install_dir, 'bin')
+        symlink(os.path.join(bin_dir, 'pypy'), os.path.join(bin_dir, 'python'))
+
 

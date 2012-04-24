@@ -2,7 +2,7 @@
 import sys
 
 from pythonz.basecommand import Command
-from pythonz.installer.pythoninstaller import PythonInstaller, PythonInstallerMacOSX
+from pythonz.installer.pythoninstaller import PythonInstaller
 
 
 class InstallCommand(Command):
@@ -84,15 +84,12 @@ class InstallCommand(Command):
         if not args:
             self.parser.print_help()
             sys.exit(1)
-        # installing python
         for arg in args:
             try:
-                if sys.platform == "darwin":
-                    p = PythonInstallerMacOSX(arg, options)
-                else:
-                    p = PythonInstaller(arg, options)
+                p = PythonInstaller.get_installer(arg, options)
                 p.install()
-            except:
+            except Exception, e:
+                print e
                 continue
 
 InstallCommand()
