@@ -150,18 +150,15 @@ class CPythonInstaller(Installer):
         logger.info("\nThis could take a while. You can run the following command on another shell to track the status:")
         logger.info("  tail -f %s\n" % self.logfile)
         logger.info("Installing %s into %s" % (self.pkg.name, self.install_dir))
-        if self.pkg.type == 'pypy':
-            shutil.copytree(self.build_dir, self.install_dir)
-        else:
-            try:
-                self.patch()
-                self.configure()
-                self.make()
-                self.make_install()
-            except:
-                rm_r(self.install_dir)
-                logger.error("Failed to install %s. Check %s to see why." % (self.pkg.name, self.logfile))
-                sys.exit(1)
+        try:
+            self.patch()
+            self.configure()
+            self.make()
+            self.make_install()
+        except:
+            rm_r(self.install_dir)
+            logger.error("Failed to install %s. Check %s to see why." % (self.pkg.name, self.logfile))
+            sys.exit(1)
         self.symlink()
         logger.info("\nInstalled %(pkgname)s successfully." % {"pkgname":self.pkg.name})
 
