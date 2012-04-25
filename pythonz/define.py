@@ -59,7 +59,7 @@ PYTHONZ_UPDATE_URL = _get_or_default('pythonz', 'url')
 PYTHONZ_UPDATE_URL_CONFIG = _get_or_default('pythonz', 'config')
 
 # python download
-PYTHON_VERSIONS_URLS = dict(cpython={}, stackless={}, pypy={})
+PYTHON_VERSIONS_URLS = dict(cpython={}, stackless={}, pypy={}, jython={})
 for section in sorted(config.sections()):
     m = re.search("^(?P<type>\w+)-(?P<version>.*)$", section)
     if m:

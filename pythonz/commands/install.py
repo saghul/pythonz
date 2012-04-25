@@ -16,7 +16,7 @@ class InstallCommand(Command):
             "-t", "--type",
             dest="type",
             default="cpython",
-            help="Type of Python version: cpython, stackless or pypy."
+            help="Type of Python version: cpython, stackless, pypy or jython."
         )
         self.parser.add_option(
             "-f", "--force",

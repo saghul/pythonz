@@ -296,12 +296,15 @@ class Subprocess(object):
 
 class Package(object):
     def __init__(self, version, type):
+        type = type.lower()
         if type == 'cpython':
             tag = 'CPython'
         elif type == 'stackless':
             tag = 'Stackless'
         elif type == 'pypy':
             tag = 'PyPy'
+        elif type == 'jython':
+            tag = 'Jython'
         else:
             raise ValueError('invalid type: %s' % type)
         self.type = type

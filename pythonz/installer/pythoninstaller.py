@@ -5,6 +5,7 @@ import shutil
 import mimetypes
 import multiprocessing
 import re
+import subprocess
 
 from pythonz.util import symlink, Package, is_url, Link,\
     unlink, is_html, Subprocess, rm_r, is_python26, is_python27,\
@@ -19,7 +20,6 @@ from pythonz.exceptions import DownloadError, UnknownVersionException
 
 
 class PythonInstaller(object):
-
     @staticmethod
     def get_installer(version, options):
         type = options.type.lower()
@@ -29,6 +29,9 @@ class PythonInstaller(object):
             return StacklessInstaller(version, options)
         elif type == 'pypy':
             return PyPyInstaller(version, options)
+        elif type == 'jython':
+            return JythonInstaller(version, options)
+        raise RuntimeError('invalid type specified: %s' % type)
 
 
 class Installer(object):
@@ -74,7 +77,6 @@ class Installer(object):
 
     def install(self):
         raise NotImplementedError
-
 
 class CPythonInstaller(Installer):
     def __init__(self, version, options):
@@ -266,12 +268,10 @@ class CPythonInstaller(Installer):
                 path_src = os.path.join(install_dir,'bin',src)
                 symlink(path_src, path_python)
 
-
 class StacklessInstaller(CPythonInstaller):
     pass
 
 class PyPyInstaller(Installer):
-
     def install(self):
         # cleanup
         if os.path.isdir(self.build_dir):
@@ -310,5 +310,48 @@ class PyPyInstaller(Installer):
         install_dir = os.path.realpath(self.install_dir)
         bin_dir = os.path.join(install_dir, 'bin')
         symlink(os.path.join(bin_dir, 'pypy'), os.path.join(bin_dir, 'python'))
+
+class JythonInstaller(Installer):
+    def install(self):
+        # check if java is installed
+        r = subprocess.call("command -v java > /dev/null", shell=True)
+        if r != 0:
+            logger.error("Jython requires Java to be installed, but the 'java' command was not found in the path.")
+            return
+
+        # cleanup
+        if os.path.isdir(self.build_dir):
+            shutil.rmtree(self.build_dir)
+
+        # get content type.
+        if is_file(self.download_url):
+            path = fileurl_to_path(self.download_url)
+            self.content_type = mimetypes.guess_type(path)[0]
+        else:
+            headerinfo = Downloader.read_head_info(self.download_url)
+            self.content_type = headerinfo['content-type']
+        if is_html(self.content_type):
+            # note: maybe got 404 or 503 http status code.
+            logger.error("Invalid content-type: `%s`" % self.content_type)
+            return
+
+        if os.path.isdir(self.install_dir):
+            logger.info("You have already installed `%s`" % self.pkg.name)
+            return
+
+        self.download()
+        logger.info("\nThis could take a while. You can run the following command on another shell to track the status:")
+        logger.info("  tail -f %s\n" % self.logfile)
+        logger.info("Installing %s into %s" % (self.pkg.name, self.install_dir))
+        cmd = 'java -jar %s -s -d %s' % (self.download_file, self.install_dir)
+        s = Subprocess(log=self.logfile, verbose=self.options.verbose)
+        s.check_call(cmd)
+        self.symlink()
+        logger.info("\nInstalled %(pkgname)s successfully." % {"pkgname":self.pkg.name})
+
+    def symlink(self):
+        install_dir = os.path.realpath(self.install_dir)
+        bin_dir = os.path.join(install_dir, 'bin')
+        symlink(os.path.join(bin_dir, 'jython'), os.path.join(bin_dir, 'python'))
 
 

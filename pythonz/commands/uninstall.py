@@ -18,7 +18,7 @@ class UninstallCommand(Command):
             "-t", "--type",
             dest="type",
             default="cpython",
-            help="Type of Python version: cpython, stackless or pypy."
+            help="Type of Python version: cpython, stackless, pypy or jython."
         )
 
     def run_command(self, options, args):
