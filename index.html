@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <title>pythonz by saghul</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>pythonz</h1>
+        <h2>Python installation manager supporting CPython, Stackless, PyPy and Jython</h2>
+
+        <section id="downloads">
+          <a href="https://github.com/saghul/pythonz/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/saghul/pythonz/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/saghul/pythonz" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <h2>Overview</h2>
+
+<p>pythonz makes it easy for you to compile and install different Python versions either system-wide or per user. It supports installing CPython, Stackless, PyPy and Jython.</p>
+
+<h2>Installing it</h2>
+
+<p>It's really easy to install pythonz, to install it for your user (that is, in your $HOME) just do as follows:</p>
+
+<pre><code>curl -kL https://raw.github.com/saghul/pythonz/master/pythonz-install | bash
+</code></pre>
+
+<p>After that add this to your <code>.bashrc</code> file:</p>
+
+<pre><code>[[ -s $HOME/.pythonz/etc/bashrc ]] &amp;&amp; source $HOME/.pythonz/etc/bashrc
+</code></pre>
+
+<h2>Using it</h2>
+
+<p>Once pythonz is installed you can go ahead and install some Python versions:</p>
+
+<pre><code>pythonz install 2.7.3
+pythonz install -t stackless 2.7.2
+pythonz install -t jython 2.5.2
+pythonz install -t pypy --url https://bitbucket.org/pypy/pypy/downloads/pypy-1.8-osx64.tar.bz2 1.8
+</code></pre>
+
+<p>Then you can create some <a href="http://pypi.python.org/pypi/virtualenv">virtualenvs</a> (using <a href="http://pypi.python.org/pypi/virtualenvwrapper">virtualenvwrapper</a>) to use the installed pythons:</p>
+
+<pre><code>mkvirtualenv -p ~/.pythonz/pythons/CPython-2.7.3/bin/python cpython272 &amp;&amp; deactivate
+mkvirtualenv -p ~/.pythonz/pythons/Stackless-2.7.2/bin/python stackless272 &amp;&amp; deactivate
+mkvirtualenv -p ~/.pythonz/pythons/Jython-2.5.2/bin/python jython252 &amp;&amp; deactivate
+mkvirtualenv -p ~/.pythonz/pythons/PyPy-1.8/bin/python pypy18 &amp;&amp; deactivate
+</code></pre>
+
+<p>Then you can use <code>workon</code> and <code>deactivate</code> as usual.</p>
+      </section>
+    </div>
+
+    
+  </body>
+</html>
