@@ -51,6 +51,8 @@ After installing it, where you would normally use `sudo`, non-root users will ne
 Usage
 -----
 
+::
+
   pythonz command [options] version
 
 Install some pythons::
