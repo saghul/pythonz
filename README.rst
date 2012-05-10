@@ -1,4 +1,3 @@
-
 pythonz: a Python installation manager
 ======================================
 
@@ -9,7 +8,7 @@ pythonz is a program to automate the building and installation of Python in the 
 a fork of the original project, `pythonbrew <https://github.com/utahta/pythonbrew>`_.
 
 The original project seems to be unmaintained, and it also has some extra features which I don't really
-need, so I made this for to make something a bit simpler that works for *me*. Yoy may also find it
+need, so I made this for to make something a bit simpler that works for *me*. You may also find it
 useful.
 
 CPython, Stackless, PyPy and Jython are supported.
@@ -25,23 +24,23 @@ or::
 
   fetch -o - https://raw.github.com/saghul/pythonz/master/pythonz-install | bash
 
-After that, pythonz installs itself to ~/.pythonz.
+After that, pythonz installs itself to ``~/.pythonz``.
 
-Please add the following line to the end of your ~/.bashrc::
+Please add the following line to the end of your ``~/.bashrc``::
 
   [[ -s $HOME/.pythonz/etc/bashrc ]] && source $HOME/.pythonz/etc/bashrc
 
-If you need to install pythonz into somewhere else, you can do that by setting a PYTHONZ_ROOT environment variable::
+If you need to install pythonz into somewhere else, you can do that by setting a ``PYTHONZ_ROOT`` environment variable::
 
   export PYTHONZ_ROOT=/path/to/pythonz
   curl -kLO https://raw.github.com/saghul/pythonz/master/pythonz-install
   chmod +x pythonz-install
   ./pythonz-install
 
-For Systemwide(Multi-User) installation
+For Systemwide (Multi-User) installation
 ---------------------------------------
 
-If the install script is run as root, pythonz will automatically install into /usr/local/pythonz.
+If the install script is run as root, pythonz will automatically install into ``/usr/local/pythonz``.
 
 pythonz will be automatically configured for every user on the system if you install it as root.
 
@@ -52,7 +51,7 @@ After installing it, where you would normally use `sudo`, non-root users will ne
 Usage
 -----
 
-pythonz command [options] version
+  pythonz command [options] version
 
 Install some pythons::
 
