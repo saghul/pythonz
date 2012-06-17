@@ -1,0 +1,30 @@
+--- configure.orig	2007-04-05 21:32:57.000000000 -0700
++++ configure	2007-04-05 21:32:59.000000000 -0700
+@@ -3816,7 +3816,11 @@
+ 	    ;;
+ 	# is there any other compiler on Darwin besides gcc?
+ 	Darwin*)
+-	    BASECFLAGS="$BASECFLAGS -Wno-long-double -no-cpp-precomp -mno-fused-madd"
++	    if [[ `/usr/bin/arch` = 'ppc' ]]; then
++	        BASECFLAGS="$BASECFLAGS -Wno-long-double -no-cpp-precomp -mno-fused-madd -fno-common"
++	    else
++	        BASECFLAGS="$BASECFLAGS -Wno-long-double -no-cpp-precomp -fno-common"
++	    fi
+ 	    ;;
+     esac
+     ;;
+@@ -10183,12 +10183,12 @@
+ 
+ case $ac_sys_system/$ac_sys_release in
+   Darwin/1.3*)
+-    LIBTOOL_CRUFT="-lcc_dynamic -arch_only ppc"
++    LIBTOOL_CRUFT="-lcc_dynamic -arch_only "`/usr/bin/arch`
+     LIBTOOL_CRUFT=$LIBTOOL_CRUFT' -install_name $(PYTHONFRAMEWORKINSTALLDIR)/Versions/$(VERSION)/$(PYTHONFRAMEWORK)'
+     LIBTOOL_CRUFT=$LIBTOOL_CRUFT' -compatibility_version $(VERSION) -current_version $(VERSION)';;
+   Darwin/*)
+-    LIBTOOL_CRUFT="-lcc_dynamic -arch_only ppc"
++    LIBTOOL_CRUFT="-lcc_dynamic -arch_only "`/usr/bin/arch`
+       LIBTOOL_CRUFT="$LIBTOOL_CRUFT"
+     LIBTOOL_CRUFT=$LIBTOOL_CRUFT' -install_name $(PYTHONFRAMEWORKINSTALLDIR)/Versions/$(VERSION)/$(PYTHONFRAMEWORK)'
+     LIBTOOL_CRUFT=$LIBTOOL_CRUFT' -compatibility_version $(VERSION) -current_version $(VERSION)';;
+ esac
