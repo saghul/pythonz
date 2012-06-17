@@ -88,8 +88,9 @@ class InstallCommand(Command):
             try:
                 p = PythonInstaller.get_installer(arg, options)
                 p.install()
-            except Exception, e:
-                print e
+            except Exception:
+                import traceback
+                traceback.print_exc()
                 continue
 
 InstallCommand()
