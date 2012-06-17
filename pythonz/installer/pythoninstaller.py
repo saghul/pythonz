@@ -86,6 +86,7 @@ class Installer(object):
     def install(self):
         raise NotImplementedError
 
+
 class CPythonInstaller(Installer):
     supported_versions = ['2.4', '2.4.1', '2.4.2', '2.4.3', '2.4.4', '2.4.5', '2.4.6',
                           '2.5', '2.5.1', '2.5.2', '2.5.3', '2.5.4', '2.5.5', '2.5.6',
@@ -178,14 +179,14 @@ class CPythonInstaller(Installer):
             self.configure()
             self.make()
             self.make_install()
-        except Exception, e:
+        except Exception:
             import traceback
             traceback.print_exc()
             rm_r(self.install_dir)
             logger.error("Failed to install %s. Check %s to see why." % (self.pkg.name, self.logfile))
             sys.exit(1)
         self.symlink()
-        logger.info("\nInstalled %(pkgname)s successfully." % {"pkgname":self.pkg.name})
+        logger.info("\nInstalled %(pkgname)s successfully." % {"pkgname": self.pkg.name})
 
     def download_and_extract(self):
         self.download()
@@ -214,7 +215,7 @@ class CPythonInstaller(Installer):
     def _patch_osx(self):
         version = Version(self.pkg.version)
         if is_python24(version):
-            PATH_PATCHES_OSX_PYTHON24 = os.path.join(PATH_PATCHES_OSX,"python24")
+            PATH_PATCHES_OSX_PYTHON24 = os.path.join(PATH_PATCHES_OSX, "python24")
             if version == '2.4':
                 self._append_patch(PATH_PATCHES_OSX_PYTHON24, ['patch240-configure', 'patch240-setup.py.diff', 'patch240-Mac-OSX-Makefile.in', 'patch240-gestaltmodule.c.diff', 'patch240-sysconfig.py.diff'])
             elif version < '2.4.4':
@@ -231,7 +232,7 @@ class CPythonInstaller(Installer):
                                                   'patch-mactoolboxglue.diff',
                                                   'patch-pymactoolbox.diff'])
         elif is_python25(version):
-            PATH_PATCHES_OSX_PYTHON25 = os.path.join(PATH_PATCHES_OSX,"python25")
+            PATH_PATCHES_OSX_PYTHON25 = os.path.join(PATH_PATCHES_OSX, "python25")
             if version == '2.5':
                 self._append_patch(PATH_PATCHES_OSX_PYTHON25, ['patch250-setup.py.diff'])
             elif version == '2.5.1':
@@ -250,7 +251,7 @@ class CPythonInstaller(Installer):
                                                   {'_localemodule.c.ed': 'Modules/_localemodule.c'},
                                                   {'locale.py.ed': 'Lib/locale.py'}])
         elif is_python26(version):
-            PATH_PATCHES_OSX_PYTHON26 = os.path.join(PATH_PATCHES_OSX,"python26")
+            PATH_PATCHES_OSX_PYTHON26 = os.path.join(PATH_PATCHES_OSX, "python26")
             self._append_patch(PATH_PATCHES_OSX_PYTHON26, [
                                                   'patch-Lib-cgi.py.diff',
                                                   'patch-Lib-distutils-dist.py.diff',
@@ -264,7 +265,7 @@ class CPythonInstaller(Installer):
                                                   {'_localemodule.c.ed': 'Modules/_localemodule.c'},
                                                   {'locale.py.ed': 'Lib/locale.py'}])
         elif is_python27(version):
-            PATH_PATCHES_OSX_PYTHON27 = os.path.join(PATH_PATCHES_OSX,"python27")
+            PATH_PATCHES_OSX_PYTHON27 = os.path.join(PATH_PATCHES_OSX, "python27")
             self._append_patch(PATH_PATCHES_OSX_PYTHON27, [
                                                   'patch-Modules-posixmodule.diff'])
 
@@ -316,18 +317,18 @@ class CPythonInstaller(Installer):
             m = re.match(r'\d\.\d', self.pkg.version)
             if m:
                 version = m.group(0)
-            symlink(os.path.join(install_dir,'Frameworks','Python.framework','Versions',version,'bin'),
-                    os.path.join(bin_dir))
-        path_python = os.path.join(install_dir,'bin','python')
+            symlink(os.path.join(install_dir, 'Frameworks', 'Python.framework', 'Versions', version, 'bin'), os.path.join(bin_dir))
+        path_python = os.path.join(install_dir, 'bin', 'python')
         if not os.path.isfile(path_python):
             src = None
-            for d in os.listdir(os.path.join(install_dir,'bin')):
+            for d in os.listdir(os.path.join(install_dir, 'bin')):
                 if re.match(r'python\d\.\d', d):
                     src = d
                     break
             if src:
-                path_src = os.path.join(install_dir,'bin',src)
+                path_src = os.path.join(install_dir, 'bin', src)
                 symlink(path_src, path_python)
+
 
 class StacklessInstaller(CPythonInstaller):
     supported_versions = ['2.6.5',
@@ -382,7 +383,7 @@ class PyPyInstaller(Installer):
         logger.info("Installing %s into %s" % (self.pkg.name, self.install_dir))
         shutil.copytree(self.build_dir, self.install_dir)
         self.symlink()
-        logger.info("\nInstalled %(pkgname)s successfully." % {"pkgname":self.pkg.name})
+        logger.info("\nInstalled %(pkgname)s successfully." % {"pkgname": self.pkg.name})
 
     def download_and_extract(self):
         self.download()
@@ -438,7 +439,7 @@ class JythonInstaller(Installer):
         s = Subprocess(log=self.logfile, verbose=self.options.verbose)
         s.check_call(cmd)
         self.symlink()
-        logger.info("\nInstalled %(pkgname)s successfully." % {"pkgname":self.pkg.name})
+        logger.info("\nInstalled %(pkgname)s successfully." % {"pkgname": self.pkg.name})
 
     def symlink(self):
         install_dir = os.path.realpath(self.install_dir)
