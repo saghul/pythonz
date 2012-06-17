@@ -194,26 +194,32 @@ class CPythonInstaller(Installer):
     def _patch_osx(self):
         version = Version(self.pkg.version)
         if is_python24(version):
+            if version == '2.4':
+                self._append_patch(PATH_PATCHES_MACOSX_PYTHON24, ['patch240-configure', 'patch240-setup.py.diff', 'patch240-Mac-OSX-Makefile.in', 'patch240-gestaltmodule.c.diff', 'patch240-sysconfig.py.diff'])
+            elif version < '2.4.4':
+                self._append_patch(PATH_PATCHES_MACOSX_PYTHON24, ['patch241-configure', 'patch240-setup.py.diff', 'patch240-Mac-OSX-Makefile.in', 'patch240-gestaltmodule.c.diff'])
+            else:
+                self._append_patch(PATH_PATCHES_MACOSX_PYTHON24, ['patch244-configure', 'patch244-setup.py.diff', 'patch244-Mac-OSX-Makefile.in', 'patch244-gestaltmodule.c.diff'])
             self._append_patch(PATH_PATCHES_MACOSX_PYTHON24, [
-                                                  'patch-configure', 
                                                   'patch-Makefile.pre.in',
                                                   'patch-Lib-cgi.py.diff',
                                                   'patch-Lib-site.py.diff',
-                                                  'patch-setup.py.diff',
                                                   'patch-Include-pyport.h',
-                                                  'patch-Mac-OSX-Makefile.in',
                                                   'patch-configure-badcflags.diff',
                                                   'patch-macosmodule.diff',
                                                   'patch-mactoolboxglue.diff',
-                                                  'patch-pymactoolbox.diff',
-                                                  'patch-gestaltmodule.c.diff',
-                                                  'patch-sysconfig.py.diff'])
+                                                  'patch-pymactoolbox.diff'])
         elif is_python25(version):
+            if version == '2.5':
+                self._append_patch(PATH_PATCHES_MACOSX_PYTHON25, ['patch250-setup.py.diff'])
+            elif version == '2.5.1':
+                self._append_patch(PATH_PATCHES_MACOSX_PYTHON25, ['patch251-setup.py.diff'])
+            else:
+                self._append_patch(PATH_PATCHES_MACOSX_PYTHON25, ['patch252-setup.py.diff'])
             self._append_patch(PATH_PATCHES_MACOSX_PYTHON25, [
                                                   'patch-Makefile.pre.in.diff',
                                                   'patch-Lib-cgi.py.diff',
                                                   'patch-Lib-distutils-dist.py.diff',
-                                                  'patch-setup.py.diff',
                                                   'patch-configure-badcflags.diff',
                                                   'patch-configure-arch_only.diff',
                                                   'patch-64bit.diff',
