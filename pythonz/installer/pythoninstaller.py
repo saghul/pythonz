@@ -12,8 +12,9 @@ from pythonz.util import symlink, Package, is_url, Link,\
     unlink, is_html, Subprocess, rm_r, is_python26, is_python27,\
     extract_downloadfile, is_archive_file, path_to_fileurl, is_file,\
     fileurl_to_path, is_python30, is_python31, is_python32,\
-    get_macosx_deployment_target, Version
+    get_macosx_deployment_target, Version, is_python25, is_python24
 from pythonz.define import PATH_BUILD, PATH_DISTS, PATH_PYTHONS, PATH_LOG, \
+    PATH_PATCHES_MACOSX_PYTHON24, PATH_PATCHES_MACOSX_PYTHON25, \
     PATH_PATCHES_MACOSX_PYTHON26, PATH_PATCHES_MACOSX_PYTHON27, PATH_PATCHES_ALL
 from pythonz.downloader import Downloader
 from pythonz.log import logger
@@ -87,7 +88,9 @@ class Installer(object):
         raise NotImplementedError
 
 class CPythonInstaller(Installer):
-    supported_versions = ['2.6', '2.6.1', '2.6.2', '2.6.3', '2.6.4', '2.6.5', '2.6.6', '2.6.7', '2.6.8',
+    supported_versions = ['2.4', '2.4.1', '2.4.2', '2.4.3', '2.4.4', '2.4.5', '2.4.6',
+                          '2.5', '2.5.1', '2.5.2', '2.5.3', '2.5.4', '2.5.5', '2.5.6',
+                          '2.6', '2.6.1', '2.6.2', '2.6.3', '2.6.4', '2.6.5', '2.6.6', '2.6.7', '2.6.8',
                           '2.7', '2.7.1', '2.7.2', '2.7.3',
                           '3.0', '3.0.1',
                           '3.1', '3.1.1', '3.1.2', '3.1.3', '3.1.4', '3.1.5',
@@ -176,7 +179,9 @@ class CPythonInstaller(Installer):
             self.configure()
             self.make()
             self.make_install()
-        except:
+        except Exception, e:
+            import traceback
+            traceback.print_exc()
             rm_r(self.install_dir)
             logger.error("Failed to install %s. Check %s to see why." % (self.pkg.name, self.logfile))
             sys.exit(1)
@@ -191,7 +196,7 @@ class CPythonInstaller(Installer):
     def _patch(self):
         version = Version(self.pkg.version)
         common_patch_dir = os.path.join(PATH_PATCHES_ALL, "common")
-        if is_python26(version):
+        if is_python26(version) or is_python25(version) or is_python24(version):
             self._append_patch(common_patch_dir, ['patch-setup.py.diff'])
         elif is_python27(version):
             if version < '2.7.2':
@@ -209,22 +214,56 @@ class CPythonInstaller(Installer):
 
     def _patch_osx(self):
         version = Version(self.pkg.version)
-        if is_python26(version):
-            patch_dir = PATH_PATCHES_MACOSX_PYTHON26
-            self._append_patch(patch_dir, ['patch-Lib-cgi.py.diff',
-                                           'patch-Lib-distutils-dist.py.diff',
-                                           'patch-Mac-IDLE-Makefile.in.diff',
-                                           'patch-Mac-Makefile.in.diff',
-                                           'patch-Mac-PythonLauncher-Makefile.in.diff',
-                                           'patch-Mac-Tools-Doc-setup.py.diff',
-                                           'patch-setup.py-db46.diff',
-                                           'patch-Lib-ctypes-macholib-dyld.py.diff',
-                                           'patch-setup_no_tkinter.py.diff',
-                                           {'_localemodule.c.ed': 'Modules/_localemodule.c'},
-                                           {'locale.py.ed': 'Lib/locale.py'}])
+        if is_python24(version):
+            if version == '2.4':
+                self._append_patch(PATH_PATCHES_MACOSX_PYTHON24, ['patch240-configure', 'patch240-setup.py.diff', 'patch240-Mac-OSX-Makefile.in', 'patch240-gestaltmodule.c.diff', 'patch240-sysconfig.py.diff'])
+            elif version < '2.4.4':
+                self._append_patch(PATH_PATCHES_MACOSX_PYTHON24, ['patch241-configure', 'patch240-setup.py.diff', 'patch240-Mac-OSX-Makefile.in', 'patch240-gestaltmodule.c.diff'])
+            else:
+                self._append_patch(PATH_PATCHES_MACOSX_PYTHON24, ['patch244-configure', 'patch244-setup.py.diff', 'patch244-Mac-OSX-Makefile.in', 'patch244-gestaltmodule.c.diff'])
+            self._append_patch(PATH_PATCHES_MACOSX_PYTHON24, [
+                                                  'patch-Makefile.pre.in',
+                                                  'patch-Lib-cgi.py.diff',
+                                                  'patch-Lib-site.py.diff',
+                                                  'patch-Include-pyport.h',
+                                                  'patch-configure-badcflags.diff',
+                                                  'patch-macosmodule.diff',
+                                                  'patch-mactoolboxglue.diff',
+                                                  'patch-pymactoolbox.diff'])
+        elif is_python25(version):
+            if version == '2.5':
+                self._append_patch(PATH_PATCHES_MACOSX_PYTHON25, ['patch250-setup.py.diff'])
+            elif version == '2.5.1':
+                self._append_patch(PATH_PATCHES_MACOSX_PYTHON25, ['patch251-setup.py.diff'])
+            else:
+                self._append_patch(PATH_PATCHES_MACOSX_PYTHON25, ['patch252-setup.py.diff'])
+            self._append_patch(PATH_PATCHES_MACOSX_PYTHON25, [
+                                                  'patch-Makefile.pre.in.diff',
+                                                  'patch-Lib-cgi.py.diff',
+                                                  'patch-Lib-distutils-dist.py.diff',
+                                                  'patch-configure-badcflags.diff',
+                                                  'patch-configure-arch_only.diff',
+                                                  'patch-64bit.diff',
+                                                  'patch-pyconfig.h.in.diff',
+                                                  'patch-gestaltmodule.c.diff',
+                                                  {'_localemodule.c.ed': 'Modules/_localemodule.c'},
+                                                  {'locale.py.ed': 'Lib/locale.py'}])
+        elif is_python26(version):
+            self._append_patch(PATH_PATCHES_MACOSX_PYTHON26, [
+                                                  'patch-Lib-cgi.py.diff',
+                                                  'patch-Lib-distutils-dist.py.diff',
+                                                  'patch-Mac-IDLE-Makefile.in.diff',
+                                                  'patch-Mac-Makefile.in.diff',
+                                                  'patch-Mac-PythonLauncher-Makefile.in.diff',
+                                                  'patch-Mac-Tools-Doc-setup.py.diff',
+                                                  'patch-setup.py-db46.diff',
+                                                  'patch-Lib-ctypes-macholib-dyld.py.diff',
+                                                  'patch-setup_no_tkinter.py.diff',
+                                                  {'_localemodule.c.ed': 'Modules/_localemodule.c'},
+                                                  {'locale.py.ed': 'Lib/locale.py'}])
         elif is_python27(version):
-            patch_dir = PATH_PATCHES_MACOSX_PYTHON27
-            self._append_patch(patch_dir, ['patch-Modules-posixmodule.diff'])
+            self._append_patch(PATH_PATCHES_MACOSX_PYTHON27, [
+                                                  'patch-Modules-posixmodule.diff'])
 
     def patch(self):
         if sys.platform == "darwin":

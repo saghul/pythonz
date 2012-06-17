@@ -72,6 +72,12 @@ def _py_version_cmp(v, v1, v2):
         v = Version(v)
     return v >= v1 and v < v2
 
+def is_python24(version):
+    return _py_version_cmp(version, '2.4', '2.5')
+
+def is_python25(version):
+    return _py_version_cmp(version, '2.5', '2.6')
+
 def is_python26(version):
     return _py_version_cmp(version, '2.6', '2.7')
 

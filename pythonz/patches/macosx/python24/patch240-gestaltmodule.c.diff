@@ -1,0 +1,11 @@
+--- Mac/Modules/gestaltmodule.c.orig	2010-11-21 15:35:00.000000000 +0900
++++ Mac/Modules/gestaltmodule.c	2010-11-21 15:48:27.000000000 +0900
+@@ -36,7 +36,7 @@
+ 	char *str;
+ 	int size;
+ 	OSType selector;
+-	long response;
++	SInt32 response;
+ 	if (!PyArg_Parse(args, "s#", &str, &size))
+ 		return NULL;
+ 	if (size != 4) {
