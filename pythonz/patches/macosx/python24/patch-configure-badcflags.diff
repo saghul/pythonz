@@ -1,0 +1,14 @@
+--- configure.orig	2009-08-31 01:29:04.000000000 +1000
++++ configure	2009-08-31 01:30:05.000000000 +1000
+@@ -3817,9 +3817,9 @@
+ 	# is there any other compiler on Darwin besides gcc?
+ 	Darwin*)
+ 	    if [[ `/usr/bin/arch` = 'ppc' ]]; then
+-	        BASECFLAGS="$BASECFLAGS -Wno-long-double -no-cpp-precomp -mno-fused-madd -fno-common"
++	        BASECFLAGS="$BASECFLAGS -mno-fused-madd -fno-common"
+ 	    else
+-	        BASECFLAGS="$BASECFLAGS -Wno-long-double -no-cpp-precomp -fno-common"
++	        BASECFLAGS="$BASECFLAGS -fno-common"
+ 	    fi
+ 	    ;;
+     esac
