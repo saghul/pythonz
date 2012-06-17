@@ -1,4 +1,5 @@
 
+import ctypes
 import os
 import sys
 import shutil
@@ -14,7 +15,7 @@ from pythonz.util import symlink, Package, is_url, Link,\
     get_macosx_deployment_target, Version
 from pythonz.define import PATH_BUILD, PATH_DISTS, PATH_PYTHONS, PATH_LOG, \
     PATH_PATCHES_MACOSX_PYTHON26, PATH_PATCHES_MACOSX_PYTHON27, PATH_PATCHES_ALL
-from pythonz.downloader import get_python_version_url, Downloader
+from pythonz.downloader import Downloader
 from pythonz.log import logger
 from pythonz.exceptions import DownloadError, UnknownVersionException
 
@@ -35,22 +36,24 @@ class PythonInstaller(object):
 
 
 class Installer(object):
+    supported_versions = []
+
     def __init__(self, version, options):
         if options.file is not None:
             if not (is_archive_file(options.file) and os.path.isfile(options.file)):
                 logger.error('invalid file specified: %s' % options.file)
                 raise RuntimeError
-            self.download_url  = path_to_fileurl(options.file)
+            self.download_url = path_to_fileurl(options.file)
         elif options.url is not None:
             if not is_url(options.url):
                 logger.error('invalid URL specified: %s' % options.url)
                 raise RuntimeError
             self.download_url = options.url
         else:
-            self.download_url = get_python_version_url(options.type, version)
-            if not self.download_url:
-                logger.error("Unknown python version: `%s`" % version)
+            if version not in self.supported_versions:
+                logger.error("Unsupported Python version: `%s`, you may install it anyway by supplying the download or file URL" % version)
                 raise UnknownVersionException
+            self.download_url = self.get_version_url(version)
         self.pkg = Package(version, options.type)
         self.install_dir = os.path.join(PATH_PYTHONS, self.pkg.name)
         self.build_dir = os.path.join(PATH_BUILD, self.pkg.name)
@@ -61,6 +64,11 @@ class Installer(object):
         self.logfile = os.path.join(PATH_LOG, 'build.log')
         self.patches = []
         self.configure_options = []
+
+    @classmethod
+    def get_version_url(cls, version):
+        # Version is known to be in supported_versions
+        raise NotImplementedError
 
     def download(self):
         if os.path.isfile(self.download_file):
@@ -79,6 +87,12 @@ class Installer(object):
         raise NotImplementedError
 
 class CPythonInstaller(Installer):
+    supported_versions = ['2.6', '2.6.1', '2.6.2', '2.6.3', '2.6.4', '2.6.5', '2.6.6', '2.6.7', '2.6.8',
+                          '2.7', '2.7.1', '2.7.2', '2.7.3',
+                          '3.0', '3.0.1',
+                          '3.1', '3.1.1', '3.1.2', '3.1.3', '3.1.4', '3.1.5',
+                          '3.2', '3.2.1', '3.2.2', '3.2.3']
+
     def __init__(self, version, options):
         super(CPythonInstaller, self).__init__(version, options)
 
@@ -102,6 +116,11 @@ class CPythonInstaller(Installer):
             if options.universal:
                 self.configure_options.append('--enable-universalsdk=/')
                 self.configure_options.append('--with-universal-archs=intel')
+
+    @classmethod
+    def get_version_url(cls, version):
+        # Version is known to be in supported_versions
+        return 'http://www.python.org/ftp/python/%(version)s/Python-%(version)s.tgz' % {'version': version}
 
     def _apply_patches(self):
         try:
@@ -269,9 +288,31 @@ class CPythonInstaller(Installer):
                 symlink(path_src, path_python)
 
 class StacklessInstaller(CPythonInstaller):
-    pass
+    supported_versions = ['2.6.5',
+                          '2.7.2',
+                          '3.1.3',
+                          '3.2.2']
+
+    @classmethod
+    def get_version_url(cls, version):
+        # Version is known to be in supported_versions
+        return 'http://www.stackless.com/binaries/stackless-%(version)s-export.tar.bz2' % {'version': version.replace('.', '')}
+
 
 class PyPyInstaller(Installer):
+    supported_versions = ['1.8',
+                          '1.9']
+
+    @classmethod
+    def get_version_url(cls, version):
+        # Version is known to be in supported_versions
+        if sys.platform == 'darwin':
+            return 'https://bitbucket.org/pypy/pypy/downloads/pypy-%(version)s-osx64.tar.bz2' % {'version': version}
+        else:
+            # Linux
+            arch = {4: '', 8: 'x86_64'}[ctypes.sizeof(ctypes.c_size_t)]
+            return 'https://bitbucket.org/pypy/pypy/downloads/pypy-%(version)s-linux%(arch)s.tar.bz2' % {'arch': arch, 'version': version}
+
     def install(self):
         # cleanup
         if os.path.isdir(self.build_dir):
@@ -311,7 +352,15 @@ class PyPyInstaller(Installer):
         bin_dir = os.path.join(install_dir, 'bin')
         symlink(os.path.join(bin_dir, 'pypy'), os.path.join(bin_dir, 'python'))
 
+
 class JythonInstaller(Installer):
+    supported_versions = ['2.5.0', '2.5.1', '2.5.2']
+
+    @classmethod
+    def get_version_url(cls, version):
+        # Version is known to be in supported_versions
+        return 'https://downloads.sourceforge.net/project/jython/jython/%(version)s/jython_installer-%(version)s.jar' % {'version': version}
+
     def install(self):
         # check if java is installed
         r = subprocess.call("command -v java > /dev/null", shell=True)

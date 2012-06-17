@@ -10,7 +10,7 @@ from pythonz.util import makedirs, rm_r
 from pythonz.define import PATH_BUILD, PATH_BIN, PATH_DISTS, PATH_PYTHONS,\
     PATH_ETC, PATH_SCRIPTS, PATH_SCRIPTS_PYTHONZ,\
     PATH_SCRIPTS_PYTHONZ_COMMANDS, PATH_BIN_PYTHONZ,\
-    PATH_LOG, PATH_PATCHES, PATH_ETC_CONFIG,\
+    PATH_LOG, PATH_PATCHES,\
     PATH_SCRIPTS_PYTHONZ_INSTALLER, PATH_HOME_ETC, ROOT
 
 
@@ -66,9 +66,6 @@ if __name__ == "__main__":
 
         # create a bashrc for pythonz
         shutil.copy(os.path.join(installer_root,'etc','bashrc'), os.path.join(PATH_ETC,'bashrc'))
-
-        # copy config.cfg
-        shutil.copy(os.path.join(installer_root,'etc','config.cfg'), PATH_ETC_CONFIG)
 
     @staticmethod
     def systemwide_install():

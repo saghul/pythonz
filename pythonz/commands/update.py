@@ -3,7 +3,7 @@ import os
 import sys
 
 from pythonz.basecommand import Command
-from pythonz.define import PATH_DISTS, ROOT, PATH_BUILD, PYTHONZ_UPDATE_URL, PYTHONZ_UPDATE_URL_CONFIG, PATH_ETC_CONFIG
+from pythonz.define import PATH_DISTS, ROOT, PATH_BUILD, PYTHONZ_UPDATE_URL
 from pythonz.downloader import Downloader
 from pythonz.exceptions import DownloadError
 from pythonz.log import logger
@@ -12,43 +12,10 @@ from pythonz.util import rm_r, extract_downloadfile, Link, unlink, Subprocess
 
 class UpdateCommand(Command):
     name = "update"
-    usage = "%prog [options]"
+    usage = "%prog"
     summary = "Update pythonz to the latest version"
 
-    def __init__(self):
-        super(UpdateCommand, self).__init__()
-        self.parser.add_option(
-            '--config',
-            dest='config',
-            action='store_true',
-            default=False,
-            help='Update config.cfg.'
-        )
-
     def run_command(self, options, args):
-        if options.config:
-            self._update_config(options, args)
-        else:
-            self._update_pythonz(options, args)
-
-    def _update_config(self, options, args):
-        # config.cfg update
-        # TODO: Automatically create for config.cfg
-        download_url = PYTHONZ_UPDATE_URL_CONFIG
-        if not download_url:
-            logger.error("Invalid download url in config.cfg. `%s`" % download_url)
-            sys.exit(1)
-        distname = Link(PYTHONZ_UPDATE_URL_CONFIG).filename
-        download_file = PATH_ETC_CONFIG
-        logger.info("Downloading %s as %s" % (distname, download_file))
-        try:
-            Downloader.fetch(download_url, download_file)
-        except DownloadError:
-            logger.error("Failed to download. `%s`" % download_url)
-            sys.exit(1)
-        logger.log("The config.cfg has been updated.")
-
-    def _update_pythonz(self, options, args):
         download_url = PYTHONZ_UPDATE_URL
         headinfo = Downloader.read_head_info(download_url)
         content_type = headinfo['content-type']

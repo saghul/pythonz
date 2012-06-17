@@ -1,10 +1,5 @@
 
 import os
-import re
-try:
-    import ConfigParser
-except ImportError:
-    import configparser as ConfigParser
 
 # pythonz installer root path
 INSTALLER_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -34,7 +29,6 @@ PATH_PATCHES_MACOSX_PYTHON26 = os.path.join(PATH_PATCHES_MACOSX,"python26")
 
 # files
 PATH_BIN_PYTHONZ = os.path.join(PATH_BIN,'pythonz')
-PATH_ETC_CONFIG = os.path.join(PATH_ETC,'config.cfg')
 
 # Home
 # pythonz home path
@@ -45,26 +39,6 @@ if not PATH_HOME:
 # directories
 PATH_HOME_ETC = os.path.join(PATH_HOME, 'etc')
 
-# read config.cfg
-config = ConfigParser.SafeConfigParser()
-config.read([PATH_ETC_CONFIG, os.path.join(INSTALLER_ROOT,'etc','config.cfg')])
-def _get_or_default(section, option, default=''):
-    try:
-        return config.get(section, option)
-    except ConfigParser.Error:
-        return default
-
 # pythonz download
-PYTHONZ_UPDATE_URL = _get_or_default('pythonz', 'url')
-PYTHONZ_UPDATE_URL_CONFIG = _get_or_default('pythonz', 'config')
-
-# python download
-PYTHON_VERSIONS_URLS = dict(cpython={}, stackless={}, pypy={}, jython={})
-for section in sorted(config.sections()):
-    m = re.search("^(?P<type>\w+)-(?P<version>.*)$", section)
-    if m:
-        data = m.groupdict()
-        type = data['type'].lower()
-        version = data['version']
-        PYTHON_VERSIONS_URLS[type][version] = config.get(section, 'url')
+PYTHONZ_UPDATE_URL = os.getenv('PYTHONZ_UPDATE_URL', 'https://github.com/saghul/pythonz/tarball/master')
 

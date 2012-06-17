@@ -4,7 +4,6 @@ import urllib2
 import sys
 import traceback
 
-from pythonz.define import PYTHON_VERSIONS_URLS
 from pythonz.exceptions import DownloadError
 from pythonz.log import logger
 
@@ -72,7 +71,4 @@ class Downloader(object):
             logger.log(traceback.format_exc())
             raise DownloadError('Failed to fetch.')
 
-
-def get_python_version_url(type, version):
-    return PYTHON_VERSIONS_URLS[type].get(version)
 
