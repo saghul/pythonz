@@ -2,11 +2,22 @@
 import os
 import sys
 
+from optparse import OptionParser
+
 from pythonz.commands import command_map, load_commands
-from pythonz.baseparser import parser
 from pythonz.define import PATH_HOME_ETC
 from pythonz.util import makedirs
 
+
+parser = OptionParser(usage="%prog COMMAND [OPTIONS]",
+                      prog="pythonz",
+                      add_help_option=False)
+parser.add_option(
+    '-h', '--help',
+    dest='help',
+    action='store_true',
+    help='Show help')
+parser.disable_interspersed_args()
 
 def init_home():
     if not os.path.isdir(PATH_HOME_ETC):

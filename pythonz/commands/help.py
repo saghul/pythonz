@@ -1,6 +1,5 @@
 
 from pythonz.commands import Command, command_map
-from pythonz.baseparser import parser
 from pythonz.log import logger
 
 
@@ -13,12 +12,12 @@ class HelpCommand(Command):
         if args:
             command = args[0]
             if command not in command_map:
-                parser.error("Unknown command: `%s`" % command)
+                self.parser.error("Unknown command: `%s`" % command)
                 return
             command = command_map[command]
             command.parser.print_help()
             return
-        parser.print_help()
+        self.parser.print_help()
         logger.log("\nCommands available:")
         commands = [command_map[key] for key in sorted(command_map.keys())]
         for command in commands:
