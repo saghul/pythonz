@@ -1,7 +1,7 @@
 
 import sys
 
-from pythonz.basecommand import Command
+from pythonz.commands import Command
 from pythonz.installer.pythoninstaller import PythonInstaller
 
 

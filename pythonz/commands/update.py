@@ -2,7 +2,7 @@
 import os
 import sys
 
-from pythonz.basecommand import Command
+from pythonz.commands import Command
 from pythonz.define import PATH_DISTS, ROOT, PATH_BUILD, PYTHONZ_UPDATE_URL
 from pythonz.downloader import Downloader
 from pythonz.exceptions import DownloadError

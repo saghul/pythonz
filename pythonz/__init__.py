@@ -2,7 +2,7 @@
 import os
 import sys
 
-from pythonz.basecommand import command_dict, load_all_commands
+from pythonz.commands import command_map, load_commands
 from pythonz.baseparser import parser
 from pythonz.define import PATH_HOME_ETC
 from pythonz.util import makedirs
@@ -19,11 +19,11 @@ def main():
     if not args:
         args = ['help'] # as default
     init_home()
-    load_all_commands()
+    load_commands()
     command = args[0].lower()
-    if command not in command_dict:
+    if command not in command_map:
         parser.error("Unknown command: `%s`" % command)
         return
-    command = command_dict[command]
+    command = command_map[command]
     command.run(args[1:])
 

@@ -1,7 +1,7 @@
 
 import os
 
-from pythonz.basecommand import Command
+from pythonz.commands import Command
 from pythonz.define import PATH_PYTHONS
 from pythonz.installer.pythoninstaller import CPythonInstaller, StacklessInstaller, PyPyInstaller, JythonInstaller
 from pythonz.log import logger
