@@ -397,12 +397,15 @@ class PyPyInstaller(Installer):
 
 
 class JythonInstaller(Installer):
-    supported_versions = ['2.5.0', '2.5.1', '2.5.2']
+    supported_versions = ['2.5.0', '2.5.1', '2.5.2', '2.5.3']
 
     @classmethod
     def get_version_url(cls, version):
         # Version is known to be in supported_versions
-        return 'https://downloads.sourceforge.net/project/jython/jython/%(version)s/jython_installer-%(version)s.jar' % {'version': version}
+        if version in ('2.5.0', '2.5.1', '2.5.2'):
+            return 'https://downloads.sourceforge.net/project/jython/jython/%(version)s/jython_installer-%(version)s.jar' % {'version': version}
+        else:
+            return 'http://search.maven.org/remotecontent?filepath=org/python/jython-installer/%(version)s/jython-installer-%(version)s.jar' % {'version': version}
 
     def install(self):
         # check if java is installed
@@ -420,8 +423,12 @@ class JythonInstaller(Installer):
             path = fileurl_to_path(self.download_url)
             self.content_type = mimetypes.guess_type(path)[0]
         else:
-            headerinfo = Downloader.read_head_info(self.download_url)
-            self.content_type = headerinfo['content-type']
+            try:
+                headerinfo = Downloader.read_head_info(self.download_url)
+            except DownloadError:
+                self.content_type = None
+            else:
+                self.content_type = headerinfo['content-type']
         if is_html(self.content_type):
             # note: maybe got 404 or 503 http status code.
             logger.error("Invalid content-type: `%s`" % self.content_type)
