@@ -6,9 +6,7 @@ INSTALLER_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # Root
 # pythonz root path
-ROOT = os.environ.get("PYTHONZ_ROOT")
-if not ROOT:
-    ROOT = os.path.join(os.environ["HOME"],".pythonz")
+ROOT = os.environ.get("PYTHONZ_ROOT") or os.path.join(os.environ["HOME"],".pythonz")
 
 # directories
 PATH_PYTHONS = os.path.join(ROOT,"pythons")
@@ -30,9 +28,7 @@ PATH_BIN_PYTHONZ = os.path.join(PATH_BIN,'pythonz')
 
 # Home
 # pythonz home path
-PATH_HOME = os.environ.get('PYTHONZ_HOME')
-if not PATH_HOME:
-    PATH_HOME = os.path.join(os.environ["HOME"],".pythonz")
+PATH_HOME = os.environ.get('PYTHONZ_HOME') or os.path.join(os.environ["HOME"],".pythonz")
 
 # directories
 PATH_HOME_ETC = os.path.join(PATH_HOME, 'etc')
