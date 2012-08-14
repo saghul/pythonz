@@ -2,10 +2,8 @@
 import urllib
 import urllib2
 import sys
-import traceback
 
 from pythonz.exceptions import DownloadError
-from pythonz.log import logger
 
 
 class ProgressBar(object):
@@ -44,9 +42,9 @@ class Downloader(object):
         try:
             r = urllib.urlopen(url)
         except IOError:
-            logger.log(traceback.format_exc())
-            raise DownloadError('Failed to fetch.')
-        return r.read()
+            raise DownloadError('Failed to fetch %s' % url)
+        else:
+            return r.read()
 
     @classmethod
     def read_head_info(cls, url):
@@ -54,11 +52,11 @@ class Downloader(object):
             req = HEADRequest(url)
             res = urllib2.urlopen(req)
         except IOError:
-            logger.log(traceback.format_exc())
-            raise DownloadError('Failed to fetch.')
-        if res.code != 200:
-            raise DownloadError('Failed to fetch.')
-        return res.info()
+            raise DownloadError('Failed to fetch %s' % url)
+        else:
+            if res.code != 200:
+                raise DownloadError('Failed to fetch %s' % url)
+            return res.info()
 
     @classmethod
     def fetch(cls, url, filename):
@@ -68,7 +66,6 @@ class Downloader(object):
             sys.stdout.write('\n')
         except IOError:
             sys.stdout.write('\n')
-            logger.log(traceback.format_exc())
-            raise DownloadError('Failed to fetch.')
+            raise DownloadError('Failed to fetch %s from %s' % (filename, url))
 
 
