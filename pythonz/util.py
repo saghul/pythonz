@@ -44,22 +44,13 @@ def splitext(name):
 
 def is_archive_file(name):
     ext = splitext(name)[1].lower()
-    archives = ('.zip', '.tar.gz', '.tar.bz2', '.tgz', '.tar')
-    if ext in archives:
-        return True
-    return False
+    return ext in ('.zip', '.tar.gz', '.tar.bz2', '.tgz', '.tar')
 
 def is_html(content_type):
-    if content_type and content_type.startswith('text/html'):
-        return True
-    return False
+    return content_type and content_type.startswith('text/html')
 
 def is_gzip(content_type, filename):
-    if(content_type == 'application/x-gzip'
-       or tarfile.is_tarfile(filename)
-       or splitext(filename)[1].lower() in ('.tar', '.tar.gz', '.tgz')):
-        return True
-    return False
+    return (content_type == 'application/x-gzip' or tarfile.is_tarfile(filename) or splitext(filename)[1].lower() in ('.tar', '.tar.gz', '.tgz'))
 
 def get_macosx_deployment_target():
     m = re.search('^([0-9]+\.[0-9]+)', platform.mac_ver()[0])
@@ -102,15 +93,14 @@ def symlink(src, dst):
         os.symlink(src, dst)
     except OSError:
         pass
-    
+
 def unlink(path):
     try:
         os.unlink(path)
-    except OSError:
-        e = sys.exc_info()[1]
-        if errno.ENOENT != e.errno:
+    except OSError, e:
+        if e.errno != errno.ENOENT:
             raise
-        
+
 def rm_r(path):
     """like rm -r command."""
     if os.path.isdir(path):
@@ -208,7 +198,7 @@ def extract_downloadfile(content_type, download_file, target_dir):
 
 def is_installed(pkg):
     return os.path.isdir(os.path.join(PATH_PYTHONS, pkg.name))
-    
+
 def path_to_fileurl(path):
     path = os.path.normcase(os.path.abspath(path))
     url = urllib.quote(path)
@@ -254,10 +244,10 @@ class Subprocess(object):
         self._cwd = cwd
         self._verbose = verbose
         self._debug = debug
-    
+
     def chdir(self, cwd):
         self._cwd = cwd
-    
+
     def shell(self, cmd):
         if self._debug:
             logger.log(cmd)
@@ -271,13 +261,13 @@ class Subprocess(object):
         returncode = subprocess.call(cmd, shell=True, cwd=self._cwd)
         if returncode:
             raise ShellCommandException('%s: failed to `%s`' % (returncode, cmd))
-    
+
     def call(self, cmd):
         if is_str(cmd):
             cmd = shlex.split(cmd)
         if self._debug:
             logger.log(cmd)
-        
+
         fp = ((self._log and open(self._log, 'a')) or None)
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=self._cwd)
         while p.returncode is None:
@@ -294,7 +284,7 @@ class Subprocess(object):
         if fp:
             fp.close()
         return p.returncode
-    
+
     def check_call(self, cmd):
         returncode = self.call(cmd)
         if returncode:
@@ -320,11 +310,11 @@ class Package(object):
     @property
     def name(self):
         return '%s-%s' % (self.tag, self.version)
-    
+
 class Link(object):
     def __init__(self, url):
         self._url = url
-    
+
     @property
     def filename(self):
         url = self._url
@@ -334,7 +324,7 @@ class Link(object):
         name = posixpath.basename(url)
         assert name, ('URL %r produced no filename' % url)
         return name
-    
+
     @property
     def base_url(self):
         return posixpath.basename(self._url.split('#', 1)[0].split('?', 1)[0])
