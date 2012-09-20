@@ -94,7 +94,8 @@ class CPythonInstaller(Installer):
                           '2.7', '2.7.1', '2.7.2', '2.7.3',
                           '3.0', '3.0.1',
                           '3.1', '3.1.1', '3.1.2', '3.1.3', '3.1.4', '3.1.5',
-                          '3.2', '3.2.1', '3.2.2', '3.2.3']
+                          '3.2', '3.2.1', '3.2.2', '3.2.3',
+                          '3.3', '3.3.0rc2']
 
     def __init__(self, version, options):
         super(CPythonInstaller, self).__init__(version, options)
@@ -123,7 +124,8 @@ class CPythonInstaller(Installer):
     @classmethod
     def get_version_url(cls, version):
         # Version is known to be in supported_versions
-        return 'http://www.python.org/ftp/python/%(version)s/Python-%(version)s.tgz' % {'version': version}
+        return 'http://www.python.org/ftp/python/%(version)s/Python-%(release)s.tgz' % {
+                'release': version, 'version': re.match(r'\d(\.\d){1,2}', version).group(0)}
 
     def _apply_patches(self):
         try:
