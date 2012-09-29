@@ -353,7 +353,7 @@ class PyPyInstaller(Installer):
             return 'https://bitbucket.org/pypy/pypy/downloads/pypy-%(version)s-osx64.tar.bz2' % {'version': version}
         else:
             # Linux
-            arch = {4: '', 8: 'x86_64'}[ctypes.sizeof(ctypes.c_size_t)]
+            arch = {4: '', 8: '64'}[ctypes.sizeof(ctypes.c_size_t)]
             return 'https://bitbucket.org/pypy/pypy/downloads/pypy-%(version)s-linux%(arch)s.tar.bz2' % {'arch': arch, 'version': version}
 
     def install(self):
