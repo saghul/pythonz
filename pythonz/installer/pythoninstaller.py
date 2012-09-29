@@ -267,8 +267,7 @@ class CPythonInstaller(Installer):
                                                   {'locale.py.ed': 'Lib/locale.py'}])
         elif is_python27(version):
             PATH_PATCHES_OSX_PYTHON27 = os.path.join(PATH_PATCHES_OSX, "python27")
-            self._append_patch(PATH_PATCHES_OSX_PYTHON27, [
-                                                  'patch-Modules-posixmodule.diff'])
+            self._append_patch(PATH_PATCHES_OSX_PYTHON27, ['patch-Modules-posixmodule.diff'])
 
     def patch(self):
         if sys.platform == "darwin":
