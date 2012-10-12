@@ -12,7 +12,10 @@ import subprocess
 import shlex
 import select
 
-from urllib2 import urlparse
+if sys.version[0] == "3":
+    from urllib.parse import urlparse
+else:
+    from urllib2 import urlparse
 
 from pythonz.define import PATH_PYTHONS
 from pythonz.exceptions import ShellCommandException
@@ -97,7 +100,7 @@ def symlink(src, dst):
 def unlink(path):
     try:
         os.unlink(path)
-    except OSError, e:
+    except OSError as e:
         if e.errno != errno.ENOENT:
             raise
 

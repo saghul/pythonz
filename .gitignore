@@ -10,3 +10,5 @@ dist
 __pycache__
 *.swp
 .idea
+venv
+build
