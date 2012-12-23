@@ -11,7 +11,8 @@ import subprocess
 import shlex
 import select
 
-if sys.version_info < (3,):
+PY3K = sys.version_info >= (3,)
+if not PY3K:
     from urllib import quote as urlquote, unquote as urlunquote
     from urllib2 import urlparse
 else:
@@ -215,16 +216,17 @@ def fileurl_to_path(url):
     return urlunquote(url)
 
 def to_str(val):
-    if sys.version_info < (3,):
+    if not PY3K:
         # python2
         if isinstance(val, unicode):
             return val.encode("utf-8")
+        return val
     if isinstance(val, bytes):
-        return val.decode()
+        return val.decode("utf-8")
     return val
 
 def is_str(val):
-    if sys.version_info < (3,):
+    if not PY3K:
         # python2
         return isinstance(val, basestring)
     # python3

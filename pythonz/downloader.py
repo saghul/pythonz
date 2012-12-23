@@ -1,13 +1,15 @@
 
 import sys
 
-if sys.version_info < (3,):
-    from urllib import urlopen, urlretrieve
-    from urllib2 import Request
-else:
-    from urllib.request import Request, urlopen, urlretrieve
-
+from pythonz.util import PY3K
 from pythonz.exceptions import DownloadError
+
+
+if PY3K:
+    from urllib.request import Request, urlopen, urlretrieve
+else:
+    from urllib import urlretrieve
+    from urllib2 import urlopen, Request
 
 
 class ProgressBar(object):
@@ -21,7 +23,7 @@ class ProgressBar(object):
         spaces = ' ' * (self._term_width - 5 - num_bar)
         percentage = '%3d' % int(current) + '%\r'
         result = bars + spaces + ' ' + percentage
-        if sys.version_info < (3,):
+        if not PY3K:
             # Python 2.x
             return result.decode("utf-8")
         return result
