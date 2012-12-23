@@ -7,15 +7,15 @@ import re
 import posixpath
 import tarfile
 import platform
-import urllib
 import subprocess
 import shlex
 import select
 
-if sys.version[0] == "3":
-    from urllib.parse import urlparse
-else:
+if sys.version_info < (3,):
+    from urllib import quote as urlquote, unquote as urlunquote
     from urllib2 import urlparse
+else:
+    from urllib.parse import urlparse, quote as urlquote, unquote as urlunquote
 
 from pythonz.define import PATH_PYTHONS
 from pythonz.exceptions import ShellCommandException
@@ -204,7 +204,7 @@ def is_installed(pkg):
 
 def path_to_fileurl(path):
     path = os.path.normcase(os.path.abspath(path))
-    url = urllib.quote(path)
+    url = urlquote(path)
     url = url.replace(os.path.sep, '/')
     url = url.lstrip('/')
     return 'file:///' + url
@@ -212,25 +212,23 @@ def path_to_fileurl(path):
 def fileurl_to_path(url):
     assert url.startswith('file:'), ('Illegal scheme:%s' % url)
     url = '/' + url[len('file:'):].lstrip('/')
-    return urllib.unquote(url)
+    return urlunquote(url)
 
 def to_str(val):
-    try:
-        # python3
-        if type(val) is bytes:
-            return val.decode()
-    except Exception:
-        if type(val) is unicode:
+    if sys.version_info < (3,):
+        # python2
+        if isinstance(val, unicode):
             return val.encode("utf-8")
+    if isinstance(val, bytes):
+        return val.decode()
     return val
 
 def is_str(val):
-    try:
+    if sys.version_info < (3,):
         # python2
         return isinstance(val, basestring)
-    except NameError:
-        # python3
-        return isinstance(val, str)
+    # python3
+    return isinstance(val, str)
 
 def is_sequence(val):
     if is_str(val):
@@ -399,4 +397,3 @@ class Version(object):
 
     def __repr__(self):
         return self._version
-

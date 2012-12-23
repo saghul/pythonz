@@ -1,6 +1,6 @@
 
 import os
-from distutils.core import setup
+from setuptools import setup
 
 
 def find_packages(toplevel):
@@ -30,5 +30,6 @@ setup(name='pythonz',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.1',
         'Programming Language :: Python :: 3.2',
+        'Programming Language :: Python :: 3.3',
       ])
 
