@@ -103,6 +103,9 @@ class CPythonInstaller(Installer):
         if Version(self.pkg.version) >= '3.1':
             self.configure_options.append('--with-computed-gotos')
 
+        if not options.static:
+            self.configure_options.append('--enable-shared')
+
         if sys.platform == "darwin":
             # set configure options
             target = get_macosx_deployment_target()
@@ -115,14 +118,9 @@ class CPythonInstaller(Installer):
                 raise Exception
             if options.framework:
                 self.configure_options.append('--enable-framework=%s' % os.path.join(self.install_dir, 'Frameworks'))
-            elif not options.static:
-                self.configure_options.append('--enable-shared')
             if options.universal:
                 self.configure_options.append('--enable-universalsdk=/')
                 self.configure_options.append('--with-universal-archs=intel')
-        else:
-            if not options.static:
-                self.configure_options.append('--enable-shared')
 
     @classmethod
     def get_version_url(cls, version):
