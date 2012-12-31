@@ -120,6 +120,9 @@ class CPythonInstaller(Installer):
             if options.universal:
                 self.configure_options.append('--enable-universalsdk=/')
                 self.configure_options.append('--with-universal-archs=intel')
+        else:
+            if not options.static:
+                self.configure_options.append('--enable-shared')
 
     @classmethod
     def get_version_url(cls, version):
