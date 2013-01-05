@@ -1,9 +1,15 @@
 
-import urllib
-import urllib2
 import sys
 
+from pythonz.util import PY3K
 from pythonz.exceptions import DownloadError
+
+
+if PY3K:
+    from urllib.request import Request, urlopen, urlretrieve
+else:
+    from urllib import urlretrieve
+    from urllib2 import urlopen, Request
 
 
 class ProgressBar(object):
@@ -13,10 +19,14 @@ class ProgressBar(object):
 
     def update_line(self, current):
         num_bar = int(current / 100.0 * (self._term_width - 5))
-        bars = u'#' * num_bar
-        spaces = u' ' * (self._term_width - 5 - num_bar)
-        percentage = u'%3d' % int(current) + u'%\r'
-        return bars + spaces + u' ' + percentage
+        bars = '#' * num_bar
+        spaces = ' ' * (self._term_width - 5 - num_bar)
+        percentage = '%3d' % int(current) + '%\r'
+        result = bars + spaces + ' ' + percentage
+        if not PY3K:
+            # Python 2.x
+            return result.decode("utf-8")
+        return result
 
     def reporthook(self, blocknum, bs, size):
         current = (blocknum * bs * 100) / size
@@ -30,7 +40,7 @@ class ProgressBar(object):
         self._out.flush()
 
 
-class HEADRequest(urllib2.Request):
+class HEADRequest(Request):
     def get_method(self):
         return "HEAD"
 
@@ -40,7 +50,7 @@ class Downloader(object):
     @classmethod
     def read(cls, url):
         try:
-            r = urllib.urlopen(url)
+            r = urlopen(url)
         except IOError:
             raise DownloadError('Failed to fetch %s' % url)
         else:
@@ -50,7 +60,7 @@ class Downloader(object):
     def read_head_info(cls, url):
         try:
             req = HEADRequest(url)
-            res = urllib2.urlopen(req)
+            res = urlopen(req)
         except IOError:
             raise DownloadError('Failed to fetch %s' % url)
         else:
@@ -62,10 +72,8 @@ class Downloader(object):
     def fetch(cls, url, filename):
         b = ProgressBar()
         try:
-            urllib.urlretrieve(url, filename, b.reporthook)
+            urlretrieve(url, filename, b.reporthook)
             sys.stdout.write('\n')
         except IOError:
             sys.stdout.write('\n')
             raise DownloadError('Failed to fetch %s from %s' % (filename, url))
-
-

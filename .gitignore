@@ -5,8 +5,10 @@
 .settings
 .tmp_*
 *.pyc
-pythonbrew.egg-info
+*.egg-info
 dist
 __pycache__
 *.swp
 .idea
+venv
+build
