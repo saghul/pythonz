@@ -23,5 +23,5 @@ class Command(object):
 
 def load_commands():
     modules = ['pythonz.commands.%s' % os.path.splitext(file)[0] for file in os.listdir(os.path.dirname(__file__)) if os.path.splitext(file)[1] == '.py' and file != os.path.basename(__file__)]
-    map(__import__, modules)
+    list(map(__import__, modules))
 

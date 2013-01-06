@@ -131,7 +131,7 @@ class CPythonInstaller(Installer):
             s = Subprocess(log=self.logfile, cwd=self.build_dir, verbose=self.options.verbose)
             for patch in self.patches:
                 if type(patch) is dict:
-                    for (ed, source) in patch.items():
+                    for ed, source in patch.items():
                         s.shell('ed - %s < %s' % (source, ed))
                 else:
                     s.shell("patch -p0 < %s" % patch)
