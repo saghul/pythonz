@@ -58,8 +58,8 @@ if __name__ == "__main__":
         # create entry point file
         with open(PATH_BIN_PYTHONZ, "w") as f:
             f.write("""#!/usr/bin/env bash
-%s %s/pythonz_main.py "$@"
-""" % (sys.executable, PATH_SCRIPTS))
+python %s/pythonz_main.py "$@"
+""" % PATH_SCRIPTS)
 
         # mode 0755
         os.chmod(PATH_BIN_PYTHONZ, stat.S_IRUSR|stat.S_IWUSR|stat.S_IXUSR|stat.S_IRGRP|stat.S_IXGRP|stat.S_IROTH|stat.S_IXOTH)
