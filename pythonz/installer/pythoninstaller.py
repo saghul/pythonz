@@ -218,11 +218,21 @@ class CPythonInstaller(Installer):
         if is_python24(version):
             PATH_PATCHES_OSX_PYTHON24 = os.path.join(PATH_PATCHES_OSX, "python24")
             if version == '2.4':
-                self._append_patch(PATH_PATCHES_OSX_PYTHON24, ['patch240-configure', 'patch240-setup.py.diff', 'patch240-Mac-OSX-Makefile.in', 'patch240-gestaltmodule.c.diff', 'patch240-sysconfig.py.diff'])
+                self._append_patch(PATH_PATCHES_OSX_PYTHON24, ['patch240-configure',
+                                                               'patch240-setup.py.diff',
+                                                               'patch240-Mac-OSX-Makefile.in',
+                                                               'patch240-gestaltmodule.c.diff',
+                                                               'patch240-sysconfig.py.diff'])
             elif version < '2.4.4':
-                self._append_patch(PATH_PATCHES_OSX_PYTHON24, ['patch241-configure', 'patch240-setup.py.diff', 'patch240-Mac-OSX-Makefile.in', 'patch240-gestaltmodule.c.diff'])
+                self._append_patch(PATH_PATCHES_OSX_PYTHON24, ['patch241-configure',
+                                                               'patch240-setup.py.diff',
+                                                               'patch240-Mac-OSX-Makefile.in',
+                                                               'patch240-gestaltmodule.c.diff'])
             else:
-                self._append_patch(PATH_PATCHES_OSX_PYTHON24, ['patch244-configure', 'patch244-setup.py.diff', 'patch244-Mac-OSX-Makefile.in', 'patch244-gestaltmodule.c.diff'])
+                self._append_patch(PATH_PATCHES_OSX_PYTHON24, ['patch244-configure',
+                                                               'patch244-setup.py.diff',
+                                                               'patch244-Mac-OSX-Makefile.in',
+                                                               'patch244-gestaltmodule.c.diff'])
             self._append_patch(PATH_PATCHES_OSX_PYTHON24, [
                                                   'patch-Makefile.pre.in',
                                                   'patch-Lib-cgi.py.diff',
