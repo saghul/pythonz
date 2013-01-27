@@ -239,12 +239,11 @@ def is_sequence(val):
 # class
 #-----------------------------
 class Subprocess(object):
-    def __init__(self, log=None, cwd=None, verbose=False, debug=False, env=None):
+    def __init__(self, log=None, cwd=None, verbose=False, debug=False):
         self._log = log
         self._cwd = cwd
         self._verbose = verbose
         self._debug = debug
-        self._env = env
 
     def chdir(self, cwd):
         self._cwd = cwd
@@ -270,7 +269,7 @@ class Subprocess(object):
             logger.log(cmd)
 
         fp = ((self._log and open(self._log, 'a')) or None)
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=self._cwd, env=self._env)
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=self._cwd)
         while p.returncode is None:
             while any(select.select([p.stdout], [], [])):
                 line = to_str(p.stdout.readline())

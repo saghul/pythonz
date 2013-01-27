@@ -278,15 +278,13 @@ class CPythonInstaller(Installer):
         self._apply_patches()
 
     def configure(self):
-        env = None
         if not self.options.static:
-            env = dict(os.environ)
-            env['LDFLAGS'] = '-Xlinker -rpath=\$$ORIGIN/../lib' + env.get('LDFLAGS', '')
+            os.environ['LDFLAGS'] = '-Xlinker -rpath=\$$ORIGIN/../lib ' + os.environ.get('LDFLAGS', '')
             # make sure rpath dir exists
             lib_dir = os.path.join(self.install_dir, 'lib')
             if not os.path.exists(lib_dir):
                 os.makedirs(lib_dir)
-        s = Subprocess(log=self.logfile, cwd=self.build_dir, verbose=self.options.verbose, env=env)
+        s = Subprocess(log=self.logfile, cwd=self.build_dir, verbose=self.options.verbose)
         cmd = "./configure --prefix=%s %s %s" % (self.install_dir, self.options.configure, ' '.join(self.configure_options))
         if self.options.verbose:
             logger.log(cmd)
