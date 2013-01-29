@@ -197,7 +197,10 @@ class CPythonInstaller(Installer):
     def _patch(self):
         version = Version(self.pkg.version)
         common_patch_dir = os.path.join(PATH_PATCHES_ALL, "common")
-        if is_python26(version) or is_python25(version) or is_python24(version):
+        if is_python24(version):
+            patch_dir = os.path.join(PATH_PATCHES_ALL, "python24")
+            self._append_patch(patch_dir, ['patch-setup.py.diff'])
+        elif is_python26(version) or is_python25(version):
             self._append_patch(common_patch_dir, ['patch-setup.py.diff'])
         elif is_python27(version):
             if version < '2.7.2':
