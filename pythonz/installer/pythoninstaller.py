@@ -82,6 +82,9 @@ class Installer(object):
                 unlink(self.download_file)
                 logger.error("Failed to download.\n%s" % (sys.exc_info()[1]))
                 sys.exit(1)
+            except:
+                unlink(self.download_file)
+                raise
 
     def install(self):
         raise NotImplementedError

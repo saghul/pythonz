@@ -28,8 +28,12 @@ class UpdateCommand(Command):
         try:
             Downloader.fetch(download_url, download_file)
         except DownloadError:
+            unlink(download_file)
             logger.error("Failed to download. `%s`" % download_url)
             sys.exit(1)
+        except:
+            unlink(download_file)
+            raise
 
         extract_dir = os.path.join(PATH_BUILD, filename)
         rm_r(extract_dir)
