@@ -202,7 +202,7 @@ class CPythonInstaller(Installer):
             self._append_patch(patch_dir, ['patch-setup.py.diff'])
         elif is_python25(version):
             patch_dir = os.path.join(PATH_PATCHES_ALL, "python25")
-            self._append_patch(patch_dir, ['patch-setup.py.diff'])
+            self._append_patch(patch_dir, ['patch-setup.py.diff', 'patch-svnversion.patch'])
         elif is_python26(version):
             self._append_patch(common_patch_dir, ['patch-setup.py.diff'])
         elif is_python27(version):
