@@ -8,7 +8,7 @@ import multiprocessing
 import re
 import subprocess
 
-from pythonz.util import symlink, Package, is_url, Link,\
+from pythonz.util import symlink, makedirs, Package, is_url, Link,\
     unlink, is_html, Subprocess, rm_r, is_python26, is_python27,\
     extract_downloadfile, is_archive_file, path_to_fileurl, is_file,\
     fileurl_to_path, is_python30, is_python31, is_python32,\
@@ -39,6 +39,10 @@ class Installer(object):
     supported_versions = []
 
     def __init__(self, version, options):
+        # create directories
+        makedirs(PATH_DISTS)
+        makedirs(PATH_LOG)
+
         if options.file is not None:
             if not (is_archive_file(options.file) and os.path.isfile(options.file)):
                 logger.error('invalid file specified: %s' % options.file)
