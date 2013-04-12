@@ -1,4 +1,3 @@
-
 import os
 
 # pythonz installer root path
@@ -34,5 +33,5 @@ PATH_HOME = os.environ.get('PYTHONZ_HOME') or os.path.join(os.environ["HOME"],".
 PATH_HOME_ETC = os.path.join(PATH_HOME, 'etc')
 
 # pythonz download
-PYTHONZ_UPDATE_URL = os.getenv('PYTHONZ_UPDATE_URL', 'https://github.com/saghul/pythonz/tarball/master')
+PYTHONZ_UPDATE_URL = os.getenv('PYTHONZ_UPDATE_URL', 'https://github.com/saghul/pythonz/archive/master.tar.gz')
 
