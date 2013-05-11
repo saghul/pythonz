@@ -1,4 +1,3 @@
-
 import ctypes
 import os
 import sys
@@ -368,7 +367,8 @@ class StacklessInstaller(CPythonInstaller):
 
 class PyPyInstaller(Installer):
     supported_versions = ['1.8',
-                          '1.9']
+                          '1.9',
+                          '2.0']
 
     @classmethod
     def get_version_url(cls, version):
