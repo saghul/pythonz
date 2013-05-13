@@ -1,3 +1,4 @@
+
 import ctypes
 import os
 import sys
@@ -328,10 +329,6 @@ class CPythonInstaller(Installer):
 
     def symlink(self):
         install_dir = os.path.realpath(self.install_dir)
-        if self.pkg.type == 'pypy':
-            bin_dir = os.path.join(install_dir, 'bin')
-            symlink(os.path.join(bin_dir, 'pypy'), os.path.join(bin_dir, 'python'))
-            return
         if self.options.framework:
             # create symlink bin -> /path/to/Frameworks/Python.framework/Versions/?.?/bin
             bin_dir = os.path.join(install_dir, 'bin')
