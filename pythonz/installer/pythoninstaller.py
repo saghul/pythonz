@@ -365,7 +365,7 @@ class StacklessInstaller(CPythonInstaller):
 class PyPyInstaller(Installer):
     supported_versions = ['1.8',
                           '1.9',
-                          '2.0']
+                          '2.0', '2.0.1']
 
     @classmethod
     def get_version_url(cls, version):
