@@ -374,6 +374,7 @@ class PyPyInstaller(Installer):
             return 'https://bitbucket.org/pypy/pypy/downloads/pypy-%(version)s-osx64.tar.bz2' % {'version': version}
         else:
             # Linux
+            logger.warning("Linux binaries are dynamically linked, as is usual, and thus might not be usable due to the sad story of linux binary compatibility, check the PyPy website for more information")
             arch = {4: '', 8: '64'}[ctypes.sizeof(ctypes.c_size_t)]
             return 'https://bitbucket.org/pypy/pypy/downloads/pypy-%(version)s-linux%(arch)s.tar.bz2' % {'arch': arch, 'version': version}
 
