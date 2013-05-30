@@ -4,6 +4,7 @@ import sys
 class Color(object):
     DEBUG = '\033[35m'
     INFO = '\033[32m'
+    WARNING = '\033[31m'
     ERROR = '\033[31m'
     ENDC = '\033[0m'
     
@@ -18,6 +19,9 @@ class Color(object):
     def info(cls, msg):
         return cls._deco(msg, cls.INFO)
     @classmethod
+    def warning(cls, msg):
+        return cls._deco(msg, cls.WARNING)
+    @classmethod
     def error(cls, msg):
         return cls._deco(msg, cls.ERROR)
 
@@ -31,6 +35,9 @@ class Logger(object):
     def info(self, msg):
         self._stdout(Color.info('%s\n' % msg))
         
+    def warning(self, msg):
+        self._stderr(Color.warning("WARNING: %s\n" % msg))
+
     def error(self, msg):
         self._stderr(Color.error("ERROR: %s\n" % msg))
         
