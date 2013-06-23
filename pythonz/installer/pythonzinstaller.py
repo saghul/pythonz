@@ -11,7 +11,8 @@ from pythonz.define import PATH_BUILD, PATH_BIN, PATH_DISTS, PATH_PYTHONS,\
     PATH_ETC, PATH_SCRIPTS, PATH_SCRIPTS_PYTHONZ,\
     PATH_SCRIPTS_PYTHONZ_COMMANDS, PATH_BIN_PYTHONZ,\
     PATH_LOG, PATH_PATCHES,\
-    PATH_SCRIPTS_PYTHONZ_INSTALLER, PATH_HOME_ETC, ROOT
+    PATH_SCRIPTS_PYTHONZ_INSTALLER, PATH_HOME_ETC, ROOT,\
+    PATH_BASH_COMPLETION
 
 
 class PythonzInstaller(object):
@@ -25,6 +26,7 @@ class PythonzInstaller(object):
         makedirs(PATH_BUILD)
         makedirs(PATH_DISTS)
         makedirs(PATH_ETC)
+        makedirs(PATH_BASH_COMPLETION)
         makedirs(PATH_BIN)
         makedirs(PATH_LOG)
         makedirs(PATH_HOME_ETC)
@@ -67,6 +69,9 @@ python %s/pythonz_main.py "$@"
         # create a bashrc for pythonz
         shutil.copy(os.path.join(installer_root,'etc','bashrc'), os.path.join(PATH_ETC,'bashrc'))
 
+        #copy all *.sh files to bash_completion.d directory
+        for path in glob.glob(os.path.join(installer_root,"etc","bash_completion.d","*.sh")):
+            shutil.copy( path, PATH_BASH_COMPLETION )
     @staticmethod
     def systemwide_install():
         profile = """\

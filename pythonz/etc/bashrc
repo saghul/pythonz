@@ -70,5 +70,18 @@ sudo-pythonz()
     __pythonz_run "$@"
 }
 
+__pythonz_bash_completion()
+{
+	PYTHONZ_COMPLETION=$PATH_ETC/bash_completion.d/pythonz_completion.sh
+	if [ -s "$PYTHONZ_COMPLETION" ];then
+		 . $PYTHONZ_COMPLETION
+	fi
+}
+
 # main
 __pythonz_set_path
+
+__pythonz_bash_completion
+
+# I don't know why the declare gets lost on sourcing pythonz_completion.sh
+declare -A _pythonz_context
