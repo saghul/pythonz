@@ -79,6 +79,14 @@ class InstallCommand(Command):
             default=False,
             help="Build static libraries."
         )
+        self.parser.add_option(
+            "--dtrace",
+            dest="dtrace",
+            action="store_true",
+            default=False,
+            help="Build with dtrace support."
+        )
+
 
     def run_command(self, options, args):
         if not args:
