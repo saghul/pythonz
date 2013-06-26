@@ -80,7 +80,7 @@ class InstallCommand(Command):
             help="Build static libraries."
         )
         self.parser.add_option(
-            "--dtrace",
+            "--with-dtrace",
             dest="dtrace",
             action="store_true",
             default=False,
