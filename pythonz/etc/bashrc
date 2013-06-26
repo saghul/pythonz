@@ -29,7 +29,7 @@ __pythonz_reload()
 
 __pythonz_update()
 {
-    $pythonz "$@"
+    eval "$pythonz $@"
     [[ $? == 0 ]] && __pythonz_reload
 }
 
@@ -53,7 +53,7 @@ __pythonz_run()
     __pythonz_find_command "$@"
     case $command_name in
         update) __pythonz_update "$@" ;;
-        *) $pythonz "$@" ;;
+        *) eval "$pythonz $@" ;;
     esac
     builtin hash -r
 }
