@@ -212,6 +212,8 @@ class CPythonInstaller(Installer):
             self._append_patch(patch_dir, ['patch-setup.py.diff', 'patch-svnversion.patch'])
         elif is_python26(version):
             self._append_patch(common_patch_dir, ['patch-setup.py.diff'])
+            patch_dir = os.path.join(PATH_PATCHES_ALL, "python26")
+            self._append_patch(patch_dir, ['patch-nosslv2.diff'])
         elif is_python27(version):
             if version < '2.7.2':
                 self._append_patch(common_patch_dir, ['patch-setup.py.diff'])
@@ -288,6 +290,9 @@ class CPythonInstaller(Installer):
                                                   'patch-setup_no_tkinter.py.diff',
                                                   {'_localemodule.c.ed': 'Modules/_localemodule.c'},
                                                   {'locale.py.ed': 'Lib/locale.py'}])
+            # Common patch to disable SSLv2 on Python 2.6.
+            patch_dir = os.path.join(PATH_PATCHES_ALL, "python26")
+            self._append_patch(patch_dir, ['patch-nosslv2.diff'])
         elif is_python27(version):
             PATH_PATCHES_OSX_PYTHON27 = os.path.join(PATH_PATCHES_OSX, "python27")
             if version < '2.7.4':
@@ -474,5 +479,3 @@ class JythonInstaller(Installer):
         install_dir = os.path.realpath(self.install_dir)
         bin_dir = os.path.join(install_dir, 'bin')
         symlink(os.path.join(bin_dir, 'jython'), os.path.join(bin_dir, 'python'))
-
-
