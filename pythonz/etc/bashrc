@@ -14,6 +14,9 @@ PATH_HOME_ETC="$PATH_HOME/etc"
 # py file
 PY_PYTHONZ="$PATH_ROOT/bin/pythonz"
 
+# completion
+PYTHONZ_COMPLETION="$PATH_ETC/bash_completion.d/pythonz_completion.sh"
+
 # functions
 __pythonz_set_path()
 {
@@ -72,7 +75,6 @@ sudo-pythonz()
 
 __pythonz_bash_completion()
 {
-	PYTHONZ_COMPLETION=$PATH_ETC/bash_completion.d/pythonz_completion.sh
 	if [ -s "$PYTHONZ_COMPLETION" ];then
 		 . $PYTHONZ_COMPLETION
 	fi
@@ -81,7 +83,9 @@ __pythonz_bash_completion()
 # main
 __pythonz_set_path
 
-__pythonz_bash_completion
+# nebale completion on bash >= 4
+if [ ${BASH_VERSION:0:1} -ge 4 ]; then
+    __pythonz_bash_completion
+    declare -A _pythonz_context
+fi
 
-# I don't know why the declare gets lost on sourcing pythonz_completion.sh
-declare -A _pythonz_context
