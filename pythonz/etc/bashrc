@@ -84,7 +84,7 @@ __pythonz_bash_completion()
 __pythonz_set_path
 
 # nebale completion on bash >= 4
-if [ ${BASH_VERSION:0:1} -ge 4 ]; then
+if [ ${BASH_VERSION} ] && [ ${BASH_VERSION:0:1} -ge 4 ]; then
     __pythonz_bash_completion
     declare -A _pythonz_context
 fi
