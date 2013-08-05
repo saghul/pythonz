@@ -69,6 +69,12 @@ python %s/pythonz_main.py "$@"
         # create a bashrc for pythonz
         shutil.copy(os.path.join(installer_root,'etc','bashrc'), os.path.join(PATH_ETC,'bashrc'))
 
+        # create a fish file for pythonz
+        shutil.copy(
+            os.path.join(installer_root, 'etc', 'pythonz.fish'),
+            os.path.join(PATH_ETC, 'pythonz.fish')
+        )
+
         #copy all *.sh files to bash_completion.d directory
         for path in glob.glob(os.path.join(installer_root,"etc","bash_completion.d","*.sh")):
             shutil.copy( path, PATH_BASH_COMPLETION )
