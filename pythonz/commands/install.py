@@ -9,7 +9,7 @@ class InstallCommand(Command):
     name = "install"
     usage = "%prog [OPTIONS] VERSION"
     summary = "Build and install the given version of python"
-    
+
     def __init__(self):
         super(InstallCommand, self).__init__()
         self.parser.add_option(
@@ -94,4 +94,3 @@ class InstallCommand(Command):
                 continue
 
 InstallCommand()
-

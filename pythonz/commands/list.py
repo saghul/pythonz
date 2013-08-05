@@ -41,4 +41,3 @@ class ListCommand(Command):
                 logger.log('     %s' % version)
 
 ListCommand()
-
