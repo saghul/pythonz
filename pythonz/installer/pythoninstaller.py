@@ -219,7 +219,8 @@ class CPythonInstaller(Installer):
                 self._append_patch(common_patch_dir, ['patch-setup.py.diff'])
         elif is_python30(version):
             patch_dir = os.path.join(PATH_PATCHES_ALL, "python30")
-            self._append_patch(patch_dir, ['patch-setup.py.diff'])
+            self._append_patch(patch_dir, ['patch-setup.py.diff',
+                                           'patch-nosslv2.diff'])
         elif is_python31(version):
             if version < '3.1.4':
                 self._append_patch(common_patch_dir, ['patch-setup.py.diff'])
