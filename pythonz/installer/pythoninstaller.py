@@ -426,7 +426,7 @@ class PyPyInstaller(Installer):
 
 
 class JythonInstaller(Installer):
-    supported_versions = ['2.5.0', '2.5.1', '2.5.2', '2.5.3']
+    supported_versions = ['2.5.0', '2.5.1', '2.5.2', '2.5.3', '2.7-b1']
 
     @classmethod
     def get_version_url(cls, version):
