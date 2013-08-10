@@ -428,6 +428,11 @@ class PyPyInstaller(Installer):
 class JythonInstaller(Installer):
     supported_versions = ['2.5.0', '2.5.1', '2.5.2', '2.5.3']
 
+    def __init__(self, version, options):
+        Installer.__init__(self, version, options)
+        filename = 'jython-installer-%s.jar' % version
+        self.download_file = os.path.join(PATH_DISTS, filename)
+
     @classmethod
     def get_version_url(cls, version):
         # Version is known to be in supported_versions
