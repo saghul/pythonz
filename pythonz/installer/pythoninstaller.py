@@ -429,7 +429,7 @@ class JythonInstaller(Installer):
     supported_versions = ['2.5.0', '2.5.1', '2.5.2', '2.5.3']
 
     def __init__(self, version, options):
-        Installer.__init__(self, version, options)
+        super(JythonInstaller, self).__init__(version, options)
         filename = 'jython-installer-%s.jar' % version
         self.download_file = os.path.join(PATH_DISTS, filename)
 
