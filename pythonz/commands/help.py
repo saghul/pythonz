@@ -26,4 +26,3 @@ class HelpCommand(Command):
         logger.log("  https://github.com/saghul/pythonz")
 
 HelpCommand()
-

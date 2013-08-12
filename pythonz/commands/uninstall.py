@@ -35,4 +35,3 @@ class UninstallCommand(Command):
             self.parser.print_help()
 
 UninstallCommand()
-

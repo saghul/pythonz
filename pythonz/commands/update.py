@@ -7,7 +7,7 @@ from pythonz.define import PATH_DISTS, ROOT, PATH_BUILD, PYTHONZ_UPDATE_URL
 from pythonz.downloader import Downloader
 from pythonz.exceptions import DownloadError
 from pythonz.log import logger
-from pythonz.util import rm_r, extract_downloadfile, Link, unlink, Subprocess
+from pythonz.util import rm_r, extract_downloadfile, unlink, Subprocess
 
 
 class UpdateCommand(Command):
@@ -43,11 +43,14 @@ class UpdateCommand(Command):
         try:
             logger.info("Installing %s into %s" % (extract_dir, ROOT))
             s = Subprocess()
-            s.check_call([sys.executable, os.path.join(extract_dir,'pythonz_install.py'), '--upgrade'])
+            s.check_call([
+                sys.executable,
+                os.path.join(extract_dir, 'pythonz_install.py'),
+                '--upgrade'
+            ])
         except:
             logger.error("Failed to update pythonz.")
             sys.exit(1)
         logger.info("pythonz has been updated.")
 
 UpdateCommand()
-

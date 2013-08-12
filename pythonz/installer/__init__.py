@@ -36,8 +36,10 @@ The default help messages will popup and tell you what to do!
 Enjoy pythonz at %(ROOT)s!!
 """ % {'ROOT': ROOT, 'yourshrc': yourshrc, 'shrc': shrc, 'PATH_ETC': PATH_ETC.replace(os.getenv('HOME'), '$HOME')})
 
+
 def upgrade_pythonz():
     PythonzInstaller.install(INSTALLER_ROOT)
+
 
 def systemwide_pythonz():
     PythonzInstaller.install(INSTALLER_ROOT)
@@ -62,5 +64,4 @@ For further instructions, run:
 The default help messages will popup and tell you what to do!
 
 Enjoy pythonz at %(ROOT)s!!
-""" % {'ROOT':ROOT})
-
+""" % {'ROOT': ROOT})
