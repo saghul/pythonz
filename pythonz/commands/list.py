@@ -21,17 +21,27 @@ class ListCommand(Command):
             default=False,
             help='Show the all available python versions.'
         )
+        self.parser.add_option(
+            '-p', '--path',
+            dest='path',
+            action='store_true',
+            default=False,
+            help='Show the path for all Python installations.'
+        )
 
     def run_command(self, options, args):
         if options.all_versions:
             self.all()
         else:
-            self.installed()
+            self.installed(path=options.path)
 
-    def installed(self):
+    def installed(self, path):
         logger.log("# Installed Python versions")
         for d in sorted(os.listdir(PATH_PYTHONS)):
-            logger.log('  %s' % d)
+            if path:
+                logger.log('  %-16s %s/%s' % (d, PATH_PYTHONS, d))
+            else:
+                logger.log('  %s' % d)
 
     def all(self):
         logger.log('# Available Python versions')
