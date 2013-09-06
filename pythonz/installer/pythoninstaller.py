@@ -110,6 +110,9 @@ class CPythonInstaller(Installer):
         if Version(self.pkg.version) >= '3.1':
             self.configure_options.append('--with-computed-gotos')
 
+        if not options.static:
+            self.configure_options.append('--enable-shared')
+
         if sys.platform == "darwin":
             # set configure options
             target = get_macosx_deployment_target()
@@ -122,8 +125,6 @@ class CPythonInstaller(Installer):
                 raise Exception
             if options.framework:
                 self.configure_options.append('--enable-framework=%s' % os.path.join(self.install_dir, 'Frameworks'))
-            elif not options.static:
-                self.configure_options.append('--enable-shared')
             if options.universal:
                 self.configure_options.append('--enable-universalsdk=/')
                 self.configure_options.append('--with-universal-archs=intel')
@@ -307,6 +308,12 @@ class CPythonInstaller(Installer):
         self._apply_patches()
 
     def configure(self):
+        if not self.options.static:
+            os.environ['LDFLAGS'] = '-Xlinker -rpath=\$$ORIGIN/../lib ' + os.environ.get('LDFLAGS', '')
+            # make sure rpath dir exists
+            lib_dir = os.path.join(self.install_dir, 'lib')
+            if not os.path.exists(lib_dir):
+                os.makedirs(lib_dir)
         s = Subprocess(log=self.logfile, cwd=self.build_dir, verbose=self.options.verbose)
         cmd = "./configure --prefix=%s %s %s" % (self.install_dir, self.options.configure, ' '.join(self.configure_options))
         if self.options.verbose:
