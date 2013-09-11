@@ -105,4 +105,40 @@ To get help on each individual command run::
 
   pythonz help <command>
 
+Howto install a Python environment with Pip?
+--------------------------------------------
+
+It's important to install a few basic development headers/libraries, because Pip needs them, 
+and a lot of packages depend on them (or at least take them for granted). ::
+
+  #!/bin/bash
+
+  PY_VERSION=2.7.5
+  BIN_DIR=/usr/bin
+  PYZ_DIR=/usr/local/pythonz
+
+  if [ ${PY_VERSION:0:1} = 2 ] ; then
+    PY_BIN=python2.7
+  else
+    PY_BIN=python3
+  fi
+
+  if [ "$UID" != 0 ] ; then
+    mkdir -p ~/bin
+    BIN_DIR=~/bin
+    PYZ_DIR=~/.pythonz
+  fi
+
+  apt-get -y install zlib1g-dev libssl-dev libexpat1-dev libffi-dev pkg-config libreadline-dev libsqlite3-dev libbz2-dev libncursesw5-dev
+
+  pythonz install $PY_VERSION
+
+  PY=$PYZ_DIR/pythons/CPython-$PY_VERSION/bin/python2.7
+
+  ln -sf $PYZ_DIR/pythons/CPython-$PY_VERSION/bin/python2.7 $BIN_DIR
+  wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py -O- | $PY
+
+  wget -O- https://raw.github.com/pypa/pip/master/contrib/get-pip.py | $PY
+
+  ln -sf /usr/local/pythonz/pythons/CPython-$PY_VERSION/bin/pip-2.7 $BIN_DIR
 
