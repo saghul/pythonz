@@ -95,7 +95,7 @@ class Installer(object):
 class CPythonInstaller(Installer):
     supported_versions = ['2.4', '2.4.1', '2.4.2', '2.4.3', '2.4.4', '2.4.5', '2.4.6',
                           '2.5', '2.5.1', '2.5.2', '2.5.3', '2.5.4', '2.5.5', '2.5.6',
-                          '2.6', '2.6.1', '2.6.2', '2.6.3', '2.6.4', '2.6.5', '2.6.6', '2.6.7', '2.6.8',
+                          '2.6', '2.6.1', '2.6.2', '2.6.3', '2.6.4', '2.6.5', '2.6.6', '2.6.7', '2.6.8', '2.6.9',
                           '2.7', '2.7.1', '2.7.2', '2.7.3', '2.7.4', '2.7.5',
                           '3.0', '3.0.1',
                           '3.1', '3.1.1', '3.1.2', '3.1.3', '3.1.4', '3.1.5',
@@ -209,8 +209,9 @@ class CPythonInstaller(Installer):
             self._append_patch(patch_dir, ['patch-setup.py.diff', 'patch-svnversion.patch'])
         elif is_python26(version):
             self._append_patch(common_patch_dir, ['patch-setup.py.diff'])
-            patch_dir = os.path.join(PATH_PATCHES_ALL, "python26")
-            self._append_patch(patch_dir, ['patch-nosslv2.diff'])
+            if version < '2.6.9':
+                patch_dir = os.path.join(PATH_PATCHES_ALL, "python26")
+                self._append_patch(patch_dir, ['patch-nosslv2.diff'])
         elif is_python27(version):
             if version < '2.7.2':
                 self._append_patch(common_patch_dir, ['patch-setup.py.diff'])
@@ -288,9 +289,9 @@ class CPythonInstaller(Installer):
                                                   'patch-setup_no_tkinter.py.diff',
                                                   {'_localemodule.c.ed': 'Modules/_localemodule.c'},
                                                   {'locale.py.ed': 'Lib/locale.py'}])
-            # Common patch to disable SSLv2 on Python 2.6.
-            patch_dir = os.path.join(PATH_PATCHES_ALL, "python26")
-            self._append_patch(patch_dir, ['patch-nosslv2.diff'])
+            if version < '2.6.9':
+                patch_dir = os.path.join(PATH_PATCHES_ALL, "python26")
+                self._append_patch(patch_dir, ['patch-nosslv2.diff'])
         elif is_python27(version):
             PATH_PATCHES_OSX_PYTHON27 = os.path.join(PATH_PATCHES_OSX, "python27")
             if version < '2.7.4':
