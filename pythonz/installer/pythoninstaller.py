@@ -17,7 +17,7 @@ from pythonz.define import PATH_BUILD, PATH_DISTS, PATH_PYTHONS, PATH_LOG, \
     PATH_PATCHES_ALL, PATH_PATCHES_OSX
 from pythonz.downloader import Downloader
 from pythonz.log import logger
-from pythonz.exceptions import DownloadError, UnknownVersionException
+from pythonz.exceptions import DownloadError
 
 
 class PythonInstaller(object):
@@ -55,8 +55,7 @@ class Installer(object):
             self.download_url = options.url
         else:
             if version not in self.supported_versions:
-                logger.error("Unsupported Python version: `%s`, you may install it anyway by supplying the download or file URL" % version)
-                raise UnknownVersionException
+                logger.warning("Unsupported Python version: `%s`, trying with the following URL anyway: %s" % (version, self.get_version_url(version)))
             self.download_url = self.get_version_url(version)
         self.pkg = Package(version, options.type)
         self.install_dir = os.path.join(PATH_PYTHONS, self.pkg.name)
@@ -71,7 +70,6 @@ class Installer(object):
 
     @classmethod
     def get_version_url(cls, version):
-        # Version is known to be in supported_versions
         raise NotImplementedError
 
     def download(self):
@@ -130,7 +128,6 @@ class CPythonInstaller(Installer):
 
     @classmethod
     def get_version_url(cls, version):
-        # Version is known to be in supported_versions
         return 'http://www.python.org/ftp/python/%(version)s/Python-%(version)s.tgz' % {'version': version}
 
     def _apply_patches(self):
@@ -364,7 +361,6 @@ class StacklessInstaller(CPythonInstaller):
 
     @classmethod
     def get_version_url(cls, version):
-        # Version is known to be in supported_versions
         return 'http://www.stackless.com/binaries/stackless-%(version)s-export.tar.bz2' % {'version': version.replace('.', '')}
 
 
@@ -376,7 +372,6 @@ class PyPyInstaller(Installer):
 
     @classmethod
     def get_version_url(cls, version):
-        # Version is known to be in supported_versions
         if sys.platform == 'darwin':
             return 'https://bitbucket.org/pypy/pypy/downloads/pypy-%(version)s-osx64.tar.bz2' % {'version': version}
         else:
@@ -435,7 +430,6 @@ class JythonInstaller(Installer):
 
     @classmethod
     def get_version_url(cls, version):
-        # Version is known to be in supported_versions
         if version in ('2.5.0', '2.5.1', '2.5.2'):
             return 'https://downloads.sourceforge.net/project/jython/jython/%(version)s/jython_installer-%(version)s.jar' % {'version': version}
         else:
