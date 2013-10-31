@@ -93,6 +93,7 @@ class Installer(object):
 
 
 class CPythonInstaller(Installer):
+    version_re = re.compile(r'(\d\.\d(\.\d)?)(.*)')
     supported_versions = ['2.4', '2.4.1', '2.4.2', '2.4.3', '2.4.4', '2.4.5', '2.4.6',
                           '2.5', '2.5.1', '2.5.2', '2.5.3', '2.5.4', '2.5.5', '2.5.6',
                           '2.6', '2.6.1', '2.6.2', '2.6.3', '2.6.4', '2.6.5', '2.6.6', '2.6.7', '2.6.8', '2.6.9',
@@ -128,6 +129,14 @@ class CPythonInstaller(Installer):
 
     @classmethod
     def get_version_url(cls, version):
+        if version not in cls.supported_versions:
+            # Unsupported alpha, beta or rc versions
+            match = cls.version_re.match(version)
+            if match is not None:
+                groups = match.groups()
+                base_version = groups[0]
+                version = groups[0] + groups[2]
+                return 'http://www.python.org/ftp/python/%(base_version)s/Python-%(version)s.tgz' % {'base_version': base_version, 'version': version}
         return 'http://www.python.org/ftp/python/%(version)s/Python-%(version)s.tgz' % {'version': version}
 
     def _apply_patches(self):
