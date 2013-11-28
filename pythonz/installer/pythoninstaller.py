@@ -379,7 +379,7 @@ class PyPyInstaller(Installer):
                           '1.9',
                           '2.0', '2.0.1', '2.0.2',
                           '2.1',
-                          '2.2']
+                          '2.2', '2.2.1']
 
     @classmethod
     def get_version_url(cls, version):
@@ -491,3 +491,4 @@ class JythonInstaller(Installer):
         install_dir = os.path.realpath(self.install_dir)
         bin_dir = os.path.join(install_dir, 'bin')
         symlink(os.path.join(bin_dir, 'jython'), os.path.join(bin_dir, 'python'))
+
