@@ -84,14 +84,18 @@ Remove stale source folders and archives::
 
   pythonz cleanup
 
-Upgrades pythonz to the latest version::
+Upgrade pythonz to the latest version::
 
   pythonz update
-  
+
+Check the installed pythonz version::
+
+  pythonz version
+
 The recommended way to use a pythonz-installed version of Python is through `virtualenv`, e.g.::
 
   mkvirtualenv -p ~/.pythonz/pythons/CPython-2.7.3/bin/python python2.7.3
-  
+
 For more information about virtualenv, checkout `its documentation <http://www.virtualenv.org/en/latest/>`_.
 
 Commands
