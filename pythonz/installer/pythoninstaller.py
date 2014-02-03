@@ -15,9 +15,8 @@ from pythonz.util import symlink, makedirs, Package, is_url, Link,\
     get_macosx_deployment_target, Version, is_python25, is_python24
 from pythonz.define import PATH_BUILD, PATH_DISTS, PATH_PYTHONS, PATH_LOG, \
     PATH_PATCHES_ALL, PATH_PATCHES_OSX
-from pythonz.downloader import Downloader
+from pythonz.downloader import Downloader, DownloadError
 from pythonz.log import logger
-from pythonz.exceptions import DownloadError
 
 
 class PythonInstaller(object):

@@ -4,8 +4,7 @@ import sys
 
 from pythonz.commands import Command
 from pythonz.define import PATH_DISTS, ROOT, PATH_BUILD, PYTHONZ_UPDATE_URL, PYTHONZ_DEV_UPDATE_URL
-from pythonz.downloader import Downloader
-from pythonz.exceptions import DownloadError
+from pythonz.downloader import Downloader, DownloadError
 from pythonz.log import logger
 from pythonz.util import rm_r, extract_downloadfile, Link, unlink, Subprocess
 

@@ -19,7 +19,6 @@ else:
     from urllib.parse import urlparse, quote as urlquote, unquote as urlunquote
 
 from pythonz.define import PATH_PYTHONS
-from pythonz.exceptions import ShellCommandException
 from pythonz.log import logger
 
 
@@ -240,6 +239,9 @@ def is_sequence(val):
 #-----------------------------
 # class
 #-----------------------------
+class ShellCommandException(Exception):
+    """General exception during shell command"""
+
 class Subprocess(object):
     def __init__(self, log=None, cwd=None, verbose=False, debug=False):
         self._log = log

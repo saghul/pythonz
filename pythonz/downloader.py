@@ -2,8 +2,6 @@
 import sys
 
 from pythonz.util import PY3K
-from pythonz.exceptions import DownloadError
-
 
 if PY3K:
     from urllib.request import Request, urlopen, urlretrieve
@@ -43,6 +41,10 @@ class ProgressBar(object):
 class HEADRequest(Request):
     def get_method(self):
         return "HEAD"
+
+
+class DownloadError(Exception):
+    """Exception during download"""
 
 
 class Downloader(object):
