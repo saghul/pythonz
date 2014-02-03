@@ -19,9 +19,6 @@ parser.add_option(
     help='Show help')
 parser.disable_interspersed_args()
 
-def init_home():
-    if not os.path.isdir(PATH_HOME_ETC):
-        makedirs(PATH_HOME_ETC)
 
 def main():
     options, args = parser.parse_args(sys.argv[1:])
@@ -29,8 +26,10 @@ def main():
         args = ['help']
     if not args:
         args = ['help'] # as default
-    init_home()
+
+    makedirs(PATH_HOME_ETC)
     load_commands()
+
     command = args[0].lower()
     if command not in command_map:
         parser.error("Unknown command: `%s`" % command)
