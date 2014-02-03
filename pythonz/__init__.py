@@ -36,5 +36,8 @@ def main():
     except KeyError:
         parser.error("Unknown command: `%s`" % command)
         return
-    command.run(args[1:])
+    try:
+        command.run(args[1:])
+    except KeyboardInterrupt:
+        pass
 
