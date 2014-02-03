@@ -3,7 +3,7 @@ import os
 import sys
 
 from pythonz.commands import Command
-from pythonz.define import PATH_DISTS, ROOT, PATH_BUILD, PYTHONZ_UPDATE_URL
+from pythonz.define import PATH_DISTS, ROOT, PATH_BUILD, PYTHONZ_UPDATE_URL, PYTHONZ_DEV_UPDATE_URL
 from pythonz.downloader import Downloader
 from pythonz.exceptions import DownloadError
 from pythonz.log import logger
@@ -15,8 +15,21 @@ class UpdateCommand(Command):
     usage = "%prog"
     summary = "Update pythonz to the latest version"
 
+    def __init__(self):
+        super(UpdateCommand, self).__init__()
+        self.parser.add_option(
+            "--dev",
+            dest="dev",
+            action="store_true",
+            default=False,
+            help="Use the development branch."
+        )
+
     def run_command(self, options, args):
-        download_url = PYTHONZ_UPDATE_URL
+        if options.dev:
+            download_url = PYTHONZ_DEV_UPDATE_URL
+        else:
+            download_url = PYTHONZ_UPDATE_URL
         headinfo = Downloader.read_head_info(download_url)
         content_type = headinfo['content-type']
         filename = "pythonz-latest"
