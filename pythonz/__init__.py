@@ -31,9 +31,10 @@ def main():
     load_commands()
 
     command = args[0].lower()
-    if command not in command_map:
+    try:
+        command = command_map[command]
+    except KeyError:
         parser.error("Unknown command: `%s`" % command)
         return
-    command = command_map[command]
     command.run(args[1:])
 
