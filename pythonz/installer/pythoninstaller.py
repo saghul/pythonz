@@ -125,6 +125,8 @@ class CPythonInstaller(Installer):
             if options.universal:
                 self.configure_options.append('--enable-universalsdk=/')
                 self.configure_options.append('--with-universal-archs=intel')
+            if options.dtrace:
+                self.configure_options.append('--with-dtrace')
 
     @classmethod
     def get_version_url(cls, version):
@@ -304,6 +306,8 @@ class CPythonInstaller(Installer):
             PATH_PATCHES_OSX_PYTHON27 = os.path.join(PATH_PATCHES_OSX, "python27")
             if version < '2.7.4':
                 self._append_patch(PATH_PATCHES_OSX_PYTHON27, ['patch-Modules-posixmodule.diff'])
+            if self.options.dtrace:
+                self._append_patch(PATH_PATCHES_OSX_PYTHON27, ['patch-dtrace.diff'])
 
     def patch(self):
         if sys.platform == "darwin":
