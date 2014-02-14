@@ -113,4 +113,14 @@ To get help on each individual command run::
 
   pythonz help <command>
 
+DTrace support
+--------------
+
+CPython versions 2.7.6 and 3.3.4 can be built with DTrace suport. Patches adding support
+for DTrace have been taken from `this page <http://www.jcea.es/artic/solitaire.htm/python_dtrace.htm>`_
+by Jesús Cea.
+
+Building Python with DTrace support::
+
+  pythonz install --configure="--with-dtrace" 2.7.6
 

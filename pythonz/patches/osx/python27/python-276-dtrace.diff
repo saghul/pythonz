@@ -1,0 +1,1959 @@
+--- Doc/library/debug.rst
++++ Doc/library/debug.rst
+@@ -14,4 +14,5 @@
+    profile.rst
+    hotshot.rst
+    timeit.rst
+-   trace.rst
+\ No newline at end of file
++   trace.rst
++   dtrace.rst
+--- /dev/null
++++ Doc/library/dtrace.rst
+@@ -0,0 +1,183 @@
++:mod:`dtrace` --- DTrace probes for Python
++===============================================
++
++.. module:: dtrace
++   :synopsis: DTrace probes for Python.
++
++**Source code:** :source:`Lib/dtrace.py`
++
++--------------
++
++The :mod:`dtrace` module indicates if the CPython executable currently
++running has been compiled with DTrace probes support.
++
++.. impl-detail::
++
++   DTrace probes are implementation details of the CPython interpreter!
++   No garantees are made about probe compatibility between versions of
++   CPython. DTrace scripts can stop working or work incorrectly without
++   warning when changing CPython versions.
++
++The :mod:`dtrace` module defines the following variable:
++
++
++.. data:: available
++
++   The variable will be ``True`` if the current CPython interpreter was
++   compiled with DTrace probe support. ``False`` if not.
++   
++
++DTrace probes
++-------------
++
++DTrace scripts are run externally to CPython. DTrace probes export
++selected events inside CPython interpreter in order to make them
++accessible to external scripts.
++
++The probes are exported through the "python" provider. The available
++probes are defined in the file :file:`Include/pydtrace.d`.
++
++To learn how to use DTrace, read `DTrace User Guide
++<http://docs.oracle.com/cd/E19253-01/819-5488/>`_.
++
++.. opcode:: function-entry (arg0, arg1, arg2)
++
++   Fires when python code enters a new function. *arg0* is sourcecode
++   file path, *arg1* is the name of the funcion called, and *arg2* is
++   line number.
++
++   The probe is not fired if Python code calls C functions.
++
++.. opcode:: function-return (arg0, arg1, arg2)
++
++   Fires when Python code finishes execution of a function. Parameters
++   are the same as in ``function-entry``.
++
++   The probe is not fired if the finishing function is written in C.
++
++.. opcode:: line (arg0, arg1, arg2)
++
++   Fires when Python code changes the execution line. Parameters are the
++   same as in ``function-entry``.
++
++   The probe is not fired in C functions.
++
++.. opcode:: gc-start (arg0)
++
++   Fires when the Python interpreter starts a garbage collection cycle.
++   *arg0* is the generation to scan, like :func:`gc.collect()`.
++
++.. opcode:: gc-done (arg0)
++
++   Fires when the Python interpreter finishes a garbage collection
++   cycle. *arg0* is the number of collected objects.
++
++.. opcode:: instance-new-start (arg0, arg1)
++
++   Fires when an object instanciation starts. *arg0* is the class name,
++   *arg1* is the filename where the class is defined.
++
++   The probe is not fired for most C code object creations.
++
++.. opcode:: instance-new-done (arg0, arg1)
++
++   Fires when an object instanciation finishes. Parameters are the same
++   as in ``instance-new-done``.
++
++   The probe is not fired for most C code object creations.
++
++.. opcode:: instance-delete-start (arg0, arg1)
++
++   Fires when an object instance is going to be destroyed. Parameters
++   are the same as in ``instance-new-done``.
++
++   The probe is not fired for most C code object destructions.
++
++.. opcode:: instance-delete-done (arg0, arg1)
++
++   Fires when an object instance has been destroyed. parameters are the
++   same as in ``instance-new-done``.
++
++   Between an ``instance-delete-start`` and corresponding
++   ``instance-delete-done`` others probes can fire if, for instance,
++   deletion of an instance creates a deletion cascade.
++
++   The probe is not fired for most C code object destructions.
++
++
++Python stack
++------------
++
++When a DTrace probe is fired, the DTrace script can examine the stack.
++Since CPython is a Python interpreter coded in C, the stack will show C
++functions, with no direct relation to the Python code currently being
++executed.
++
++Using the special "jstack()" DTrace function, the user will be given
++hints about the python program stack, if possible. In particular, the
++augmented stack will show python function calls, filename, name
++of the function or method, and the line number.
++
++DTrace scripts examples
++-----------------------
++
++DTrace python provider is suffixed by the pid of the process to monitor.
++In the examples, the pid will be 9876.
++
++Show the time spent doing garbage collection (in nanoseconds)::
++
++  python9876:::gc-start
++  {
++      self->t = timestamp;
++  }
++
++  python9876:::gc-done
++  /self->t/
++  {
++      printf("%d", timestamp-self->t);
++      self->t = 0;
++  }
++
++Count how many instances are created of each class::
++
++  python9876:::instance-new-start
++  {
++      @v[copyinstr(arg1), copyinstr(arg0)] = count();
++  }
++
++Observe time spent in object destruction, useful if datastructures are
++complicated and deletion of an object can create a cascade effect::
++
++  python9876:::instance-delete-start
++  /self->t==0/
++  {
++      self->t = timestamp;
++      self->level = 0;
++  }
++
++  python9876:::instance-delete-start
++  /self->t/
++  {
++      self->level += 1;
++  }
++
++  python9876:::instance-delete-done
++  /(self->level) && (self->t)/
++  {
++      self->level -= 1;
++  }
++
++  python9876:::instance-delete-done
++  /(self->level==0) && (self->t)/
++  {
++      @time = quantize(timestamp-self->t);
++      self->t = 0;
++  }
++
++To know which python source code lines create new TCP/IP connections::
++
++  pid9876::sock_connect:entry
++  {
++      @conn[jstack()] = count();
++  }
++
+--- Include/code.h
++++ Include/code.h
+@@ -6,6 +6,8 @@
+ extern "C" {
+ #endif
+ 
++#include "pyconfig.h"
++
+ /* Bytecode object */
+ typedef struct {
+     PyObject_HEAD
+@@ -25,6 +27,9 @@
+     int co_firstlineno;		/* first source line number */
+     PyObject *co_lnotab;	/* string (encoding addr<->lineno mapping) See
+ 				   Objects/lnotab_notes.txt for details. */
++#ifdef WITH_DTRACE
++    unsigned short *co_linenos; /* dtrace stack helper */
++#endif
+     void *co_zombieframe;     /* for optimization only (see frameobject.c) */
+     PyObject *co_weakreflist;   /* to support weakrefs to code objects */
+ } PyCodeObject;
+--- /dev/null
++++ Include/pydtrace.d
+@@ -0,0 +1,157 @@
++provider python {
++    probe function__entry(const char *, const char *, int);
++    probe function__return(const char *, const char *, int);
++    probe instance__new__start(const char *, const char *);
++    probe instance__new__done(const char *, const char *);
++    probe instance__delete__start(const char *, const char *);
++    probe instance__delete__done(const char *, const char *);
++    probe line(const char *, const char *, int);
++    probe gc__start(int);
++    probe gc__done(long);
++};
++
++#pragma D attributes Evolving/Evolving/Common provider python provider
++#pragma D attributes Private/Private/Common provider python module
++#pragma D attributes Private/Private/Common provider python function
++#pragma D attributes Evolving/Evolving/Common provider python name
++#pragma D attributes Evolving/Evolving/Common provider python args
++
++
++
++#ifdef PYDTRACE_STACK_HELPER
++/*
++ * Python ustack helper.  This relies on the first argument (PyFrame *) being
++ * on the stack; see Python/ceval.c for the contortions we go through to ensure
++ * this is the case.
++ *
++ * On x86, the PyFrame * is two slots up from the frame pointer; on SPARC, it's
++ * eight.
++ *
++ * Some details about this in "Python and DTrace in build 65":
++ * http://blogs.oracle.com/levon/entry/python_and_dtrace_in_build
++ */
++
++/*
++ * Yes, this is as gross as it looks. DTrace cannot handle static functions,
++ * and our stat_impl.h has them in ILP32.
++ */
++#define _SYS_STAT_H
++
++/*
++** When compiling in 32 bits:
++** - Early inclusion to avoid problems with
++**   _FILE_OFFSET_BITS redefined.
++** - Also, we must "undef" _POSIX_PTHREAD_SEMANTICS
++**   to avoid error compiling this source.
++*/
++#include "pyconfig.h"
++#undef _POSIX_PTHREAD_SEMANTICS
++
++#include <stdio.h>
++#include <sys/types.h>
++
++#include "pyport.h"
++#include "object.h"
++#include "pystate.h"
++#include "pyarena.h"
++#include "pythonrun.h"
++#include "compile.h"
++#include "frameobject.h"
++#include "stringobject.h"
++
++#include "pydtrace_offsets.h"
++
++#if defined(__i386)
++#define	startframe PyEval_EvalFrameEx
++#define	endframe AFTER_PyEval_EvalFrameEx
++#elif defined(__amd64)
++#define	startframe PyEval_EvalFrameExReal
++#define	endframe AFTER_PyEval_EvalFrameExReal
++#elif defined(__sparc)
++#define	startframe PyEval_EvalFrameExReal
++#define	endframe AFTER_PyEval_EvalFrameExReal
++#endif
++
++#ifdef __sparcv9
++#define	STACK_BIAS (2048-1)
++#else
++#define	STACK_BIAS 0
++#endif
++
++#define	at_evalframe(addr) \
++    ((uintptr_t)addr >= ((uintptr_t)&``startframe) && \
++     (uintptr_t)addr < ((uintptr_t)&``endframe))
++#define	probe dtrace:helper:ustack:
++#define	print_result(r) (r)
++
++#if defined(__i386) || defined(__amd64)
++#define	frame_ptr_addr ((uintptr_t)arg1 + sizeof(uintptr_t) * 2)
++#elif defined(__sparc)
++#define	frame_ptr_addr ((uintptr_t)arg1 + STACK_BIAS + sizeof(uintptr_t) * 8)
++#else
++#error unknown architecture
++#endif
++
++/* startframe and endframe are macro-expansions */
++extern uintptr_t startframe;
++extern uintptr_t endframe;
++
++#define	copyin_obj(addr, obj) ((obj *)copyin((uintptr_t)(addr), sizeof(obj)))
++#define	pystr_addr(addr) ((char *)addr + offsetof(PyStringObject, ob_sval))
++#define	copyin_str(dest, addr, obj) \
++    (copyinto((uintptr_t)pystr_addr(addr), obj->ob_size, (dest)))
++#define	add_str(addr, obj) \
++    copyin_str(this->result + this->pos, addr, obj); \
++    this->pos += obj->ob_size; \
++    this->result[this->pos] = '\0';
++#define	add_digit(nr, div) ((nr / div) ? \
++    (this->result[this->pos++] = '0' + ((nr / div) % 10)) : \
++    (this->result[this->pos] = '\0'))
++#define	add_char(c) (this->result[this->pos++] = c)
++
++probe /at_evalframe(arg0)/ 
++{
++	this->framep = *(uintptr_t *)copyin(frame_ptr_addr, sizeof(uintptr_t));
++	this->frameo = copyin_obj(this->framep, PyFrameObject);
++	this->codep = this->frameo->f_code;
++	this->codeo = copyin_obj(this->codep, PyCodeObject);
++	/* If we just enter a function, show the definition line */
++	this->lineno = this->codeo->co_firstlineno +
++		(this->frameo->f_lasti == -1 ? 0 :
++		*copyin_obj(this->codeo->co_linenos + this->frameo->f_lasti,
++				unsigned short));
++	this->filenamep = this->codeo->co_filename;
++	this->fnamep = this->codeo->co_name;
++	this->filenameo = copyin_obj(this->filenamep, PyStringObject);
++	this->fnameo = copyin_obj(this->fnamep, PyStringObject);
++
++	this->len = 1 + this->filenameo->ob_size + 1 + 5 + 2 +
++	    this->fnameo->ob_size + 1 + 1;
++
++	this->result = (char *)alloca(this->len);
++	this->pos = 0;
++
++	add_char('@');
++	add_str(this->filenamep, this->filenameo);
++	add_char(':');
++	add_digit(this->lineno, 10000);
++	add_digit(this->lineno, 1000);
++	add_digit(this->lineno, 100);
++	add_digit(this->lineno, 10);
++	add_digit(this->lineno, 1);
++	add_char(' ');
++	add_char('(');
++	add_str(this->fnamep, this->fnameo);
++	add_char(')');
++	this->result[this->pos] = '\0';
++
++	print_result(stringof(this->result));
++}
++
++probe /!at_evalframe(arg0)/
++{
++	NULL;
++}
++
++#endif  /* PYDTRACE_STACK_HELPER */
++
+--- /dev/null
++++ Include/pydtrace_offsets.c
+@@ -0,0 +1,21 @@
++#include <stdlib.h>
++#include <stdio.h>
++
++int main(int argc, const char* argv[]) {
++    if (argc != 3) {
++        printf("Parameter number incorrect\n");
++        exit(1);
++    }
++
++    printf("/* File autogenerated. DO NOT MODIFY MANUALLY */\n");
++    printf("\n");
++    printf("#ifndef PYDTRACE_OFFSETS_H\n");
++    printf("#define PYDTRACE_OFFSETS_H\n");
++    printf("\n");
++    printf("#define AFTER_PyEval_EvalFrameEx      %s\n", argv[1]);
++    printf("#define AFTER_PyEval_EvalFrameExReal  %s\n", argv[2]);
++    printf("\n");
++    printf("#endif\n");
++    return 0;
++}
++
+--- /dev/null
++++ Include/pydtrace_offsets.sh
+@@ -0,0 +1,30 @@
++#!/bin/sh
++
++DTRACE_NM=$1
++CEVAL_O=$2
++PYDTRACE_OFFSETS=$3
++if test "$DTRACE_NM" = "OTHER" ; then
++    $PYDTRACE_OFFSETS \
++		"`nm -n $CEVAL_O | grep \" T \" | \
++		sed -n \"/ T PyEval_EvalFrameEx$/{n;p;}\" | \
++		sed \"s/.* T \(.*\)$/\1/\"`" \
++		"`nm -n $CEVAL_O | grep \" T \" | \
++		sed -n \"/ T PyEval_EvalFrameExReal$/{n;p;}\" | \
++		sed \"s/.* T \(.*\)$/\1/\"`"
++fi
++if test "$DTRACE_NM" = "SOLARIS" ; then 
++    $PYDTRACE_OFFSETS \
++		"`/usr/ccs/bin/nm -n $CEVAL_O | \
++		/usr/bin/grep \"\\|FUNC \\|\" | \
++		/usr/bin/grep -v \"\\|IGNORE \\|\" | \
++		/usr/bin/tr -d \"\\[\\]\\|\" | sort -n | \
++		sed -n \"/ PyEval_EvalFrameEx$/{n;p;}\" | \
++		sed \"s/.* \([a-zA-Z0-9_]*\)$/\1/\"`" \
++		"`/usr/ccs/bin/nm -n $CEVAL_O | \
++		/usr/bin/grep \"\\|FUNC \\|\" | \
++		/usr/bin/grep -v \"\\|IGNORE \\|\" | \
++	       	/usr/bin/tr -d \"\\[\\]\\|\" | sort -n | \
++		sed -n \"/ PyEval_EvalFrameExReal$/{n;p;}\" | \
++		sed \"s/.* \([a-zA-Z0-9_]*\)$/\1/\"`"
++fi
++
+--- /dev/null
++++ Lib/test/dtrace_sample.py
+@@ -0,0 +1,73 @@
++# Sample script for use by test_dtrace.py
++# DO NOT MODIFY THIS FILE IN ANY WAY WITHOUT UPDATING test_dtrace.py!!!!!
++
++import gc
++
++def function_1() :
++    pass
++
++# Check stacktrace
++def function_2() :
++    function_1()
++
++# CALL_FUNCTION_VAR
++def function_3(dummy, dummy2) :
++    pass
++
++# CALL_FUNCTION_KW
++def function_4(**dummy) :
++    pass
++
++# CALL_FUNCTION_VAR_KW
++def function_5(dummy, dummy2, **dummy3) :
++    pass
++
++def test_entry_return_and_stack() :
++    function_1()
++    function_2()
++    function_3(*(1,2))
++    function_4(**{"test":42})
++    function_5(*(1,2), **{"test":42})
++
++def test_line() :
++    a = 1  # Preamble
++    for i in xrange(2) :
++        a = i
++        b = i+2
++        c = i+3
++        d = a + b +c
++    a = 1  # Epilogue
++
++def test_instance_creation_destruction() :
++    class old_style_class() :
++        pass
++    class new_style_class(object) :
++        pass
++
++    a = old_style_class()
++    del a
++    gc.collect()
++    b = new_style_class()
++    del b
++    gc.collect()
++
++    a = old_style_class()
++    del old_style_class
++    gc.collect()
++    b = new_style_class()
++    del new_style_class
++    gc.collect()
++    del a
++    gc.collect()
++    del b
++    gc.collect()
++
++def test_garbage_collection() :
++    gc.collect()
++
++if __name__ == "__main__":
++    test_entry_return_and_stack()
++    test_line()
++    test_instance_creation_destruction()
++    test_garbage_collection()
++
+--- /dev/null
++++ Lib/test/test_dtrace.py
+@@ -0,0 +1,344 @@
++import sys, unittest, subprocess, os.path, dis, types, re
++import dtrace
++from test.test_support import TESTFN, run_unittest, findfile
++
++sample = os.path.abspath(findfile("dtrace_sample.py"))
++if not dtrace.available :
++    raise unittest.SkipTest, "dtrace support not compiled in"
++
++def normalize(data) :
++    # DTRACE keeps a per-CPU buffer, and when showing the fired probes,
++    # buffers are concatenated. So if the operating system moves our
++    # thread around, the straight result can be "non causal".
++    # So we add timestamps to the probe firing, and sort by that field.
++
++    # When compiling with '--with-pydebug'
++    data = "".join(re.split("\[[0-9]+ refs\]", data))
++
++    try :
++        result = [i.split("\t") \
++                for i in data.replace("\r", "").split("\n") if len(i)]
++        result.sort(key = lambda i: int(i[0]))
++        result = "".join((i[1] for i in result))
++        result = result.replace(" ", "")
++    except :
++        # If something goes wrong, rebuild the value so we can see the
++        # real result when the assert fails.
++        result = data.replace("\r", "").replace("\n", "")
++    return result
++
++dscript = """
++pid$target::PyEval_EvalCode:entry
++"""
++dscript = dscript.replace("\r", "").replace("\n", "")
++result, _ = subprocess.Popen(["dtrace", "-q", "-l", "-n", dscript,
++    "-c", "%s %s" %(sys.executable, sample)], stdout=subprocess.PIPE,
++    stderr=subprocess.STDOUT).communicate()
++if result.split("\n")[1].split()[-2:] != ["PyEval_EvalCode", "entry"] :
++    result2 = repr(result)
++    raise unittest.SkipTest("dtrace seems not to be working. " + \
++        "Please, check your privileges. " +
++        "Result: " +result2)
++
++class DTraceTestsNormal(unittest.TestCase) :
++    def setUp(self) :
++        self.optimize = False
++
++    def test_function_entry_return(self) :
++        dscript = """
++python$target:::function-entry
++/(copyinstr(arg0)=="%(path)s") &&
++(copyinstr(arg1)=="test_entry_return_and_stack")/
++{
++    self->trace = 1;
++}
++python$target:::function-entry,python$target:::function-return
++/(copyinstr(arg0)=="%(path)s") && (self->trace)/
++{
++    printf("%%d\t**%%s*%%s*%%s*%%d\\n", timestamp,
++        probename, copyinstr(arg0),
++        copyinstr(arg1), arg2);
++}
++python$target:::function-return
++/(copyinstr(arg0)=="%(path)s") &&
++(copyinstr(arg1)=="test_entry_return_and_stack")/
++{
++    self->trace = 0;
++}
++""" %{"path":sample}
++
++        dscript = dscript.replace("\r", "").replace("\n", "")
++        expected_result = """
++        **function-entry*%(path)s*test_entry_return_and_stack*25
++        **function-entry*%(path)s*function_1*6
++        **function-return*%(path)s*function_1*7
++        **function-entry*%(path)s*function_2*10
++        **function-entry*%(path)s*function_1*6
++        **function-return*%(path)s*function_1*7
++        **function-return*%(path)s*function_2*11
++        **function-entry*%(path)s*function_3*14
++        **function-return*%(path)s*function_3*15
++        **function-entry*%(path)s*function_4*18
++        **function-return*%(path)s*function_4*19
++        **function-entry*%(path)s*function_5*22
++        **function-return*%(path)s*function_5*23
++        **function-return*%(path)s*test_entry_return_and_stack*30
++        """ %{"path":sample}
++
++        command = "%s %s" %(sys.executable, sample)
++        if self.optimize :
++            command = "%s -OO %s" %(sys.executable, sample)
++        actual_result, _ = subprocess.Popen(["dtrace", "-q", "-n",
++            dscript,
++            "-c", command],
++                stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()
++
++        actual_result = normalize(actual_result)
++        expected_result = expected_result.replace("\r", "").replace("\n",
++                "").replace(" ", "")
++        self.assertEqual(actual_result, expected_result)
++
++    @unittest.skipIf(sys.platform == 'darwin',
++        "MacOS X doesn't support jstack()")
++    def test_stack(self) :
++        dscript = """
++python$target:::function-entry
++/(copyinstr(arg0)=="%(path)s") &&
++(copyinstr(arg1)=="test_entry_return_and_stack")/
++{
++    self->trace = 1;
++}
++python$target:::function-entry
++/(copyinstr(arg0)=="%(path)s") && (self->trace)/
++{
++    printf("[x]");
++    jstack();
++}
++python$target:::function-return
++/(copyinstr(arg0)=="%(path)s") &&
++(copyinstr(arg1)=="test_entry_return_and_stack")/
++{
++    self->trace = 0;
++}
++""" %{"path":sample}
++
++        dscript = dscript.replace("\r", "").replace("\n", "")
++        expected_result = """
++        [x]
++        [%(path)s:25(test_entry_return_and_stack)]
++        [x]
++        [%(path)s:6(function_1)]
++        [%(path)s:26(test_entry_return_and_stack)]
++        [x]
++        [%(path)s:10(function_2)]
++        [%(path)s:27(test_entry_return_and_stack)]
++        [x]
++        [%(path)s:6(function_1)]
++        [%(path)s:11(function_2)]
++        [%(path)s:27(test_entry_return_and_stack)]
++        [x]
++        [%(path)s:14(function_3)]
++        [%(path)s:28(test_entry_return_and_stack)]
++        [x]
++        [%(path)s:18(function_4)]
++        [%(path)s:29(test_entry_return_and_stack)]
++        [x]
++        [%(path)s:22(function_5)]
++        [%(path)s:30(test_entry_return_and_stack)]
++        """ %{"path":sample}
++
++        command = "%s %s" %(sys.executable, sample)
++        if self.optimize :
++            command = "%s -OO %s" %(sys.executable, sample)
++        actual_result, _ = subprocess.Popen(["dtrace", "-q", "-n",
++            dscript,
++            "-c", command],
++                stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()
++
++        # When compiling with '--with-pydebug'
++        actual_result = "".join(re.split("\[[0-9]+ refs\]", actual_result))
++
++        actual_result = [i for i in actual_result.split("\n") if (("[" in i)
++            and not i.endswith(" (<module>) ]"))]
++        actual_result = "".join(actual_result)
++        actual_result = actual_result.replace("\r", "").replace("\n",
++                "").replace(" ", "")
++        expected_result = expected_result.replace("\r", "").replace("\n",
++                "").replace(" ", "")
++        self.assertEqual(actual_result, expected_result)
++
++    def test_garbage_collection(self) :
++        dscript = """
++python$target:::gc-start,python$target:::gc-done
++{
++    printf("%d\t**%s(%ld)\\n", timestamp, probename, arg0);
++}
++"""
++
++        dscript = dscript.replace("\r", "").replace("\n", "")
++        command = "%s %s" %(sys.executable, sample)
++        if self.optimize :
++            command = "%s -OO %s" %(sys.executable, sample)
++        actual_result, _ = subprocess.Popen(["dtrace", "-q", "-n",
++            dscript,
++            "-c", command],
++                stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()
++
++        actual_result = normalize(actual_result)
++        for i in xrange(10) :
++            actual_result = actual_result.replace(str(i), "")
++        expected_result = "**gc-start()**gc-done()" * \
++            actual_result.count("**gc-start()**")
++
++        self.assertEqual(actual_result, expected_result)
++
++    def test_verify_opcodes(self) :
++        # Verify that we are checking:
++        opcodes = set(["CALL_FUNCTION", "CALL_FUNCTION_VAR",
++            "CALL_FUNCTION_KW", "CALL_FUNCTION_VAR_KW"])
++        with open(sample) as f :
++            obj = compile(f.read(), "sample", "exec")
++        class dump() :
++            def __init__(self) :
++                self.buf = []
++            def write(self, v) :
++                self.buf.append(v)
++
++        dump = dump()
++        stdout = sys.stdout
++        sys.stdout = dump
++        for i in obj.co_consts :
++            if isinstance(i, types.CodeType) and \
++                (i.co_name == 'test_entry_return_and_stack') :
++                dis.dis(i)
++        sys.stdout = stdout
++        dump = "\n".join(dump.buf)
++        dump = dump.replace("\r", "").replace("\n", "").split()
++        for i in dump :
++            opcodes.discard(i)
++        # Are we verifying all the relevant opcodes?
++        self.assertEqual(set(), opcodes)  # Are we verifying all opcodes?
++
++    def test_line(self) :
++        dscript = """
++python$target:::line
++/(copyinstr(arg0)=="%(path)s") &&
++(copyinstr(arg1)=="test_line")/
++{
++    printf("%%d\t**%%s*%%s*%%s*%%d\\n", timestamp,
++        probename, copyinstr(arg0),
++        copyinstr(arg1), arg2);
++}
++""" %{"path":sample}
++
++        dscript = dscript.replace("\r", "").replace("\n", "")
++        expected_result = """
++        **line*%(path)s*test_line*33
++        **line*%(path)s*test_line*34
++        **line*%(path)s*test_line*35
++        **line*%(path)s*test_line*36
++        **line*%(path)s*test_line*37
++        **line*%(path)s*test_line*38
++        **line*%(path)s*test_line*34
++        **line*%(path)s*test_line*35
++        **line*%(path)s*test_line*36
++        **line*%(path)s*test_line*37
++        **line*%(path)s*test_line*38
++        **line*%(path)s*test_line*34
++        **line*%(path)s*test_line*39
++        """ %{"path":sample}
++
++        command = "%s %s" %(sys.executable, sample)
++        if self.optimize :
++            command = "%s -OO %s" %(sys.executable, sample)
++        actual_result, _ = subprocess.Popen(["dtrace", "-q", "-n",
++            dscript,
++            "-c", command],
++                stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()
++
++        actual_result = normalize(actual_result)
++        expected_result = expected_result.replace("\r", "").replace("\n",
++                "").replace(" ", "")
++        self.assertEqual(actual_result, expected_result)
++
++    def test_instance_creation_destruction(self) :
++        dscript = """
++python$target:::function-entry
++/(copyinstr(arg0)=="%(path)s") &&
++(copyinstr(arg1)=="test_instance_creation_destruction")/
++{
++    self->trace = 1;
++}
++
++python$target:::instance-new-start,
++python$target:::instance-new-done,
++python$target:::instance-delete-start,
++python$target:::instance-delete-done
++/self->trace/
++{
++    printf("%%d\t**%%s* (%%s.%%s)\\n", timestamp,
++        probename, copyinstr(arg1), copyinstr(arg0));
++}
++
++python$target:::function-return
++/(copyinstr(arg0)=="%(path)s") &&
++(copyinstr(arg1)=="test_instance_creation_destruction")/
++{
++    self->trace = 0;
++}
++""" %{"path":sample}
++
++        dscript = dscript.replace("\r", "").replace("\n", "")
++        expected_result = """
++        **instance-new-start*(__main__.old_style_class)
++        **instance-new-done*(__main__.old_style_class)
++        **instance-delete-start*(__main__.old_style_class)
++        **instance-delete-done*(__main__.old_style_class)
++        **instance-new-start*(__main__.new_style_class)
++        **instance-new-done*(__main__.new_style_class)
++        **instance-delete-start*(__main__.new_style_class)
++        **instance-delete-done*(__main__.new_style_class)
++        **instance-new-start*(__main__.old_style_class)
++        **instance-new-done*(__main__.old_style_class)
++        **instance-new-start*(__main__.new_style_class)
++        **instance-new-done*(__main__.new_style_class)
++        **instance-delete-start*(__main__.old_style_class)
++        **instance-delete-done*(__main__.old_style_class)
++        **instance-delete-start*(__main__.new_style_class)
++        **instance-delete-done*(__main__.new_style_class)
++        """
++
++        command = "%s %s" %(sys.executable, sample)
++        if self.optimize :
++            command = "%s -OO %s" %(sys.executable, sample)
++        actual_result, _ = subprocess.Popen(["dtrace", "-q", "-n",
++            dscript,
++            "-c", command],
++                stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()
++
++        actual_result = normalize(actual_result)
++        expected_result = expected_result.replace("\r", "").replace("\n",
++                "").replace(" ", "")
++        self.assertEqual(actual_result, expected_result)
++
++
++
++# This class try to verify that dtrace probes
++# are still working with optimizations enabled in the bytecode.
++#
++# Some tests will not actually verify it. For instance,
++# source code compilation follows optimization status of
++# current working Python. So, you should run the test
++# both with an optimizing and a non optimizing Python.
++class DTraceTestsOptimize(DTraceTestsNormal) :
++    def setUp(self) :
++        self.optimize = True
++
++
++def test_main():
++    run_unittest(DTraceTestsNormal)
++    run_unittest(DTraceTestsOptimize)
++
++if __name__ == '__main__':
++    test_main()
++
+--- Lib/test/test_sys.py
++++ Lib/test/test_sys.py
+@@ -517,6 +517,7 @@
+         self.assertEqual(sys.getsizeof(True, -1), size('l'))
+ 
+     def test_objecttypes(self):
++        import dtrace
+         # check all types defined in Objects/
+         size = test.test_support.calcobjsize
+         vsize = test.test_support.calcvobjsize
+@@ -554,7 +555,10 @@
+         # complex
+         check(complex(0,1), size('2d'))
+         # code
+-        check(get_cell().func_code, size('4i8Pi3P'))
++        if dtrace.available :
++            check(get_cell().func_code, size('4i8PiPH2P'))
++        else :
++            check(get_cell().func_code, size('4i8Pi3P'))
+         # BaseException
+         check(BaseException(), size('3P'))
+         # UnicodeEncodeError
+--- Makefile.pre.in
++++ Makefile.pre.in
+@@ -51,6 +51,13 @@
+ # Use this to make a link between python$(VERSION) and python in $(BINDIR)
+ LN=		@LN@
+ 
++DTRACE=         @DTRACE@
++DFLAGS=         @DFLAGS@
++DTRACEOBJS=     @DTRACEOBJS@
++DTRACE_NM=      @DTRACE_NM@
++DTRACE_LINKER=  @DTRACE_LINKER@
++
++
+ # Portable install script (configure doesn't always guess right)
+ INSTALL=	@INSTALL@
+ INSTALL_PROGRAM=@INSTALL_PROGRAM@
+@@ -570,6 +577,7 @@
+ 		$(MODULE_OBJS) \
+ 		$(SIGNAL_OBJS) \
+ 		$(MODOBJS) \
++		$(DTRACEOBJS) \
+ 		$(srcdir)/Modules/getbuildinfo.c
+ 	$(CC) -c $(PY_CFLAGS) \
+ 	      -DSVNVERSION="\"`LC_ALL=C $(SVNVERSION)`\"" \
+@@ -577,6 +585,11 @@
+ 	      -DHGTAG="\"`LC_ALL=C $(HGTAG)`\"" \
+ 	      -DHGBRANCH="\"`LC_ALL=C $(HGBRANCH)`\"" \
+ 	      -o $@ $(srcdir)/Modules/getbuildinfo.c
++	if test "$(DTRACEOBJS)" != "" ; then \
++		$(DTRACE_LINKER) --relocatable \
++	          $@ $(DTRACEOBJS) -o $@.DTRACE ; \
++		mv $@.DTRACE $@ ; \
++	fi;
+ 
+ Modules/getpath.o: $(srcdir)/Modules/getpath.c Makefile
+ 	$(CC) -c $(PY_CFLAGS) -DPYTHONPATH='"$(PYTHONPATH)"' \
+@@ -664,6 +677,52 @@
+ Python/formatter_string.o: $(srcdir)/Python/formatter_string.c \
+ 				$(STRINGLIB_HEADERS)
+ 
++
++Include/pydtrace.h: Include/pydtrace.d
++	if test "$(DTRACE)" != "" ; then \
++		$(DTRACE) -o $@ $(DFLAGS) \
++			-C -h -s Include/pydtrace.d ; \
++	else	touch $@ ; \
++	fi;
++
++Include/pydtrace_offsets.h: Include/pydtrace_offsets.c Python/ceval.o
++	$(CC) $(OPT) $(LDFLAGS) -o Include/pydtrace_offsets \
++		Include/pydtrace_offsets.c
++	Include/pydtrace_offsets.sh $(DTRACE_NM) \
++		Python/ceval.o Include/pydtrace_offsets > \
++		Include/pydtrace_offsets.h
++
++Python/ceval.o: Include/pydtrace.h
++Modules/gcmodule.o: Include/pydtrace.h
++Objects/classobject.o: Include/pydtrace.h
++Objects/typeobject.o: Include/pydtrace.h
++
++Python/pydtrace.o: Include/pydtrace.d Include/pydtrace_offsets.h \
++			Python/ceval.o Modules/gcmodule.o \
++			Objects/classobject.o Objects/typeobject.o
++	# We do the "touch" game to break a circular dependency between
++	# "Python/ceval.o" and "Include/pydtrace_offsets.h".
++	if test "$(DTRACE)" != "" ; then \
++		touch -r Python/ceval.o Python/ceval.o.ts_dtrace ; \
++		touch -r Modules/gcmodule.o Modules/gcmodule.o.ts_dtrace ; \
++		touch -r Objects/classobject.o Objects/classobject.o.ts_dtrace ; \
++		touch -r Objects/typeobject.o Objects/typeobject.o.ts_dtrace ; \
++		$(DTRACE) -o $@ -DPYDTRACE_STACK_HELPER \
++			$(CPPFLAGS) $(DFLAGS) \
++			-C -G -s Include/pydtrace.d \
++			  Python/ceval.o Modules/gcmodule.o \
++			  Objects/classobject.o Objects/typeobject.o ; \
++		touch -r Python/ceval.o.ts_dtrace Python/ceval.o ; \
++		touch -r Modules/gcmodule.o.ts_dtrace Modules/gcmodule.o ; \
++		touch -r Objects/classobject.o.ts_dtrace Objects/classobject.o ; \
++		touch -r Objects/typeobject.o.ts_dtrace Objects/typeobject.o ; \
++		rm Python/ceval.o.ts_dtrace ; \
++		rm Modules/gcmodule.o.ts_dtrace ; \
++		rm Objects/classobject.o.ts_dtrace ; \
++		rm Objects/typeobject.o.ts_dtrace ; \
++	else    touch $@ ; \
++	fi;
++
+ ############################################################################
+ # Header files
+ 
+@@ -1276,6 +1335,12 @@
+ 	find . -name '*.so.[0-9]*.[0-9]*' -exec rm -f {} ';'
+ 	find build -name 'fficonfig.h' -exec rm -f {} ';' || true
+ 	find build -name 'fficonfig.py' -exec rm -f {} ';' || true
++	rm -f Include/pydtrace.h
++	rm -f Include/pydtrace_offsets Include/pydtrace_offsets.h 
++	rm -f Python/ceval.o.ts_dtrace
++	rm -f Modules/gcmodule.o.ts_dtrace
++	rm -f Objects/classobject.o.ts_dtrace
++	rm -f Objects/typeobject.o.ts_dtrace
+ 	-rm -f Lib/lib2to3/*Grammar*.pickle
+ 
+ profile-removal:
+@@ -1305,6 +1370,12 @@
+ 				     -o -name '*.orig' -o -name '*.rej' \
+ 				     -o -name '*.bak' ')' \
+ 				     -exec rm -f {} ';'
++	rm -f Include/pydtrace.h
++	rm -f Include/pydtrace_offsets Include/pydtrace_offsets.h
++	rm -f Python/ceval.o.ts_dtrace
++	rm -f Modules/gcmodule.o.ts_dtrace
++	rm -f Objects/classobject.o.ts_dtrace
++	rm -f Objects/typeobject.o.ts_dtrace
+ 
+ # Check for smelly exported symbols (not starting with Py/_Py)
+ smelly: all
+--- /dev/null
++++ Modules/dtracemodule.c
+@@ -0,0 +1,25 @@
++#include "Python.h"
++
++static PyMethodDef dtrace_methods[] = {
++    {NULL,      NULL}
++};
++
++
++PyMODINIT_FUNC initdtrace(void)
++{
++    PyObject *mod, *v;
++
++    mod = Py_InitModule("dtrace", dtrace_methods);
++    if (!mod)
++        return;
++
++#ifdef WITH_DTRACE
++    v = Py_True;
++#else
++    v = Py_False;
++#endif
++
++    Py_INCREF(v);
++    if (PyModule_AddObject(mod, "available", v) < 0)
++        return;
++}
+--- Modules/gcmodule.c
++++ Modules/gcmodule.c
+@@ -21,6 +21,10 @@
+ #include "Python.h"
+ #include "frameobject.h"        /* for PyFrame_ClearFreeList */
+ 
++#ifdef WITH_DTRACE
++#include "pydtrace.h"
++#endif
++
+ /* Get an object's GC head */
+ #define AS_GC(o) ((PyGC_Head *)(o)-1)
+ 
+@@ -869,7 +873,12 @@
+ /* This is the main function.  Read this to understand how the
+  * collection process works. */
+ static Py_ssize_t
+-collect(int generation)
++#ifdef WITH_DTRACE
++collect2
++#else
++collect
++#endif
++(int generation)
+ {
+     int i;
+     Py_ssize_t m = 0; /* # objects collected */
+@@ -1029,6 +1038,49 @@
+     return n+m;
+ }
+ 
++#ifdef WITH_DTRACE
++static void
++dtrace_gc_start(int collection)
++{
++    PYTHON_GC_START(collection);
++
++    /*
++     * Currently a USDT tail-call will not receive the correct arguments.
++     * Disable the tail call here.
++     */
++#if defined(__sparc)
++    asm("nop");
++#endif
++}
++
++static void
++dtrace_gc_done(Py_ssize_t value)
++{
++    PYTHON_GC_DONE((long) value);
++
++    /*
++     * Currently a USDT tail-call will not receive the correct arguments.
++     * Disable the tail call here.
++     */
++#if defined(__sparc)
++    asm("nop");
++#endif
++}
++
++static Py_ssize_t
++collect(int collection)
++{
++    Py_ssize_t value;
++
++    if (PYTHON_GC_START_ENABLED())
++        dtrace_gc_start(collection);
++    value = collect2(collection);
++    if (PYTHON_GC_DONE_ENABLED())
++        dtrace_gc_done(value);
++    return value;
++}
++#endif /* WITH_DTRACE */
++
+ static Py_ssize_t
+ collect_generations(void)
+ {
+--- Objects/classobject.c
++++ Objects/classobject.c
+@@ -4,6 +4,10 @@
+ #include "Python.h"
+ #include "structmember.h"
+ 
++#ifdef WITH_DTRACE
++#include "pydtrace.h"
++#endif
++
+ /* Free list for method objects to safe malloc/free overhead
+  * The im_self element is used to chain the elements.
+  */
+@@ -553,6 +557,30 @@
+     PyObject *init;
+     static PyObject *initstr;
+ 
++#ifdef WITH_DTRACE
++    PyObject *mod;
++    char *mod_name;
++    char *cl_name;
++
++    if (PYTHON_INSTANCE_NEW_START_ENABLED()) {
++        mod = PyDict_GetItemString(((PyClassObject *)klass)->cl_dict,
++                "__module__");
++
++        if (mod == NULL || !PyString_Check(mod)) {
++            mod_name = "?";
++        } else {
++            mod_name = PyString_AS_STRING(mod);
++            if (!mod_name)
++                 mod_name = "?";
++        }
++        cl_name = PyString_AS_STRING(((PyClassObject *)klass)->cl_name);
++        if (!cl_name)
++            cl_name = "?";
++
++        PYTHON_INSTANCE_NEW_START(cl_name, mod_name);
++    }
++#endif
++
+     if (initstr == NULL) {
+         initstr = PyString_InternFromString("__init__");
+         if (initstr == NULL)
+@@ -594,6 +622,26 @@
+             Py_DECREF(res);
+         }
+     }
++
++#ifdef WITH_DTRACE
++    if (PYTHON_INSTANCE_NEW_DONE_ENABLED()) {
++        mod = PyDict_GetItemString(((PyClassObject *)klass)->cl_dict,
++                "__module__");
++
++        if (mod == NULL || !PyString_Check(mod)) {
++            mod_name = "?";
++        } else {
++            mod_name = PyString_AS_STRING(mod);
++            if (!mod_name)
++                 mod_name = "?";
++        }
++        cl_name = PyString_AS_STRING(((PyClassObject *)klass)->cl_name);
++        if (!cl_name)
++            cl_name = "?";
++
++        PYTHON_INSTANCE_NEW_DONE(cl_name, mod_name);
++    }
++#endif
+     return (PyObject *)inst;
+ }
+ 
+@@ -628,7 +676,12 @@
+ 
+ 
+ static void
+-instance_dealloc(register PyInstanceObject *inst)
++#ifdef WITH_DTRACE
++instance_dealloc2
++#else
++instance_dealloc
++#endif
++(register PyInstanceObject *inst)
+ {
+     PyObject *error_type, *error_value, *error_traceback;
+     PyObject *del;
+@@ -705,6 +758,49 @@
+     }
+ }
+ 
++#ifdef WITH_DTRACE
++static void
++instance_dealloc(register PyInstanceObject *inst)
++{
++    PyObject *mod;
++    char *mod_name = NULL;
++    char *cl_name = NULL;
++    PyClassObject *in_class;
++
++    if (PYTHON_INSTANCE_DELETE_START_ENABLED() ||
++            PYTHON_INSTANCE_DELETE_DONE_ENABLED()) {
++        in_class = inst->in_class;
++        Py_INCREF(in_class);
++        mod = PyDict_GetItemString(in_class->cl_dict, "__module__");
++        if (mod == NULL || !PyString_Check(mod)) {
++            mod_name = "?";
++        } else {
++            mod_name = PyString_AS_STRING(mod);
++            if (!mod_name)
++                 mod_name = "?";
++        }
++        cl_name = PyString_AS_STRING(in_class->cl_name);
++        if (!cl_name)
++             cl_name = "?";
++    }
++
++    if (PYTHON_INSTANCE_DELETE_START_ENABLED() && cl_name) {
++        PYTHON_INSTANCE_DELETE_START(cl_name, mod_name);
++    }
++
++    instance_dealloc2(inst);
++
++    if (PYTHON_INSTANCE_DELETE_DONE_ENABLED() && cl_name) {
++        PYTHON_INSTANCE_DELETE_DONE(cl_name, mod_name);
++    }
++
++    if (cl_name) {
++        Py_DECREF(in_class);
++    }
++}
++#endif
++
++
+ static PyObject *
+ instance_getattr1(register PyInstanceObject *inst, PyObject *name)
+ {
+--- Objects/codeobject.c
++++ Objects/codeobject.c
+@@ -104,6 +104,28 @@
+         co->co_lnotab = lnotab;
+         co->co_zombieframe = NULL;
+         co->co_weakreflist = NULL;
++#ifdef WITH_DTRACE
++        i = PyString_Size(co->co_code);
++        co->co_linenos = PyMem_Malloc(sizeof(unsigned short) * i);
++        if (co->co_linenos) {
++            unsigned short *p = (unsigned short *)(co->co_linenos);
++            unsigned char *p2 = (unsigned char*)PyString_AsString(co->co_lnotab);
++            int size = PyString_Size(co->co_lnotab) / 2;
++            int i2;
++            unsigned short offset = 0;
++
++            while (size) {
++                size -= 1;
++                i2 = *p2++;
++                i-=i2;
++                while (i2--)
++                    *p++ = offset;
++                offset += *p2++;
++            }
++            while(i--)
++                *p++ = offset;
++        }
++#endif
+     }
+     return co;
+ }
+@@ -313,6 +335,10 @@
+     Py_XDECREF(co->co_filename);
+     Py_XDECREF(co->co_name);
+     Py_XDECREF(co->co_lnotab);
++#ifdef WITH_DTRACE
++    if (co->co_linenos)
++        PyMem_Free(co->co_linenos);
++#endif
+     if (co->co_zombieframe != NULL)
+         PyObject_GC_Del(co->co_zombieframe);
+     if (co->co_weakreflist != NULL)
+--- Objects/typeobject.c
++++ Objects/typeobject.c
+@@ -3,6 +3,10 @@
+ #include "Python.h"
+ #include "structmember.h"
+ 
++#ifdef WITH_DTRACE
++#include "pydtrace.h"
++#endif
++
+ #include <ctype.h>
+ 
+ 
+@@ -754,8 +758,29 @@
+ PyType_GenericAlloc(PyTypeObject *type, Py_ssize_t nitems)
+ {
+     PyObject *obj;
+-    const size_t size = _PyObject_VAR_SIZE(type, nitems+1);
++    size_t size;
++
++#ifdef WITH_DTRACE
++    PyObject *mod;
++    char *mod_name;
++
++    if (PYTHON_INSTANCE_NEW_START_ENABLED()) {
++        if (type->tp_flags & Py_TPFLAGS_HEAPTYPE) {
++            mod = PyDict_GetItemString(type->tp_dict, "__module__");
++            if (mod == NULL || !PyString_Check(mod)) {
++                mod_name = "?";
++            } else {
++                mod_name = PyString_AS_STRING(mod);
++                if (!mod_name)
++                     mod_name = "?";
++            }
++            PYTHON_INSTANCE_NEW_START((char *)(type->tp_name), mod_name);
++        }
++    }
++#endif
++
+     /* note that we need to add one, for the sentinel */
++    size = _PyObject_VAR_SIZE(type, nitems+1);
+ 
+     if (PyType_IS_GC(type))
+         obj = _PyObject_GC_Malloc(size);
+@@ -777,6 +802,23 @@
+ 
+     if (PyType_IS_GC(type))
+         _PyObject_GC_TRACK(obj);
++
++#ifdef WITH_DTRACE
++    if (PYTHON_INSTANCE_NEW_DONE_ENABLED()) {
++        if (type->tp_flags & Py_TPFLAGS_HEAPTYPE) {
++            mod = PyDict_GetItemString(type->tp_dict, "__module__");
++            if (mod == NULL || !PyString_Check(mod)) {
++                mod_name = "?";
++            } else {
++                mod_name = PyString_AS_STRING(mod);
++                if (!mod_name)
++                     mod_name = "?";
++            }
++            PYTHON_INSTANCE_NEW_DONE((char *)(type->tp_name), mod_name);
++        }
++    }
++#endif
++
+     return obj;
+ }
+ 
+@@ -897,9 +939,56 @@
+     return 0;
+ }
+ 
++#ifdef WITH_DTRACE
++static void subtype_dealloc2(PyObject *);  /* Forward declaration */
++
+ static void
+ subtype_dealloc(PyObject *self)
+ {
++    PyObject *mod;
++    char *mod_name;
++    PyTypeObject *type;
++
++    type = Py_TYPE(self);
++    Py_INCREF(type);
++
++    if (PYTHON_INSTANCE_DELETE_START_ENABLED()) {
++        mod = PyDict_GetItemString(type->tp_dict, "__module__");
++        if (mod == NULL || !PyString_Check(mod)) {
++            mod_name = "?";
++        } else {
++            mod_name = PyString_AS_STRING(mod);
++            if (!mod_name)
++                 mod_name = "?";
++        }
++        PYTHON_INSTANCE_DELETE_START((char *)(type->tp_name), mod_name);
++    }
++
++    subtype_dealloc2(self);
++
++    if (PYTHON_INSTANCE_DELETE_DONE_ENABLED()) {
++        mod = PyDict_GetItemString(type->tp_dict, "__module__");
++        if (mod == NULL || !PyString_Check(mod)) {
++            mod_name = "?";
++        } else {
++            mod_name = PyString_AS_STRING(mod);
++            if (!mod_name)
++                 mod_name = "?";
++        }
++        PYTHON_INSTANCE_DELETE_DONE((char *)(type->tp_name), mod_name);
++    }
++    Py_DECREF(type);
++}
++#endif
++
++static void
++#ifdef WITH_DTRACE
++subtype_dealloc2
++#else
++subtype_dealloc
++#endif
++(PyObject *self)
++{
+     PyTypeObject *type, *base;
+     destructor basedealloc;
+     PyThreadState *tstate = PyThreadState_GET();
+--- Python/ceval.c
++++ Python/ceval.c
+@@ -19,6 +19,10 @@
+ 
+ #include <ctype.h>
+ 
++#ifdef WITH_DTRACE
++#include "pydtrace.h"
++#endif
++
+ #ifndef WITH_TSC
+ 
+ #define READ_TIMESTAMP(var)
+@@ -120,6 +124,12 @@
+ #define CALL_FLAG_VAR 1
+ #define CALL_FLAG_KW 2
+ 
++#ifdef WITH_DTRACE
++static void maybe_dtrace_line(PyFrameObject *frame,
++                              int *instr_lb, int *instr_ub,
++                              int *instr_prev);
++#endif
++
+ #ifdef LLTRACE
+ static int lltrace;
+ static int prtrace(PyObject *, char *);
+@@ -672,6 +682,50 @@
+                       NULL);
+ }
+ 
++#ifdef WITH_DTRACE
++static void
++dtrace_entry(PyFrameObject *f)
++{
++    const char *filename;
++    const char *fname;
++    int lineno;
++
++    filename = PyString_AsString(f->f_code->co_filename);
++    fname = PyString_AsString(f->f_code->co_name);
++    lineno = PyCode_Addr2Line(f->f_code, f->f_lasti);
++
++    PYTHON_FUNCTION_ENTRY((char *)filename, (char *)fname, lineno);
++
++    /*
++     * Currently a USDT tail-call will not receive the correct arguments.
++     * Disable the tail call here.
++     */
++#if defined(__sparc)
++    asm("nop");
++#endif
++}
++
++static void
++dtrace_return(PyFrameObject *f)
++{
++    const char *filename;
++    const char *fname;
++    int lineno;
++
++    filename = PyString_AsString(f->f_code->co_filename);
++    fname = PyString_AsString(f->f_code->co_name);
++    lineno = PyCode_Addr2Line(f->f_code, f->f_lasti);
++    PYTHON_FUNCTION_RETURN((char *)filename, (char *)fname, lineno);
++
++    /*
++     * Currently a USDT tail-call will not receive the correct arguments.
++     * Disable the tail call here.
++     */
++#if defined(__sparc)
++    asm("nop");
++#endif
++}
++#endif
+ 
+ /* Interpreter main loop */
+ 
+@@ -683,8 +737,16 @@
+     return PyEval_EvalFrameEx(f, 0);
+ }
+ 
++
+ PyObject *
++#if defined(WITH_DTRACE) && defined(__amd64)
++PyEval_EvalFrameExReal(long a1, long a2, long a3, long a4, long a5, long a6,
++    PyFrameObject *f, int throwflag)
++#elif defined(WITH_DTRACE) && defined(__sparc)
++PyEval_EvalFrameExReal(PyFrameObject *f, int throwflag)
++#else
+ PyEval_EvalFrameEx(PyFrameObject *f, int throwflag)
++#endif
+ {
+ #ifdef DXPAIRS
+     int lastopcode = 0;
+@@ -910,6 +972,11 @@
+         }
+     }
+ 
++#ifdef WITH_DTRACE
++    if (PYTHON_FUNCTION_ENTRY_ENABLED())
++        dtrace_entry(f);
++#endif
++
+     co = f->f_code;
+     names = co->co_names;
+     consts = co->co_consts;
+@@ -1096,6 +1163,12 @@
+         /* Main switch on opcode */
+         READ_TIMESTAMP(inst0);
+ 
++#ifdef WITH_DTRACE
++        if (PYTHON_LINE_ENABLED()) {
++            maybe_dtrace_line(f, &instr_lb, &instr_ub, &instr_prev);
++        }
++#endif
++
+         switch (opcode) {
+ 
+         /* BEWARE!
+@@ -3001,6 +3074,10 @@
+ 
+     /* pop frame */
+ exit_eval_frame:
++#ifdef WITH_DTRACE
++    if (PYTHON_FUNCTION_RETURN_ENABLED())
++        dtrace_return(f);
++#endif
+     Py_LeaveRecursiveCall();
+     tstate->frame = f->f_back;
+ 
+@@ -3696,6 +3773,57 @@
+     return result;
+ }
+ 
++/*
++ * These shenanigans look like utter madness, but what we're actually doing is
++ * making sure that the ustack helper will see the PyFrameObject pointer on the
++ * stack. We have two tricky cases:
++ *
++ * amd64
++ *
++ * We use up the six registers for passing arguments, meaning the call can't
++ * use a register for passing 'f', and has to push it onto the stack in a known
++ * location.
++ *
++ * And how does "throwflag" figure in to this? -PN
++ *
++ * SPARC
++ *
++ * Here the problem is that (on 32-bit) the compiler is re-using %i0 before
++ * some calls inside PyEval_EvalFrameReal(), which means that when it's saved,
++ * it's just some junk value rather than the real first argument. So, instead,
++ * we trace our proxy PyEval_EvalFrame(), where we 'know' the compiler won't
++ * decide to re-use %i0. We also need to defeat optimization of our proxy.
++ */
++
++#if defined(WITH_DTRACE)
++
++#if defined(__amd64)
++
++PyObject *
++PyEval_EvalFrameEx(PyFrameObject *f, int throwflag)
++{
++    volatile PyObject *f2;
++    f2 = PyEval_EvalFrameExReal(0, 0, 0, 0, 0, 0, f, throwflag);
++    return (PyObject *)f2;
++}
++
++#elif defined(__sparc)
++
++volatile int dummy;
++
++PyObject *
++PyEval_EvalFrameEx(PyFrameObject *f, int throwflag)
++{
++    volatile PyObject *f2;
++    f2 = PyEval_EvalFrameExReal(f, throwflag);
++    dummy = f->ob_refcnt;
++    return (PyObject *)f2;
++}
++
++#endif
++#endif
++
++
+ PyObject *
+ _PyEval_CallTracing(PyObject *func, PyObject *args)
+ {
+@@ -3714,6 +3842,51 @@
+     return result;
+ }
+ 
++#ifdef WITH_DTRACE
++/* See Objects/lnotab_notes.txt for a description of how tracing works. */
++/* Practically a ripoff of "maybe_call_line_trace" function. */
++static void
++maybe_dtrace_line(PyFrameObject *frame, int *instr_lb, int *instr_ub,
++                  int *instr_prev)
++{
++    int line = frame->f_lineno;
++    char *co_filename, *co_name;
++
++    /* If the last instruction executed isn't in the current
++       instruction window, reset the window.
++    */
++    if (frame->f_lasti < *instr_lb || frame->f_lasti >= *instr_ub) {
++        PyAddrPair bounds;
++        line = _PyCode_CheckLineNumber(frame->f_code, frame->f_lasti,
++                                       &bounds);
++        *instr_lb = bounds.ap_lower;
++        *instr_ub = bounds.ap_upper;
++    }
++    /* If the last instruction falls at the start of a line or if
++       it represents a jump backwards, update the frame's line
++       number and call the trace function. */
++    if (frame->f_lasti == *instr_lb || frame->f_lasti < *instr_prev) {
++        frame->f_lineno = line;
++        co_filename = PyString_AsString(frame->f_code->co_filename);
++        if (!co_filename)
++            co_filename = "?";
++        co_name = PyString_AsString(frame->f_code->co_name);
++        if (!co_name)
++            co_name = "?";
++        PYTHON_LINE(co_filename, co_name, line);
++    }
++    *instr_prev = frame->f_lasti;
++
++    /*
++     * Currently a USDT tail-call will not receive the correct arguments.
++     * Disable the tail call here.
++     */
++#if defined(__sparc)
++    asm("nop");
++#endif
++}
++#endif
++
+ /* See Objects/lnotab_notes.txt for a description of how tracing works. */
+ static int
+ maybe_call_line_trace(Py_tracefunc func, PyObject *obj,
+--- Python/sysmodule.c
++++ Python/sysmodule.c
+@@ -1399,7 +1399,6 @@
+     Py_XDECREF(sysin);
+     Py_XDECREF(sysout);
+     Py_XDECREF(syserr);
+-
+     SET_SYS_FROM_STRING("version",
+                          PyString_FromString(Py_GetVersion()));
+     SET_SYS_FROM_STRING("hexversion",
+--- configure
++++ configure
+@@ -639,6 +639,11 @@
+ MACHDEP_OBJS
+ DYNLOADFILE
+ DLINCLDIR
++DTRACEOBJS
++DTRACE_LINKER
++DTRACE_NM
++DFLAGS
++DTRACE
+ THREADOBJ
+ LDLAST
+ USE_THREAD_MODULE
+@@ -801,6 +806,7 @@
+ with_tsc
+ with_pymalloc
+ with_valgrind
++with_dtrace
+ with_wctype_functions
+ with_fpectl
+ with_libm
+@@ -1482,6 +1488,7 @@
+   --with(out)-tsc         enable/disable timestamp counter profile
+   --with(out)-pymalloc    disable/enable specialized mallocs
+   --with-valgrind         Enable Valgrind support
++  --with(out)-dtrace      disable/enable dtrace support
+   --with-wctype-functions use wctype.h functions
+   --with-fpectl           enable SIGFPE catching
+   --with-libm=STRING      math library
+@@ -10066,6 +10073,181 @@
+ 
+ fi
+ 
++# Check for dtrace support
++{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for --with-dtrace" >&5
++$as_echo_n "checking for --with-dtrace... " >&6; }
++
++# Check whether --with-dtrace was given.
++if test "${with_dtrace+set}" = set; then :
++  withval=$with_dtrace;
++else
++  with_dtrace=no
++fi
++
++{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $with_dtrace" >&5
++$as_echo "$with_dtrace" >&6; }
++
++
++
++
++
++DTRACE=
++DFLAGS=
++if test "$with_dtrace" = "yes"
++then
++    DTRACE_NM=OTHER
++    DTRACE_LINKER=ld
++    DTRACEOBJS="Python/pydtrace.o"
++    # Extract the first word of "dtrace", so it can be a program name with args.
++set dummy dtrace; ac_word=$2
++{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
++$as_echo_n "checking for $ac_word... " >&6; }
++if ${ac_cv_path_DTRACE+:} false; then :
++  $as_echo_n "(cached) " >&6
++else
++  case $DTRACE in
++  [\\/]* | ?:[\\/]*)
++  ac_cv_path_DTRACE="$DTRACE" # Let the user override the test with a path.
++  ;;
++  *)
++  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
++for as_dir in $PATH$PATH_SEPARATOR/usr/sbin
++do
++  IFS=$as_save_IFS
++  test -z "$as_dir" && as_dir=.
++    for ac_exec_ext in '' $ac_executable_extensions; do
++  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
++    ac_cv_path_DTRACE="$as_dir/$ac_word$ac_exec_ext"
++    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
++    break 2
++  fi
++done
++  done
++IFS=$as_save_IFS
++
++  test -z "$ac_cv_path_DTRACE" && ac_cv_path_DTRACE="dtrace"
++  ;;
++esac
++fi
++DTRACE=$ac_cv_path_DTRACE
++if test -n "$DTRACE"; then
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $DTRACE" >&5
++$as_echo "$DTRACE" >&6; }
++else
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
++$as_echo "no" >&6; }
++fi
++
++
++    # The cast to long int works around a bug in the HP C Compiler
++# version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
++# declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
++# This bug is HP SR number 8606223364.
++{ $as_echo "$as_me:${as_lineno-$LINENO}: checking size of long" >&5
++$as_echo_n "checking size of long... " >&6; }
++if ${ac_cv_sizeof_long+:} false; then :
++  $as_echo_n "(cached) " >&6
++else
++  if ac_fn_c_compute_int "$LINENO" "(long int) (sizeof (long))" "ac_cv_sizeof_long"        "$ac_includes_default"; then :
++
++else
++  if test "$ac_cv_type_long" = yes; then
++     { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
++$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
++as_fn_error 77 "cannot compute sizeof (long)
++See \`config.log' for more details" "$LINENO" 5; }
++   else
++     ac_cv_sizeof_long=0
++   fi
++fi
++
++fi
++{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_sizeof_long" >&5
++$as_echo "$ac_cv_sizeof_long" >&6; }
++
++
++
++cat >>confdefs.h <<_ACEOF
++#define SIZEOF_LONG $ac_cv_sizeof_long
++_ACEOF
++
++
++    if test "$ac_cv_sizeof_long" -eq 8
++    then
++        DFLAGS="-64"
++    else
++        DFLAGS="-32"
++    fi
++    sys_release="$ac_sys_release"
++    if test $ac_sys_system = "SunOS"
++    then
++        if test $sys_release="5.11"
++        then
++            sys_release=`uname -v`
++        fi
++    fi
++    case $ac_sys_system/$sys_release in
++        SunOS/5.10)
++            DTRACE_NM=SOLARIS
++            DTRACE_LINKER=/usr/ccs/bin/ld
++            ;;
++        SunOS/11.*)
++            DTRACE_NM=SOLARIS
++            DTRACE_LINKER=/usr/ccs/bin/ld
++	    ;;
++        SunOS/*)
++            DTRACE_LINKER=/usr/ccs/bin/ld
++            ;;
++        Darwin/*)
++            DTRACEOBJS=""  # Not needed in Mac
++            # The cast to long int works around a bug in the HP C Compiler
++# version HP92453-01 B.11.11.23709.GP, which incorrectly rejects
++# declarations like `int a3[[(sizeof (unsigned char)) >= 0]];'.
++# This bug is HP SR number 8606223364.
++{ $as_echo "$as_me:${as_lineno-$LINENO}: checking size of long" >&5
++$as_echo_n "checking size of long... " >&6; }
++if ${ac_cv_sizeof_long+:} false; then :
++  $as_echo_n "(cached) " >&6
++else
++  if ac_fn_c_compute_int "$LINENO" "(long int) (sizeof (long))" "ac_cv_sizeof_long"        "$ac_includes_default"; then :
++
++else
++  if test "$ac_cv_type_long" = yes; then
++     { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
++$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
++as_fn_error 77 "cannot compute sizeof (long)
++See \`config.log' for more details" "$LINENO" 5; }
++   else
++     ac_cv_sizeof_long=0
++   fi
++fi
++
++fi
++{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_sizeof_long" >&5
++$as_echo "$ac_cv_sizeof_long" >&6; }
++
++
++
++cat >>confdefs.h <<_ACEOF
++#define SIZEOF_LONG $ac_cv_sizeof_long
++_ACEOF
++
++
++            if test "$ac_cv_sizeof_long" -eq 8
++            then
++                DFLAGS="-arch i386"
++            else
++                DFLAGS="-arch x86_64"
++            fi
++            ;;
++    esac
++
++$as_echo "#define WITH_DTRACE 1" >>confdefs.h
++
++fi
++
++
++
+ # Check for --with-wctype-functions
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for --with-wctype-functions" >&5
+ $as_echo_n "checking for --with-wctype-functions... " >&6; }
+--- configure.ac
++++ configure.ac
+@@ -2830,6 +2830,69 @@
+     )
+ fi
+ 
++# Check for dtrace support
++AC_MSG_CHECKING(for --with-dtrace)
++AC_ARG_WITH(dtrace,
++  AC_HELP_STRING(--with(out)-dtrace, disable/enable dtrace support),,
++  with_dtrace=no)
++AC_MSG_RESULT($with_dtrace)
++
++AC_SUBST(DTRACE)
++AC_SUBST(DFLAGS)
++AC_SUBST(DTRACE_NM)
++AC_SUBST(DTRACE_LINKER)
++DTRACE=
++DFLAGS=
++if test "$with_dtrace" = "yes"
++then
++    DTRACE_NM=OTHER
++    DTRACE_LINKER=ld
++    DTRACEOBJS="Python/pydtrace.o"
++    AC_PATH_PROG(DTRACE, [dtrace], [dtrace], [$PATH$PATH_SEPARATOR/usr/sbin])
++    AC_CHECK_SIZEOF([long])
++    if [test "$ac_cv_sizeof_long" -eq 8]
++    then
++        DFLAGS="-64"
++    else
++        DFLAGS="-32"
++    fi
++    sys_release="$ac_sys_release"
++    if test $ac_sys_system = "SunOS"
++    then
++        if test $sys_release="5.11"
++        then
++            sys_release=`uname -v`
++        fi
++    fi
++    case $ac_sys_system/$sys_release in
++        SunOS/5.10)
++            DTRACE_NM=SOLARIS
++            DTRACE_LINKER=/usr/ccs/bin/ld
++            ;;
++        SunOS/11.*)
++            DTRACE_NM=SOLARIS
++            DTRACE_LINKER=/usr/ccs/bin/ld
++	    ;;
++        SunOS/*)
++            DTRACE_LINKER=/usr/ccs/bin/ld
++            ;;
++        Darwin/*)
++            DTRACEOBJS=""  # Not needed in Mac
++            AC_CHECK_SIZEOF([long])
++            if [test "$ac_cv_sizeof_long" -eq 8]
++            then
++                DFLAGS="-arch i386"
++            else
++                DFLAGS="-arch x86_64"
++            fi
++            ;;
++    esac
++    AC_DEFINE(WITH_DTRACE, 1, 
++     [Define if you want to compile in Dtrace support])
++fi
++
++AC_SUBST(DTRACEOBJS)
++
+ # Check for --with-wctype-functions
+ AC_MSG_CHECKING(for --with-wctype-functions)
+ AC_ARG_WITH(wctype-functions, 
+--- pyconfig.h.in
++++ pyconfig.h.in
+@@ -1101,6 +1101,9 @@
+ /* Define if you want documentation strings in extension modules */
+ #undef WITH_DOC_STRINGS
+ 
++/* Define to compile in Dtrace support */
++#undef WITH_DTRACE
++
+ /* Define if you want to use the new-style (Openstep, Rhapsody, MacOS) dynamic
+    linker (dyld) instead of the old-style (NextStep) dynamic linker (rld).
+    Dyld is necessary to support frameworks. */
+--- setup.py
++++ setup.py
+@@ -679,6 +679,9 @@
+         # http://mail.python.org/pipermail/python-dev/2006-January/060023.html
+         #exts.append( Extension('timing', ['timingmodule.c']) )
+ 
++        # jcea DTRACE probes
++        exts.append( Extension('dtrace', ['dtracemodule.c']) )
++
+         #
+         # Here ends the simple stuff.  From here on, modules need certain
+         # libraries, are platform-specific, or present other surprises.

@@ -12,7 +12,7 @@ from pythonz.util import symlink, makedirs, Package, is_url, Link,\
     unlink, is_html, Subprocess, rm_r, is_python26, is_python27,\
     extract_downloadfile, is_archive_file, path_to_fileurl, is_file,\
     fileurl_to_path, is_python30, is_python31, is_python32,\
-    get_macosx_deployment_target, Version, is_python25, is_python24
+    get_macosx_deployment_target, Version, is_python25, is_python24, is_python33
 from pythonz.define import PATH_BUILD, PATH_DISTS, PATH_PYTHONS, PATH_LOG, \
     PATH_PATCHES_ALL, PATH_PATCHES_OSX
 from pythonz.downloader import Downloader, DownloadError
@@ -100,7 +100,7 @@ class CPythonInstaller(Installer):
                           '3.0', '3.0.1',
                           '3.1', '3.1.1', '3.1.2', '3.1.3', '3.1.4', '3.1.5',
                           '3.2', '3.2.1', '3.2.2', '3.2.3', '3.2.4', '3.2.5',
-                          '3.3.0', '3.3.1', '3.3.2', '3.3.3']
+                          '3.3.0', '3.3.1', '3.3.2', '3.3.3', '3.3.4']
 
     def __init__(self, version, options):
         super(CPythonInstaller, self).__init__(version, options)
@@ -304,6 +304,12 @@ class CPythonInstaller(Installer):
             PATH_PATCHES_OSX_PYTHON27 = os.path.join(PATH_PATCHES_OSX, "python27")
             if version < '2.7.4':
                 self._append_patch(PATH_PATCHES_OSX_PYTHON27, ['patch-Modules-posixmodule.diff'])
+            elif version == '2.7.6':
+                self._append_patch(PATH_PATCHES_OSX_PYTHON27, ['python-276-dtrace.diff'])
+        elif is_python33(version):
+            PATH_PATCHES_OSX_PYTHON33 = os.path.join(PATH_PATCHES_OSX, "python33")
+            if version == '3.3.4':
+                self._append_patch(PATH_PATCHES_OSX_PYTHON33, ['python-334-dtrace.diff'])
 
     def patch(self):
         if sys.platform == "darwin":

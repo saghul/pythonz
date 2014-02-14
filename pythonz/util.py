@@ -87,6 +87,9 @@ def is_python31(version):
 def is_python32(version):
     return _py_version_cmp(version, '3.2', '3.3')
 
+def is_python33(version):
+    return _py_version_cmp(version, '3.3', '3.4')
+
 def makedirs(path):
     if not os.path.exists(path):
         os.makedirs(path)
