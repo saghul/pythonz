@@ -1,0 +1,11 @@
+
+1.1.0
+=====
+* Added support for CPython 3.3.4
+* Added DTrace patches for CPython 2.7.6 and 3.3.4 on OSX
+
+1.0.0
+=====
+* First tagged release
+* Support for CPython, PyPy, Stackless and Jython
+
