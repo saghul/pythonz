@@ -55,6 +55,18 @@ Usage
 
   pythonz command [options] version
 
+Before building Python, you might want to install some optional dependencies, for functionality that
+is often expected to be included in a Python build (it can be a bummer to discover these missing and
+have to rebuild your python setup). These include the following, ordered by (very roughly guessed)
+probability that you will need them (names may differ in your system package manager)::
+
+  libz-dev (or zlib)
+  libbz2-dev
+  libreadline-dev
+  libsqlite3-dev
+  libncurses5-dev
+  libgdbm-dev
+
 Install some pythons::
 
   pythonz install 2.7.3
