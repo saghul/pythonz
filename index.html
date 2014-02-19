@@ -46,6 +46,20 @@
 
 <h2>Using it</h2>
 
+<p>Before building Python, you might want to install some optional dependencies, for functionality that
+is often expected to be included in a Python build (it can be a bummer to discover these missing and
+have to rebuild your python setup). These include the following, ordered by (very roughly guessed)
+probability that you will need them (names may differ in your system package manager):</p>
+
+<ul>
+  <li>libz-dev (or zlib)</li>
+  <li>libbz2-dev</li>
+  <li>libreadline-dev</li>
+  <li>libsqlite3-dev</li>
+  <li>libncurses5-dev</li>
+  <li>libgdbm-dev</li>
+</ul>
+
 <p>Once pythonz is installed you can go ahead and install some Python versions:</p>
 
 <pre><code>pythonz install 2.7.3
