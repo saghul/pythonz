@@ -357,17 +357,7 @@ class CPythonInstaller(Installer):
             m = re.match(r'\d\.\d', self.pkg.version)
             if m:
                 version = m.group(0)
-            symlink(os.path.join(install_dir, 'Frameworks', 'Python.framework', 'Versions', version, 'bin'), os.path.join(bin_dir))
-        path_python = os.path.join(install_dir, 'bin', 'python')
-        if not os.path.isfile(path_python):
-            src = None
-            for d in os.listdir(os.path.join(install_dir, 'bin')):
-                if re.match(r'python\d\.\d', d):
-                    src = d
-                    break
-            if src:
-                path_src = os.path.join(install_dir, 'bin', src)
-                symlink(path_src, path_python)
+                symlink(os.path.join(install_dir, 'Frameworks', 'Python.framework', 'Versions', version, 'bin'), os.path.join(bin_dir))
 
 
 class StacklessInstaller(CPythonInstaller):
@@ -424,18 +414,12 @@ class PyPyInstaller(Installer):
         logger.info("  tail -f %s\n" % self.logfile)
         logger.info("Installing %s into %s" % (self.pkg.name, self.install_dir))
         shutil.copytree(self.build_dir, self.install_dir)
-        self.symlink()
         logger.info("\nInstalled %(pkgname)s successfully." % {"pkgname": self.pkg.name})
 
     def download_and_extract(self):
         self.download()
         if not extract_downloadfile(self.content_type, self.download_file, self.build_dir):
             sys.exit(1)
-
-    def symlink(self):
-        install_dir = os.path.realpath(self.install_dir)
-        bin_dir = os.path.join(install_dir, 'bin')
-        symlink(os.path.join(bin_dir, 'pypy'), os.path.join(bin_dir, 'python'))
 
 
 class JythonInstaller(Installer):
@@ -491,11 +475,5 @@ class JythonInstaller(Installer):
         cmd = 'java -jar %s -s -d %s' % (self.download_file, self.install_dir)
         s = Subprocess(log=self.logfile, verbose=self.options.verbose)
         s.check_call(cmd)
-        self.symlink()
         logger.info("\nInstalled %(pkgname)s successfully." % {"pkgname": self.pkg.name})
-
-    def symlink(self):
-        install_dir = os.path.realpath(self.install_dir)
-        bin_dir = os.path.join(install_dir, 'bin')
-        symlink(os.path.join(bin_dir, 'jython'), os.path.join(bin_dir, 'python'))
 
