@@ -1,4 +1,12 @@
 
+1.2.0
+=====
+* Added support for CPython 3.3.5
+* Add mention of optional dependencies before build
+* Use setuptools and fallback to distutils
+* Add 'pythonz' entrypoint, useful for system-wide installations
+* Simplified setting PATH environment variable
+
 1.1.0
 =====
 * Added support for CPython 3.3.4

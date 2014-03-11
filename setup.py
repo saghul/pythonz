@@ -10,7 +10,7 @@ def find_packages(toplevel):
     return [directory.replace(os.path.sep, '.') for directory, subdirs, files in os.walk(toplevel) if '__init__.py' in files]
 
 setup(name='pythonz',
-      version              = 'dev',
+      version              = '1.2.0',
       description          = 'Manage python installations in your system',
       long_description     = open('README.rst').read(),
       author               = 'utahta',
