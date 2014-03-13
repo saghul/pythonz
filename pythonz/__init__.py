@@ -5,7 +5,7 @@ import sys
 from optparse import OptionParser
 
 from pythonz.commands import command_map, load_commands
-from pythonz.define import PATH_HOME_ETC
+from pythonz.define import PATH_HOME_ETC, PATH_PYTHONS
 from pythonz.util import makedirs
 
 
@@ -27,10 +27,12 @@ def main():
     if not args:
         args = ['help'] # as default
 
+    makedirs(PATH_PYTHONS)
     makedirs(PATH_HOME_ETC)
-    load_commands()
 
+    load_commands()
     command = args[0].lower()
+
     try:
         command = command_map[command]
     except KeyError:

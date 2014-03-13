@@ -39,6 +39,7 @@ class Installer(object):
 
     def __init__(self, version, options):
         # create directories
+        makedirs(PATH_BUILD)
         makedirs(PATH_DISTS)
         makedirs(PATH_LOG)
 
