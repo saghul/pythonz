@@ -1,4 +1,9 @@
 
+1.2.1
+=====
+* Initialize Python installation and build paths
+* Removed executable permission from patch files
+
 1.2.0
 =====
 * Added support for CPython 3.3.5
