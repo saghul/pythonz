@@ -1,4 +1,8 @@
 
+1.2.2
+=====
+* Added support for CPython 3.4.0
+
 1.2.1
 =====
 * Initialize Python installation and build paths
