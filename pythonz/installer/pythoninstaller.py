@@ -219,9 +219,15 @@ class CPythonInstaller(Installer):
             self._append_patch(patch_dir, ['patch-setup.py.diff', 'patch-svnversion.patch'])
         elif is_python26(version):
             self._append_patch(common_patch_dir, ['patch-setup.py.diff'])
-            if version < '2.6.9':
+            if version < '2.6.5':
                 patch_dir = os.path.join(PATH_PATCHES_ALL, "python26")
-                self._append_patch(patch_dir, ['patch-nosslv2.diff'])
+                self._append_patch(patch_dir, ['patch-nosslv2-1.diff'])
+            elif version < '2.6.6':
+                patch_dir = os.path.join(PATH_PATCHES_ALL, "python26")
+                self._append_patch(patch_dir, ['patch-nosslv2-2.diff'])
+            elif version < '2.6.9':
+                patch_dir = os.path.join(PATH_PATCHES_ALL, "python26")
+                self._append_patch(patch_dir, ['patch-nosslv2-3.diff'])
         elif is_python27(version):
             if version < '2.7.2':
                 self._append_patch(common_patch_dir, ['patch-setup.py.diff'])
