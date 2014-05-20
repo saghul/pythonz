@@ -1,4 +1,12 @@
 
+1.3.0
+=====
+* Add support for CPython 3.4.1
+* Added PyPy 2.3 support
+* Added support for Stackless 3.2.5 and 3.3.5
+* Don't create unnecessary symlinks
+* Properly patch Python 2.6.0 through Python 2.6.6
+
 1.2.2
 =====
 * Added support for CPython 3.4.0
