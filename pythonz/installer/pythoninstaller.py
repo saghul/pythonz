@@ -102,7 +102,7 @@ class CPythonInstaller(Installer):
                           '3.1', '3.1.1', '3.1.2', '3.1.3', '3.1.4', '3.1.5',
                           '3.2', '3.2.1', '3.2.2', '3.2.3', '3.2.4', '3.2.5',
                           '3.3.0', '3.3.1', '3.3.2', '3.3.3', '3.3.4', '3.3.5',
-                          '3.4.0']
+                          '3.4.0', '3.4.1']
 
     def __init__(self, version, options):
         super(CPythonInstaller, self).__init__(version, options)
@@ -219,9 +219,13 @@ class CPythonInstaller(Installer):
             self._append_patch(patch_dir, ['patch-setup.py.diff', 'patch-svnversion.patch'])
         elif is_python26(version):
             self._append_patch(common_patch_dir, ['patch-setup.py.diff'])
-            if version < '2.6.9':
-                patch_dir = os.path.join(PATH_PATCHES_ALL, "python26")
-                self._append_patch(patch_dir, ['patch-nosslv2.diff'])
+            patch_dir = os.path.join(PATH_PATCHES_ALL, "python26")
+            if version < '2.6.5':
+                self._append_patch(patch_dir, ['patch-nosslv2-1.diff'])
+            elif version < '2.6.6':
+                self._append_patch(patch_dir, ['patch-nosslv2-2.diff'])
+            elif version < '2.6.9':
+                self._append_patch(patch_dir, ['patch-nosslv2-3.diff'])
         elif is_python27(version):
             if version < '2.7.2':
                 self._append_patch(common_patch_dir, ['patch-setup.py.diff'])
@@ -301,7 +305,7 @@ class CPythonInstaller(Installer):
                                                   {'locale.py.ed': 'Lib/locale.py'}])
             if version < '2.6.9':
                 patch_dir = os.path.join(PATH_PATCHES_ALL, "python26")
-                self._append_patch(patch_dir, ['patch-nosslv2.diff'])
+                self._append_patch(patch_dir, ['patch-nosslv2-3.diff'])
         elif is_python27(version):
             PATH_PATCHES_OSX_PYTHON27 = os.path.join(PATH_PATCHES_OSX, "python27")
             if version < '2.7.4':
@@ -357,17 +361,7 @@ class CPythonInstaller(Installer):
             m = re.match(r'\d\.\d', self.pkg.version)
             if m:
                 version = m.group(0)
-            symlink(os.path.join(install_dir, 'Frameworks', 'Python.framework', 'Versions', version, 'bin'), os.path.join(bin_dir))
-        path_python = os.path.join(install_dir, 'bin', 'python')
-        if not os.path.isfile(path_python):
-            src = None
-            for d in os.listdir(os.path.join(install_dir, 'bin')):
-                if re.match(r'python\d\.\d', d):
-                    src = d
-                    break
-            if src:
-                path_src = os.path.join(install_dir, 'bin', src)
-                symlink(path_src, path_python)
+                symlink(os.path.join(install_dir, 'Frameworks', 'Python.framework', 'Versions', version, 'bin'), os.path.join(bin_dir))
 
 
 class StacklessInstaller(CPythonInstaller):
@@ -387,7 +381,8 @@ class PyPyInstaller(Installer):
                           '1.9',
                           '2.0', '2.0.1', '2.0.2',
                           '2.1',
-                          '2.2', '2.2.1']
+                          '2.2', '2.2.1',
+                          '2.3']
 
     @classmethod
     def get_version_url(cls, version):
@@ -425,18 +420,12 @@ class PyPyInstaller(Installer):
         logger.info("  tail -f %s\n" % self.logfile)
         logger.info("Installing %s into %s" % (self.pkg.name, self.install_dir))
         shutil.copytree(self.build_dir, self.install_dir)
-        self.symlink()
         logger.info("\nInstalled %(pkgname)s successfully." % {"pkgname": self.pkg.name})
 
     def download_and_extract(self):
         self.download()
         if not extract_downloadfile(self.content_type, self.download_file, self.build_dir):
             sys.exit(1)
-
-    def symlink(self):
-        install_dir = os.path.realpath(self.install_dir)
-        bin_dir = os.path.join(install_dir, 'bin')
-        symlink(os.path.join(bin_dir, 'pypy'), os.path.join(bin_dir, 'python'))
 
 
 class JythonInstaller(Installer):
@@ -492,11 +481,5 @@ class JythonInstaller(Installer):
         cmd = 'java -jar %s -s -d %s' % (self.download_file, self.install_dir)
         s = Subprocess(log=self.logfile, verbose=self.options.verbose)
         s.check_call(cmd)
-        self.symlink()
         logger.info("\nInstalled %(pkgname)s successfully." % {"pkgname": self.pkg.name})
-
-    def symlink(self):
-        install_dir = os.path.realpath(self.install_dir)
-        bin_dir = os.path.join(install_dir, 'bin')
-        symlink(os.path.join(bin_dir, 'jython'), os.path.join(bin_dir, 'python'))
 
