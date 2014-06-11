@@ -1,42 +1,54 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
-
     <title>pythonz by saghul</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
   </head>
-
   <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/saghul/pythonz">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/saghul/pythonz/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/saghul/pythonz/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
 
-    <header>
-      <div class="container">
-        <h1>pythonz</h1>
-        <h2>Python installation manager supporting CPython, Stackless, PyPy and Jython</h2>
+    <div class="wrapper">
 
-        <section id="downloads">
-          <a href="https://github.com/saghul/pythonz/zipball/master" class="btn">Download as .zip</a>
-          <a href="https://github.com/saghul/pythonz/tarball/master" class="btn">Download as .tar.gz</a>
-          <a href="https://github.com/saghul/pythonz" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
-        </section>
-      </div>
-    </header>
+      <section>
+        <div id="title">
+          <h1>pythonz</h1>
+          <p>Python installation manager supporting CPython, Stackless, PyPy and Jython</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/saghul">saghul</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
 
-    <div class="container">
-      <section id="main_content">
-        <h2>Overview</h2>
+        <h2>
+<a name="overview" class="anchor" href="#overview"><span class="octicon octicon-link"></span></a>Overview</h2>
 
 <p>pythonz makes it easy for you to compile and install different Python versions either system-wide or per user. It supports installing CPython, Stackless, PyPy and Jython.</p>
 
-<h2>Installing it</h2>
+<h2>
+<a name="installing-it" class="anchor" href="#installing-it"><span class="octicon octicon-link"></span></a>Installing it</h2>
 
 <p>It's really easy to install pythonz, to install it for your user (that is, in your $HOME) just do as follows:</p>
 
-<pre><code>curl -kL https://raw.github.com/saghul/pythonz/master/pythonz-install | bash
+<pre><code>curl -kL https://raw.githubusercontent.com/saghul/pythonz/master/pythonz-install | bash
 </code></pre>
 
 <p>After that add this to your <code>.bashrc</code> file:</p>
@@ -44,21 +56,8 @@
 <pre><code>[[ -s $HOME/.pythonz/etc/bashrc ]] &amp;&amp; source $HOME/.pythonz/etc/bashrc
 </code></pre>
 
-<h2>Using it</h2>
-
-<p>Before building Python, you might want to install some optional dependencies, for functionality that
-is often expected to be included in a Python build (it can be a bummer to discover these missing and
-have to rebuild your python setup). These include the following, ordered by (very roughly guessed)
-probability that you will need them (names may differ in your system package manager):</p>
-
-<ul>
-  <li>libz-dev (or zlib)</li>
-  <li>libbz2-dev</li>
-  <li>libreadline-dev</li>
-  <li>libsqlite3-dev</li>
-  <li>libncurses5-dev</li>
-  <li>libgdbm-dev</li>
-</ul>
+<h2>
+<a name="using-it" class="anchor" href="#using-it"><span class="octicon octicon-link"></span></a>Using it</h2>
 
 <p>Once pythonz is installed you can go ahead and install some Python versions:</p>
 
@@ -70,16 +69,17 @@ pythonz install -t pypy --url https://bitbucket.org/pypy/pypy/downloads/pypy-1.8
 
 <p>Then you can create some <a href="http://pypi.python.org/pypi/virtualenv">virtualenvs</a> (using <a href="http://pypi.python.org/pypi/virtualenvwrapper">virtualenvwrapper</a>) to use the installed pythons:</p>
 
-<pre><code>mkvirtualenv -p ~/.pythonz/pythons/CPython-2.7.3/bin/python cpython272 &amp;&amp; deactivate
-mkvirtualenv -p ~/.pythonz/pythons/Stackless-2.7.2/bin/python stackless272 &amp;&amp; deactivate
-mkvirtualenv -p ~/.pythonz/pythons/Jython-2.5.2/bin/python jython252 &amp;&amp; deactivate
-mkvirtualenv -p ~/.pythonz/pythons/PyPy-1.8/bin/python pypy18 &amp;&amp; deactivate
+<pre><code>mkvirtualenv -p $(pythonz locate 2.7.2) cpython272 &amp;&amp; deactivate
+mkvirtualenv -p $(pythonz locate -t stackless 2.7.2) stackless272 &amp;&amp; deactivate
+mkvirtualenv -p $(pythonz locate -t jython 2.5.2) jython252 &amp;&amp; deactivate
+mkvirtualenv -p $(pythonz locate -t pypy 2.3.1) pypy231 &amp;&amp; deactivate
 </code></pre>
 
 <p>Then you can use <code>workon</code> and <code>deactivate</code> as usual.</p>
       </section>
-    </div>
 
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
     
   </body>
 </html>
