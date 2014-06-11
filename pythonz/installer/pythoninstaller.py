@@ -353,25 +353,21 @@ class CPythonInstaller(Installer):
 
     def symlink(self):
         install_dir = os.path.realpath(self.install_dir)
+        bin_dir = os.path.join(install_dir, 'bin')
         if self.options.framework:
             # create symlink bin -> /path/to/Frameworks/Python.framework/Versions/?.?/bin
-            bin_dir = os.path.join(install_dir, 'bin')
             if os.path.exists(bin_dir):
                 rm_r(bin_dir)
             m = re.match(r'\d\.\d', self.pkg.version)
             if m:
                 version = m.group(0)
             symlink(os.path.join(install_dir, 'Frameworks', 'Python.framework', 'Versions', version, 'bin'), os.path.join(bin_dir))
-        path_python = os.path.join(install_dir, 'bin', 'python')
+        path_python = os.path.join(bin_dir, 'python')
         if not os.path.isfile(path_python):
-            src = None
-            for d in os.listdir(os.path.join(install_dir, 'bin')):
-                if re.match(r'python\d\.\d', d):
-                    src = d
+            for f in os.listdir(bin_dir):
+                if re.match(r'python\d\.\d$', f):
+                    symlink(os.path.join(bin_dir, f), path_python)
                     break
-            if src:
-                path_src = os.path.join(install_dir, 'bin', src)
-                symlink(path_src, path_python)
 
 
 class StacklessInstaller(CPythonInstaller):
