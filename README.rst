@@ -108,9 +108,13 @@ Check the installed pythonz version::
 
   pythonz version
 
+Print the path to the interpreter of a given version::
+
+  pythonz locate 2.7.7
+
 The recommended way to use a pythonz-installed version of Python is through `virtualenv`, e.g.::
 
-  mkvirtualenv -p ~/.pythonz/pythons/CPython-2.7.3/bin/python python2.7.3
+  mkvirtualenv -p $(pythonz locate 2.7.3) python2.7.3
 
 For more information about virtualenv, checkout `its documentation <http://www.virtualenv.org/en/latest/>`_.
 

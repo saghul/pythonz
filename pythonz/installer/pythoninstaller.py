@@ -97,7 +97,7 @@ class CPythonInstaller(Installer):
     supported_versions = ['2.4', '2.4.1', '2.4.2', '2.4.3', '2.4.4', '2.4.5', '2.4.6',
                           '2.5', '2.5.1', '2.5.2', '2.5.3', '2.5.4', '2.5.5', '2.5.6',
                           '2.6', '2.6.1', '2.6.2', '2.6.3', '2.6.4', '2.6.5', '2.6.6', '2.6.7', '2.6.8', '2.6.9',
-                          '2.7', '2.7.1', '2.7.2', '2.7.3', '2.7.4', '2.7.5', '2.7.6',
+                          '2.7', '2.7.1', '2.7.2', '2.7.3', '2.7.4', '2.7.5', '2.7.6', '2.7.7',
                           '3.0', '3.0.1',
                           '3.1', '3.1.1', '3.1.2', '3.1.3', '3.1.4', '3.1.5',
                           '3.2', '3.2.1', '3.2.2', '3.2.3', '3.2.4', '3.2.5',
@@ -353,15 +353,21 @@ class CPythonInstaller(Installer):
 
     def symlink(self):
         install_dir = os.path.realpath(self.install_dir)
+        bin_dir = os.path.join(install_dir, 'bin')
         if self.options.framework:
             # create symlink bin -> /path/to/Frameworks/Python.framework/Versions/?.?/bin
-            bin_dir = os.path.join(install_dir, 'bin')
             if os.path.exists(bin_dir):
                 rm_r(bin_dir)
             m = re.match(r'\d\.\d', self.pkg.version)
             if m:
                 version = m.group(0)
-                symlink(os.path.join(install_dir, 'Frameworks', 'Python.framework', 'Versions', version, 'bin'), os.path.join(bin_dir))
+            symlink(os.path.join(install_dir, 'Frameworks', 'Python.framework', 'Versions', version, 'bin'), os.path.join(bin_dir))
+        path_python = os.path.join(bin_dir, 'python')
+        if not os.path.isfile(path_python):
+            for f in os.listdir(bin_dir):
+                if re.match(r'python\d\.\d$', f):
+                    symlink(os.path.join(bin_dir, f), path_python)
+                    break
 
 
 class StacklessInstaller(CPythonInstaller):
@@ -382,7 +388,7 @@ class PyPyInstaller(Installer):
                           '2.0', '2.0.1', '2.0.2',
                           '2.1',
                           '2.2', '2.2.1',
-                          '2.3']
+                          '2.3', '2.3.1']
 
     @classmethod
     def get_version_url(cls, version):
@@ -420,12 +426,18 @@ class PyPyInstaller(Installer):
         logger.info("  tail -f %s\n" % self.logfile)
         logger.info("Installing %s into %s" % (self.pkg.name, self.install_dir))
         shutil.copytree(self.build_dir, self.install_dir)
+        self.symlink()
         logger.info("\nInstalled %(pkgname)s successfully." % {"pkgname": self.pkg.name})
 
     def download_and_extract(self):
         self.download()
         if not extract_downloadfile(self.content_type, self.download_file, self.build_dir):
             sys.exit(1)
+
+    def symlink(self):
+        install_dir = os.path.realpath(self.install_dir)
+        bin_dir = os.path.join(install_dir, 'bin')
+        symlink(os.path.join(bin_dir, 'pypy'), os.path.join(bin_dir, 'python'))
 
 
 class JythonInstaller(Installer):
@@ -481,5 +493,11 @@ class JythonInstaller(Installer):
         cmd = 'java -jar %s -s -d %s' % (self.download_file, self.install_dir)
         s = Subprocess(log=self.logfile, verbose=self.options.verbose)
         s.check_call(cmd)
+        self.symlink()
         logger.info("\nInstalled %(pkgname)s successfully." % {"pkgname": self.pkg.name})
+
+    def symlink(self):
+        install_dir = os.path.realpath(self.install_dir)
+        bin_dir = os.path.join(install_dir, 'bin')
+        symlink(os.path.join(bin_dir, 'jython'), os.path.join(bin_dir, 'python'))
 

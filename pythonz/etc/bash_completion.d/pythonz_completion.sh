@@ -6,39 +6,33 @@ _pythonz_complete(){
     local logfile
 
     COMPREPLY=()
-    
+
     types="cpython stackless pypy jython"
-    commands="cleanup help install list uninstall update"
-    
-    
+    commands="cleanup help install list locate uninstall update version"
+
     if [ $COMP_CWORD -eq 1 ]; then
-    
       _pythonz_context["pythonz"]="-h"
       _pythonz_compreply $commands ${_pythonz_context["pythonz"]}
-
-    elif [ $COMP_CWORD -eq 2 ]; then 
-
+    elif [ $COMP_CWORD -eq 2 ]; then
       _pythonz_context["type"]="cpython"
       _pythonz_context["install"]="-t -f -v -h --run-tests --framework --universal --static --file --url"
       _pythonz_context["uninstall"]="-t -h"
       _pythonz_context["cleanup"]="-a -h"
       _pythonz_context["list"]="-a -h"
-
+      _pythonz_context["locate"]="-t -h"
+      _pythonz_context["update"]="--dev -h"
+      _pythonz_context["version"]="-h"
       command=${COMP_WORDS[COMP_CWORD-1]}
       _pythonz_handle_command $command
-
     elif [ $COMP_CWORD -ge 3 ]; then
       command=${COMP_WORDS[1]}
       command_option=${COMP_WORDS[COMP_CWORD-1]}
-
       _pythonz_handle_command_option $command_option
-
     fi
     return 0
   }
 
 _pythonz_handle_command(){
-  
   command=$*
 
   case "$command" in
@@ -47,21 +41,18 @@ _pythonz_handle_command(){
       commands=$( echo $commands | sed -e "s/help\|-h//g" )
       _pythonz_compreply $commands
       ;;
-
     install)
-
-      _pythonz_install 
+      _pythonz_install
       ;;
     uninstall)
-      
-      _pythonz_uninstall 
+      _pythonz_uninstall
       ;;
-    
-    list|cleanup)
-
+    locate)
+      _pythonz_locate
+      ;;
+    list|cleanup|update|version)
       _pythonz_compreply  ${_pythonz_context["$command"]}
       ;;
-
     *)
       ;;
   esac
@@ -73,27 +64,22 @@ _pythonz_handle_command_option(){
   case "$option" in
     -h)
       ;;
-    
     -t)
       _pythonz_update_command_options
       _pythonz_compreply $types
       ;;
-    
     cpython|stackless|pypy|jython)
       _pythonz_context["type"]=$option
       _pythonz_handle_command $command
       ;;
-
     --file)
       _pythonz_update_command_options
       _pythonz_handle_file
       ;;
-
     --url)
       _pythonz_update_command_options
       _pythonz_handle_url
       ;;
-
     *)
       _pythonz_update_command_options
       _pythonz_handle_command $command
@@ -112,23 +98,24 @@ _pythonz_handle_url(){
 }
 
 _pythonz_update_command_options(){
-  
   if [[ $option == -* ]];then
     _pythonz_context["$command"]=$( echo ${_pythonz_context["$command"]} |sed -e "s/ /\n/g" |sed -e "s/^$option/ /" )
   fi
 }
 
 _pythonz_install(){
-
   _pythonz_available_versions
   _pythonz_compreply ${_pythonz_context["install"]} $available_versions
-
 }
 
 _pythonz_uninstall(){
-  
   _pythonz_installed_versions
   _pythonz_compreply ${_pythonz_context["uninstall"]} $installed_versions
+}
+
+_pythonz_locate(){
+  _pythonz_installed_versions
+  _pythonz_compreply ${_pythonz_context["locate"]} $installed_versions
 }
 
 _pythonz_available_versions(){
@@ -137,9 +124,9 @@ _pythonz_available_versions(){
 
     if [ -n "$installed_regex" ];then
         available_versions=$( echo $known_versions | sed -e "s/$installed_regex/ /g" )
-    else 
+    else
         available_versions=$known_versions
-    fi 
+    fi
 
 }
 
