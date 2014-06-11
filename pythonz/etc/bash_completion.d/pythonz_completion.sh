@@ -8,7 +8,7 @@ _pythonz_complete(){
     COMPREPLY=()
 
     types="cpython stackless pypy jython"
-    commands="cleanup help install list uninstall update"
+    commands="cleanup help install list locate uninstall update version"
 
     if [ $COMP_CWORD -eq 1 ]; then
       _pythonz_context["pythonz"]="-h"
@@ -19,6 +19,9 @@ _pythonz_complete(){
       _pythonz_context["uninstall"]="-t -h"
       _pythonz_context["cleanup"]="-a -h"
       _pythonz_context["list"]="-a -h"
+      _pythonz_context["locate"]="-t -h"
+      _pythonz_context["update"]="--dev -h"
+      _pythonz_context["version"]="-h"
       command=${COMP_WORDS[COMP_CWORD-1]}
       _pythonz_handle_command $command
     elif [ $COMP_CWORD -ge 3 ]; then
@@ -38,14 +41,16 @@ _pythonz_handle_command(){
       commands=$( echo $commands | sed -e "s/help\|-h//g" )
       _pythonz_compreply $commands
       ;;
-
     install)
       _pythonz_install
       ;;
     uninstall)
       _pythonz_uninstall
       ;;
-    list|cleanup)
+    locate)
+      _pythonz_locate
+      ;;
+    list|cleanup|update|version)
       _pythonz_compreply  ${_pythonz_context["$command"]}
       ;;
     *)
@@ -106,6 +111,11 @@ _pythonz_install(){
 _pythonz_uninstall(){
   _pythonz_installed_versions
   _pythonz_compreply ${_pythonz_context["uninstall"]} $installed_versions
+}
+
+_pythonz_locate(){
+  _pythonz_installed_versions
+  _pythonz_compreply ${_pythonz_context["locate"]} $installed_versions
 }
 
 _pythonz_available_versions(){
