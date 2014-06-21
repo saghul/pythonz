@@ -155,7 +155,7 @@ def untar_file(filename, location):
         # note: python<=2.5 doesnt seem to know about pax headers, filter them
         leading = has_leading_dir([
             member.name for member in tar.getmembers()
-            if member.name != 'pax_global_header'
+            if not member.name.startswith('.') and member.name != 'pax_global_header'
         ])
         for member in tar.getmembers():
             fn = member.name
