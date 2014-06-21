@@ -78,6 +78,7 @@ Install some pythons::
   pythonz install --url http://www.python.org/ftp/python/2.7/Python-2.7.2.tgz 2.7.2
   pythonz install --file /path/to/Python-2.7.2.tgz 2.7.2
   pythonz install 2.7.3 3.2.3
+  pythonz install -t pypy3 2.3.1
 
 List the installed pythons::
 
