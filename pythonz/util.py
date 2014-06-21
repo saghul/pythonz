@@ -196,10 +196,10 @@ def extract_downloadfile(content_type, download_file, target_dir):
     logger.info("Extracting %s into %s" % (os.path.basename(download_file), target_dir))
     if is_gzip(content_type, download_file):
         untar_file(download_file, target_dir)
+        return True
     else:
         logger.error("Cannot determine archive format of %s" % download_file)
         return False
-    return True
 
 def is_installed(pkg):
     return os.path.isdir(os.path.join(PATH_PYTHONS, pkg.name))
