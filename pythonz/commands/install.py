@@ -9,14 +9,14 @@ class InstallCommand(Command):
     name = "install"
     usage = "%prog [OPTIONS] VERSION"
     summary = "Build and install the given version of python"
-    
+
     def __init__(self):
         super(InstallCommand, self).__init__()
         self.parser.add_option(
             "-t", "--type",
             dest="type",
             default="cpython",
-            help="Type of Python version: cpython, stackless, pypy or jython."
+            help="Type of Python version: cpython, stackless, pypy, pypy3 or jython."
         )
         self.parser.add_option(
             "-f", "--force",

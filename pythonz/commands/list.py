@@ -3,7 +3,7 @@ import os
 
 from pythonz.commands import Command
 from pythonz.define import PATH_PYTHONS
-from pythonz.installer.pythoninstaller import CPythonInstaller, StacklessInstaller, PyPyInstaller, JythonInstaller
+from pythonz.installer.pythoninstaller import CPythonInstaller, StacklessInstaller, PyPyInstaller, PyPy3Installer, JythonInstaller
 from pythonz.log import logger
 
 
@@ -45,7 +45,7 @@ class ListCommand(Command):
 
     def all(self):
         logger.log('# Available Python versions')
-        for type, installer in zip(['cpython', 'stackless', 'pypy', 'jython'], [CPythonInstaller, StacklessInstaller, PyPyInstaller, JythonInstaller]):
+        for type, installer in zip(['cpython', 'stackless', 'pypy', 'pypy3', 'jython'], [CPythonInstaller, StacklessInstaller, PyPyInstaller, PyPy3Installer, JythonInstaller]):
             logger.log('  # %s:' % type)
             for version in installer.supported_versions:
                 logger.log('     %s' % version)

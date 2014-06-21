@@ -155,7 +155,7 @@ def untar_file(filename, location):
         # note: python<=2.5 doesnt seem to know about pax headers, filter them
         leading = has_leading_dir([
             member.name for member in tar.getmembers()
-            if member.name != 'pax_global_header'
+            if not member.name.startswith('.') and member.name != 'pax_global_header'
         ])
         for member in tar.getmembers():
             fn = member.name
@@ -196,10 +196,10 @@ def extract_downloadfile(content_type, download_file, target_dir):
     logger.info("Extracting %s into %s" % (os.path.basename(download_file), target_dir))
     if is_gzip(content_type, download_file):
         untar_file(download_file, target_dir)
+        return True
     else:
         logger.error("Cannot determine archive format of %s" % download_file)
         return False
-    return True
 
 def is_installed(pkg):
     return os.path.isdir(os.path.join(PATH_PYTHONS, pkg.name))
@@ -306,6 +306,8 @@ class Package(object):
             tag = 'Stackless'
         elif type == 'pypy':
             tag = 'PyPy'
+        elif type == 'pypy3':
+            tag = 'PyPy3'
         elif type == 'jython':
             tag = 'Jython'
         else:

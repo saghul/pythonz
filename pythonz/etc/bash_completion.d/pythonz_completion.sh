@@ -7,7 +7,7 @@ _pythonz_complete(){
 
     COMPREPLY=()
 
-    types="cpython stackless pypy jython"
+    types="cpython stackless pypy pypy3 jython"
     commands="cleanup help install list locate uninstall update version"
 
     if [ $COMP_CWORD -eq 1 ]; then
@@ -68,7 +68,7 @@ _pythonz_handle_command_option(){
       _pythonz_update_command_options
       _pythonz_compreply $types
       ;;
-    cpython|stackless|pypy|jython)
+    cpython|stackless|pypy|pypy3|jython)
       _pythonz_context["type"]=$option
       _pythonz_handle_command $command
       ;;

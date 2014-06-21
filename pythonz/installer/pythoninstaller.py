@@ -29,6 +29,8 @@ class PythonInstaller(object):
             return StacklessInstaller(version, options)
         elif type == 'pypy':
             return PyPyInstaller(version, options)
+        elif type == 'pypy3':
+            return PyPy3Installer(version, options)
         elif type == 'jython':
             return JythonInstaller(version, options)
         raise RuntimeError('invalid type specified: %s' % type)
@@ -422,8 +424,6 @@ class PyPyInstaller(Installer):
             return
 
         self.download_and_extract()
-        logger.info("\nThis could take a while. You can run the following command on another shell to track the status:")
-        logger.info("  tail -f %s\n" % self.logfile)
         logger.info("Installing %s into %s" % (self.pkg.name, self.install_dir))
         shutil.copytree(self.build_dir, self.install_dir)
         self.symlink()
@@ -438,6 +438,20 @@ class PyPyInstaller(Installer):
         install_dir = os.path.realpath(self.install_dir)
         bin_dir = os.path.join(install_dir, 'bin')
         symlink(os.path.join(bin_dir, 'pypy'), os.path.join(bin_dir, 'python'))
+
+
+class PyPy3Installer(PyPyInstaller):
+    supported_versions = ['2.3.1']
+
+    @classmethod
+    def get_version_url(cls, version):
+        if sys.platform == 'darwin':
+            return 'https://bitbucket.org/pypy/pypy/downloads/pypy3-%(version)s-osx64.tar.bz2' % {'version': version}
+        else:
+            # Linux
+            logger.warning("Linux binaries are dynamically linked, as is usual, and thus might not be usable due to the sad story of linux binary compatibility, check the PyPy website for more information")
+            arch = {4: '', 8: '64'}[ctypes.sizeof(ctypes.c_size_t)]
+            return 'https://bitbucket.org/pypy/pypy/downloads/pypy3-%(version)s-linux%(arch)s.tar.bz2' % {'arch': arch, 'version': version}
 
 
 class JythonInstaller(Installer):
