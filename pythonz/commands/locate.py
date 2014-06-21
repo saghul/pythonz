@@ -18,7 +18,7 @@ class LocateCommand(Command):
             "-t", "--type",
             dest="type",
             default="cpython",
-            help="Type of Python version: cpython, stackless, pypy or jython."
+            help="Type of Python version: cpython, stackless, pypy, pypy3 or jython."
         )
 
     def run_command(self, options, args):

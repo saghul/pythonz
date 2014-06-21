@@ -306,6 +306,8 @@ class Package(object):
             tag = 'Stackless'
         elif type == 'pypy':
             tag = 'PyPy'
+        elif type == 'pypy3':
+            tag = 'PyPy3'
         elif type == 'jython':
             tag = 'Jython'
         else:
