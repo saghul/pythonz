@@ -423,8 +423,6 @@ class PyPyInstaller(Installer):
             return
 
         self.download_and_extract()
-        logger.info("\nThis could take a while. You can run the following command on another shell to track the status:")
-        logger.info("  tail -f %s\n" % self.logfile)
         logger.info("Installing %s into %s" % (self.pkg.name, self.install_dir))
         shutil.copytree(self.build_dir, self.install_dir)
         self.symlink()
