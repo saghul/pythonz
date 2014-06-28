@@ -1,4 +1,9 @@
 
+1.5.0
+=====
+* Add support for Stackless 3.2.5 and 3.3.5
+* Add ability to reinstall an already installed version
+
 1.4.1
 =====
 * Add support for PyPy3 2.3.1
