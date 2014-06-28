@@ -383,7 +383,15 @@ class StacklessInstaller(CPythonInstaller):
     supported_versions = ['2.6.5',
                           '2.7.2',
                           '3.1.3',
-                          '3.2.2']
+                          '3.2.2', '3.2.5',
+                          '3.3.5']
+
+    def _patch_osx(self):
+        super(StacklessInstaller, self)._patch_osx()
+        version = Version(self.pkg.version)
+        if version in ('3.2.5', '3.3.5'):
+            PATH_PATCHES_OSX_PYTHON33 = os.path.join(PATH_PATCHES_OSX, "python33")
+            self._append_patch(PATH_PATCHES_OSX_PYTHON33, ['stackless-335-compile.diff'])
 
     @classmethod
     def get_version_url(cls, version):
