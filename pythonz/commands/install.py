@@ -79,6 +79,13 @@ class InstallCommand(Command):
             default=False,
             help="Build static libraries."
         )
+        self.parser.add_option(
+            "--reinstall",
+            dest="reinstall",
+            action="store_true",
+            default=False,
+            help="Reinstall Python version, if already installed."
+        )
 
     def run_command(self, options, args):
         if not args:
