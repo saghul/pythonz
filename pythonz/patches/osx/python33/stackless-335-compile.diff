@@ -1,0 +1,79 @@
+
+--- Stackless/module/channelobject.c
++++ Stackless/module/channelobject.c
+@@ -624,8 +624,6 @@ PyChannel_SendException_M(PyChannelObjec
+     return PyStackless_CallCMethod_Main(&def, (PyObject *) self, "OO", klass, args);
+ }
+ 
+-static CHANNEL_SEND_EXCEPTION_HEAD(impl_channel_send_exception);
+-
+ static PyObject *
+ impl_channel_send_exception(PyChannelObject *self, PyObject *klass, PyObject *args)
+ {
+@@ -1009,7 +1007,6 @@ channel_send_sequence(PyChannelObject *s
+ {
+     STACKLESS_GETARG();
+     PyThreadState *ts = PyThreadState_GET();
+-    /*unused: PyChannel_HeapType *t = (PyChannel_HeapType *) self->ob_type;*/
+     PyObject *it;
+     PyCFrameObject *f;
+ 
+--- Stackless/module/scheduling.c
++++ Stackless/module/scheduling.c
+@@ -449,8 +449,7 @@ int
+ slp_schedule_callback(PyTaskletObject *prev, PyTaskletObject *next)
+ {
+     PyObject *args;
+-    PyThreadState *ts = PyThreadState_GET();
+-
++    
+     if (prev == NULL) prev = (PyTaskletObject *)Py_None;
+     if (next == NULL) next = (PyTaskletObject *)Py_None;
+     args = Py_BuildValue("(OO)", prev, next);
+@@ -1267,7 +1266,6 @@ schedule_task_destruct(PyObject **retval
+      * field to help us with that, someone else with decref it.
+      */
+     PyThreadState *ts = PyThreadState_GET();
+-    PyObject *tmpval=NULL;
+     int fail = 0;
+ 
+     /* we should have no nesting level */
+--- Stackless/module/taskletobject.c
++++ Stackless/module/taskletobject.c
+@@ -611,8 +611,7 @@ static int
+ impl_tasklet_remove(PyTaskletObject *task)
+ {
+     PyThreadState *ts = PyThreadState_GET();
+-    PyTaskletObject *hold = ts->st.current;
+-
++    
+     assert(PyTasklet_Check(task));
+     if (ts->st.main == NULL) return PyTasklet_Remove_M(task);
+     assert(ts->st.current != NULL);
+@@ -737,6 +736,9 @@ PyTasklet_Run(PyTaskletObject *task)
+ }
+ 
+ static PyObject *
++PyTasklet_Switch_M(PyTaskletObject *task);
++
++static PyObject *
+ impl_tasklet_run_remove(PyTaskletObject *task, int remove)
+ {
+     STACKLESS_GETARG();
+@@ -746,8 +748,13 @@ impl_tasklet_run_remove(PyTaskletObject 
+     PyTaskletObject *prev = ts->st.current;
+     
+     assert(PyTasklet_Check(task));
+-    if (ts->st.main == NULL)
+-        return PyTasklet_Run_M(task);
++    if (ts->st.main == NULL) {
++        if (!remove)
++            return PyTasklet_Run_M(task);
++        else
++            return PyTasklet_Switch_M(task);
++    }
++    
+ 
+     /* we always call impl_tasklet_insert, so we must
+      * also uninsert in case of failure
+

@@ -65,6 +65,17 @@ class Installer(object):
         filename = Link(self.download_url).filename
         self.download_file = os.path.join(PATH_DISTS, filename)
 
+        # cleanup
+        if os.path.isdir(self.build_dir):
+            shutil.rmtree(self.build_dir)
+
+        if os.path.isdir(self.install_dir):
+            if options.reinstall:
+                shutil.rmtree(self.install_dir)
+            else:
+                logger.error("You have already installed `%s`" % self.pkg.name)
+                raise RuntimeError
+
         self.options = options
         self.logfile = os.path.join(PATH_LOG, 'build.log')
         self.patches = []
@@ -167,10 +178,6 @@ class CPythonInstaller(Installer):
                 self.patches.append(os.path.join(patch_dir, patch))
 
     def install(self):
-        # cleanup
-        if os.path.isdir(self.build_dir):
-            shutil.rmtree(self.build_dir)
-
         # get content type.
         if is_file(self.download_url):
             path = fileurl_to_path(self.download_url)
@@ -379,6 +386,13 @@ class StacklessInstaller(CPythonInstaller):
                           '3.2.2', '3.2.5',
                           '3.3.5']
 
+    def _patch_osx(self):
+        super(StacklessInstaller, self)._patch_osx()
+        version = Version(self.pkg.version)
+        if version in ('3.2.5', '3.3.5'):
+            PATH_PATCHES_OSX_PYTHON33 = os.path.join(PATH_PATCHES_OSX, "python33")
+            self._append_patch(PATH_PATCHES_OSX_PYTHON33, ['stackless-335-compile.diff'])
+
     @classmethod
     def get_version_url(cls, version):
         return 'http://www.stackless.com/binaries/stackless-%(version)s-export.tar.bz2' % {'version': version.replace('.', '')}
@@ -403,10 +417,6 @@ class PyPyInstaller(Installer):
             return 'https://bitbucket.org/pypy/pypy/downloads/pypy-%(version)s-linux%(arch)s.tar.bz2' % {'arch': arch, 'version': version}
 
     def install(self):
-        # cleanup
-        if os.path.isdir(self.build_dir):
-            shutil.rmtree(self.build_dir)
-
         # get content type.
         if is_file(self.download_url):
             path = fileurl_to_path(self.download_url)
@@ -475,10 +485,6 @@ class JythonInstaller(Installer):
         if r != 0:
             logger.error("Jython requires Java to be installed, but the 'java' command was not found in the path.")
             return
-
-        # cleanup
-        if os.path.isdir(self.build_dir):
-            shutil.rmtree(self.build_dir)
 
         # get content type.
         if is_file(self.download_url):
