@@ -178,8 +178,6 @@ For Python <= 3.2
 
 Use `virtualenv`, e.g.::
 
-::
-
   mkvirtualenv -p $(pythonz locate 2.7.3) python2.7.3
 
 For more information about virtualenv, checkout `its documentation <http://www.virtualenv.org/en/latest/>`_.
@@ -188,8 +186,6 @@ For Python >= 3.3
 ^^^^^^^^^^^^^^^^^
 
 Use `pyvenv` directly from Python, e.g.::
-
-::
 
   /usr/local/pythonz/pythons/CPython-3.4.1/bin/pyvenv pyvenv
 
