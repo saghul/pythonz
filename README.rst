@@ -48,24 +48,35 @@ After installing it, where you would normally use `sudo`, non-root users will ne
 
   sudo-pythonz install 2.7.3
 
+Before install Pythons via Pythonz
+----------------------------------
+
+You might want to install some optional dependencies, for functionality that
+is often expected to be included in a Python build (it can be a bummer to discover these missing and
+have to rebuild your python setup). These include the following, ordered by (very roughly guessed)
+probability that you will need them::
+
+Debian family (Ubuntu...)
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  sudo apt-get install build-essential zlib1g-dev libbz2-dev libssl-dev libreadline-dev libncurses5-dev libsqlite3-dev libgdbm-dev libdb-dev libexpat-dev libpcap-dev liblzma-dev libpcre3-dev
+
+if you need tk component, add **tk-dev**.
+
+RPM family (CentOS, RHEL...)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+  yum groupinstall "Development tools"
+  yum install zlib-devel bzip2-devel openssl-devel readline-devel ncurses-devel sqlite-devel gdbm-devel db4-devel expat-devel libpcap-devel xz-devel pcre-devel
+
+if you need tk component, add **tk-devel**.
+
 Usage
 -----
 
 ::
 
   pythonz command [options] version
-
-Before building Python, you might want to install some optional dependencies, for functionality that
-is often expected to be included in a Python build (it can be a bummer to discover these missing and
-have to rebuild your python setup). These include the following, ordered by (very roughly guessed)
-probability that you will need them (names may differ in your system package manager)::
-
-  libz-dev (or zlib)
-  libbz2-dev
-  libreadline-dev
-  libsqlite3-dev
-  libncurses5-dev
-  libgdbm-dev
 
 Install some pythons::
 
