@@ -38,7 +38,7 @@ If you need to install pythonz into somewhere else, you can do that by setting a
   ./pythonz-install
 
 For Systemwide (Multi-User) installation
----------------------------------------
+----------------------------------------
 
 If the install script is run as root, pythonz will automatically install into ``/usr/local/pythonz``.
 
@@ -48,6 +48,33 @@ After installing it, where you would normally use `sudo`, non-root users will ne
 
   sudo-pythonz install 2.7.3
 
+Before installing Pythons via Pythonz
+-------------------------------------
+
+You might want to install some optional dependencies, for functionality that
+is often expected to be included in a Python build (it can be a bummer to discover these missing and
+have to rebuild your python setup). These include the following, ordered by (very roughly guessed)
+probability that you will need them::
+
+Debian family (Ubuntu...)
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
+
+  sudo apt-get install build-essential zlib1g-dev libbz2-dev libssl-dev libreadline-dev libncurses5-dev libsqlite3-dev libgdbm-dev libdb-dev libexpat-dev libpcap-dev liblzma-dev libpcre3-dev
+
+If you need tkinter support, add **tk-dev**.
+
+RPM family (CentOS, RHEL...)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
+
+  yum groupinstall "Development tools"
+  yum install zlib-devel bzip2-devel openssl-devel readline-devel ncurses-devel sqlite-devel gdbm-devel db4-devel expat-devel libpcap-devel xz-devel pcre-devel
+
+If you need tkinter support, add **tk-devel**.
+
 Usage
 -----
 
@@ -55,19 +82,25 @@ Usage
 
   pythonz command [options] version
 
-Before building Python, you might want to install some optional dependencies, for functionality that
-is often expected to be included in a Python build (it can be a bummer to discover these missing and
-have to rebuild your python setup). These include the following, ordered by (very roughly guessed)
-probability that you will need them (names may differ in your system package manager)::
+See the available commands
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-  libz-dev (or zlib)
-  libbz2-dev
-  libreadline-dev
-  libsqlite3-dev
-  libncurses5-dev
-  libgdbm-dev
+::
 
-Install some pythons::
+  pythonz help
+
+To get help on each individual command
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
+
+  pythonz help <command>
+
+
+Install some pythons
+^^^^^^^^^^^^^^^^^^^^
+
+::
 
   pythonz install 2.7.3
   pythonz install -t stackless 2.7.2
@@ -80,55 +113,83 @@ Install some pythons::
   pythonz install 2.7.3 3.2.3
   pythonz install -t pypy3 2.3.1
 
-List the installed pythons::
+List the installed pythons
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
 
   pythonz list
 
-List all the available python versions for installing::
+List all the available python versions for installing
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
 
   pythonz list -a
 
-Uninstall the specified python::
+Uninstall the specified python
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
 
   pythonz uninstall 2.7.3
   pythonz uninstall -t stackless 3.2.2
 
-Remove stale source folders and archives::
+Remove stale source folders and archives
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
 
   pythonz cleanup
 
-Upgrade pythonz to the latest version::
+Upgrade pythonz to the latest version
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
 
   pythonz update
 
-Upgrade pythonz to the latest development version::
+Upgrade pythonz to the latest development version
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
 
   pythonz update --dev
 
-Check the installed pythonz version::
+Check the installed pythonz version
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
 
   pythonz version
 
-Print the path to the interpreter of a given version::
+Print the path to the interpreter of a given version
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
 
   pythonz locate 2.7.7
 
-The recommended way to use a pythonz-installed version of Python is through `virtualenv`, e.g.::
+Recommended way to use a pythonz-installed version of Python
+------------------------------------------------------------
+
+For Python <= 3.2
+^^^^^^^^^^^^^^^^^
+
+Use `virtualenv`, e.g.::
 
   mkvirtualenv -p $(pythonz locate 2.7.3) python2.7.3
 
 For more information about virtualenv, checkout `its documentation <http://www.virtualenv.org/en/latest/>`_.
 
-Commands
---------
+For Python >= 3.3
+^^^^^^^^^^^^^^^^^
 
-See the available commands::
+Use `pyvenv` directly from Python, e.g.::
 
-  pythonz help
+  /usr/local/pythonz/pythons/CPython-3.4.1/bin/pyvenv pyvenv
 
-To get help on each individual command run::
-
-  pythonz help <command>
+For more information about pyvenv, checkout `its documentation <https://docs.python.org/3/library/venv.html>`_.
 
 DTrace support
 --------------
