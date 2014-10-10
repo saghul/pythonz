@@ -149,13 +149,6 @@ Upgrade pythonz to the latest version
 
   pythonz update
 
-Upgrade pythonz to the latest development version
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-::
-
-  pythonz update --dev
-
 Check the installed pythonz version
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
