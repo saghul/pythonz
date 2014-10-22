@@ -31,7 +31,14 @@ class LocateCommand(Command):
         if not is_installed(pkg):
             logger.error("`%s` is not installed." % pkgname)
             return
-        logger.log(os.path.join(PATH_PYTHONS, pkgname, 'bin', 'python'))
+        for bin in ('python3', 'python', 'pypy3', 'pypy'):
+            path = os.path.join(PATH_PYTHONS, pkgname, 'bin', bin)
+            if os.path.exists(path):
+                break
+        else:
+            # fallback
+            path = os.path.join(PATH_PYTHONS, pkgname, 'bin', 'python')
+        logger.log(path)
 
 LocateCommand()
 
