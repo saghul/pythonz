@@ -452,7 +452,8 @@ class PyPyInstaller(Installer):
 
 
 class PyPy3Installer(PyPyInstaller):
-    supported_versions = ['2.3.1']
+    supported_versions = ['2.3.1',
+                          '2.4.0']
 
     @classmethod
     def get_version_url(cls, version):
