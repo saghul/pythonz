@@ -36,5 +36,4 @@ PATH_HOME_ETC = os.path.join(PATH_HOME, 'etc')
 
 # pythonz download
 PYTHONZ_UPDATE_URL = 'https://github.com/saghul/pythonz/archive/master.tar.gz'
-PYTHONZ_DEV_UPDATE_URL = 'https://github.com/saghul/pythonz/archive/dev.tar.gz'
 

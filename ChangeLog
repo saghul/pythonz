@@ -1,4 +1,18 @@
 
+1.6.1
+=====
+* Add support for PyPy3 2.4.0
+* Simplify detecting file type
+* Fix locate command
+
+1.6.0
+=====
+* Add support for CPython 3.4.2
+* Add support for PyPy 2.4.0
+* Improved installation instructions
+* Add -C and --configure options to bash completion
+* Remove development branch
+
 1.5.1
 =====
 * Add support for CPython 2.7.8

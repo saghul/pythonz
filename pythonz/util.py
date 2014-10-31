@@ -53,7 +53,7 @@ def is_html(content_type):
     return content_type and content_type.startswith('text/html')
 
 def is_gzip(content_type, filename):
-    return (content_type == 'application/x-gzip' or tarfile.is_tarfile(filename) or splitext(filename)[1].lower() in ('.tar', '.tar.gz', '.tgz'))
+    return content_type == 'application/x-gzip' or tarfile.is_tarfile(filename) or splitext(filename)[1].lower() in ('.tar', '.tar.gz', '.tgz', '.tar.bz2', '.tbz')
 
 def get_macosx_deployment_target():
     m = re.search('^([0-9]+\.[0-9]+)', platform.mac_ver()[0])
