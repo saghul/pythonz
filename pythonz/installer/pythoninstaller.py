@@ -136,9 +136,9 @@ class CPythonInstaller(Installer):
             if options.framework:
                 self.configure_options.append('--enable-framework=%s' % os.path.join(
                                               self.install_dir, 'Frameworks'))
-            elif not options.static and not target == '10.10':
-                self.configure_options.append('--enable-shared')
-            elif not options.static and Version(self.pkg.version) <= '3.4.0' and Version(self.pkg.version) >= '3.4.2':
+            elif not options.static and (not target == '10.10' or (Version(
+                                         self.pkg.version) <= '3.4.0' and Version(
+                                         self.pkg.version) >= '3.4.2')):
                 self.configure_options.append('--enable-shared')
             if options.universal:
                 self.configure_options.append('--enable-universalsdk=/')
