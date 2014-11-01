@@ -134,9 +134,12 @@ class CPythonInstaller(Installer):
                 logger.error("Can't specify both framework and static.")
                 raise Exception
             if options.framework:
-                self.configure_options.append('--enable-framework=%s' % os.path.join(self.install_dir, 'Frameworks'))
-            elif not options.static and target > '10.9' and version >= '3.4.0' and version < '3.4.2':
+                self.configure_options.append('--enable-framework=%s' % os.path.join(
+                                              self.install_dir, 'Frameworks'))
+            elif not options.static and (target <= '10.9' or (
+                                         version <= '3.4.0' and version >= '3.4.2')):
                 self.configure_options.append('--enable-shared')
+
             if options.universal:
                 self.configure_options.append('--enable-universalsdk=/')
                 self.configure_options.append('--with-universal-archs=intel')
