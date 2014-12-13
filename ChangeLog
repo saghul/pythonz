@@ -1,4 +1,9 @@
 
+1.7.0
+=====
+* Add support for CPython 2.7.9
+* Make static builds by default on OSX too
+
 1.6.1
 =====
 * Add support for PyPy3 2.4.0
