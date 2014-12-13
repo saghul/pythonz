@@ -63,21 +63,21 @@ class InstallCommand(Command):
             dest="framework",
             action="store_true",
             default=False,
-            help="Build (MacOSX|Darwin) framework."
+            help="Build Framework. (OSX only)"
         )
         self.parser.add_option(
             "--universal",
             dest="universal",
             action="store_true",
             default=False,
-            help="Build for both 32 & 64 bit Intel."
+            help="Build for both 32 & 64 bit Intel. (OSX only)"
         )
         self.parser.add_option(
-            "--static",
-            dest="static",
+            "--shared",
+            dest="shared",
             action="store_true",
             default=False,
-            help="Build static libraries."
+            help="Build shared libraries."
         )
         self.parser.add_option(
             "--reinstall",

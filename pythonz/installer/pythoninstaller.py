@@ -130,16 +130,19 @@ class CPythonInstaller(Installer):
                 self.configure_options.append('MACOSX_DEPLOYMENT_TARGET=%s' % target)
 
             # set build options
-            if options.framework and options.static:
-                logger.error("Can't specify both framework and static.")
+            if options.framework and options.shared:
+                logger.error("Can't specify both framework and shared.")
                 raise Exception
             if options.framework:
                 self.configure_options.append('--enable-framework=%s' % os.path.join(self.install_dir, 'Frameworks'))
-            elif not options.static:
+            if options.shared:
                 self.configure_options.append('--enable-shared')
             if options.universal:
                 self.configure_options.append('--enable-universalsdk=/')
                 self.configure_options.append('--with-universal-archs=intel')
+        else:
+            if options.shared:
+                self.configure_options.append('--enable-shared')
 
     @classmethod
     def get_version_url(cls, version):

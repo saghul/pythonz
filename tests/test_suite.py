@@ -64,7 +64,7 @@ def test_03_install():
     for t, versions in TESTPY_VERSION:
         o = Options({'type': t, 'force':True, 'run_tests':False, 'url': None,
                      'file': None, 'verbose':False, 'configure': "",
-                     'framework':False, 'universal':False, 'static':False})
+                     'framework':False, 'universal':False, 'shared':False})
         c = InstallCommand()
         c.run_command(o, [versions.pop()]) # pythonz install 2.5.5
         if versions:
