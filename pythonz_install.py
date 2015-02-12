@@ -1,6 +1,8 @@
 
+import os
+
 from optparse import OptionParser
-from pythonz.installer import install_pythonz, upgrade_pythonz, systemwide_pythonz
+
 
 if __name__ == "__main__":
     parser = OptionParser()
@@ -20,9 +22,13 @@ if __name__ == "__main__":
     )
     opt, arg = parser.parse_args()
     if opt.systemwide:
+        os.environ['PYTHONZ_ROOT'] = '/usr/local/pythonz'
+        from pythonz.installer import systemwide_pythonz
         systemwide_pythonz()
     elif opt.upgrade:
+        from pythonz.installer import upgrade_pythonz
         upgrade_pythonz()
     else:
+        from pythonz.installer import install_pythonz
         install_pythonz()
 
