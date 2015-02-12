@@ -1,4 +1,8 @@
 
+1.7.1
+=====
+* Add support for PyPy 2.5.0
+
 1.7.0
 =====
 * Add support for CPython 2.7.9
