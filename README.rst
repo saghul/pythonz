@@ -75,6 +75,12 @@ RPM family (CentOS, RHEL...)
 
 If you need tkinter support, add **tk-devel**.
 
+OS X
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+::
+
+  xcode-select --install
+  
 Usage
 -----
 
