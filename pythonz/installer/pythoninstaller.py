@@ -471,7 +471,8 @@ class PyPy3Installer(PyPyInstaller):
 
 
 class JythonInstaller(Installer):
-    supported_versions = ['2.5.0', '2.5.1', '2.5.2', '2.5.3']
+    supported_versions = ['2.5.0', '2.5.1', '2.5.2', '2.5.3',
+                          '2.7.0']
 
     def __init__(self, version, options):
         super(JythonInstaller, self).__init__(version, options)
