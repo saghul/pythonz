@@ -7,7 +7,7 @@ INSTALLER_ROOT = os.path.dirname(os.path.abspath(__file__))
 # Root
 # pythonz root path
 SYSTEMWIDE_PATH = '/usr/local/pythonz'
-ROOT = os.environ.get('PYTHONZ_ROOT') or os.path.join(os.environ['HOME'], '.pythonz') if not os.path.abspath(os.path.dirname(__file__)).startswith(SYSTEMWIDE_PATH) else SYSTEMWIDE_PATH
+ROOT = os.environ.get('PYTHONZ_ROOT') or os.path.join(os.environ.get('HOME'), '.pythonz') if not os.path.abspath(os.path.dirname(__file__)).startswith(SYSTEMWIDE_PATH) else SYSTEMWIDE_PATH
 
 # directories
 PATH_PYTHONS = os.path.join(ROOT, 'pythons')
@@ -30,7 +30,7 @@ PATH_BIN_PYTHONZ = os.path.join(PATH_BIN, 'pythonz')
 
 # Home
 # pythonz home path
-PATH_HOME = os.environ.get('PYTHONZ_HOME') or os.path.join(os.environ['HOME'], '.pythonz')
+PATH_HOME = os.environ.get('PYTHONZ_HOME') or os.path.join(os.environ.get('HOME'), '.pythonz')
 
 # directories
 PATH_HOME_ETC = os.path.join(PATH_HOME, 'etc')
