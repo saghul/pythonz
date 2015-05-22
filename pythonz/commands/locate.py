@@ -24,13 +24,13 @@ class LocateCommand(Command):
     def run_command(self, options, args):
         if not args or len(args) > 1:
             self.parser.print_help()
-            return
+            sys.exit(1)
 
         pkg = Package(args[0], options.type)
         pkgname = pkg.name
         if not is_installed(pkg):
             logger.error("`%s` is not installed." % pkgname)
-            return
+            sys.exit(1)
         for bin in ('python3', 'python', 'pypy3', 'pypy'):
             path = os.path.join(PATH_PYTHONS, pkgname, 'bin', bin)
             if os.path.exists(path):
