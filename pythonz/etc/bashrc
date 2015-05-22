@@ -1,7 +1,7 @@
 # settings
 if [[ -d "$PYTHONZ_ROOT" ]] ; then
     PATH_ROOT="$PYTHONZ_ROOT"
-elif [[ -d "$HOME/.pythonz" ]]
+elif [[ -d "$HOME/.pythonz" ]]; then
     PATH_ROOT="$HOME/.pythonz"
 elif [[ -d "/usr/local/pythonz" ]] ; then
     PATH_ROOT="/usr/local/pythonz"
@@ -13,7 +13,7 @@ PATH_ETC="$PATH_ROOT/etc"
 
 if [[ -d "$PYTHONZ_HOME" ]] ; then
     PATH_HOME="$PYTHONZ_HOME"
-elif [[ -d "$HOME" ]]
+elif [[ -d "$HOME" ]]; then
     PATH_HOME="$HOME/.pythonz"
 elif [[ -d "/usr/local/pythonz" ]] ; then
     PATH_HOME="/usr/local/pythonz"
