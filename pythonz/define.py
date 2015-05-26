@@ -6,7 +6,8 @@ INSTALLER_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # Root
 # pythonz root path
-ROOT = os.environ.get('PYTHONZ_ROOT') or os.path.join(os.environ['HOME'], '.pythonz')
+SYSTEMWIDE_PATH = '/usr/local/pythonz'
+ROOT = os.environ.get('PYTHONZ_ROOT') or os.path.join(os.environ['HOME'], '.pythonz') if not os.path.abspath(os.path.dirname(__file__)).startswith(SYSTEMWIDE_PATH) else SYSTEMWIDE_PATH
 
 # directories
 PATH_PYTHONS = os.path.join(ROOT, 'pythons')
@@ -36,5 +37,4 @@ PATH_HOME_ETC = os.path.join(PATH_HOME, 'etc')
 
 # pythonz download
 PYTHONZ_UPDATE_URL = 'https://github.com/saghul/pythonz/archive/master.tar.gz'
-PYTHONZ_DEV_UPDATE_URL = 'https://github.com/saghul/pythonz/archive/dev.tar.gz'
 

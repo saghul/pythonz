@@ -15,7 +15,7 @@ _pythonz_complete(){
       _pythonz_compreply $commands ${_pythonz_context["pythonz"]}
     elif [ $COMP_CWORD -eq 2 ]; then
       _pythonz_context["type"]="cpython"
-      _pythonz_context["install"]="-t -f -v -h --run-tests --framework --universal --static --file --url --reinstall"
+      _pythonz_context["install"]="-t -f -v -h --run-tests --framework --universal --shared --file --url --reinstall -C --configure"
       _pythonz_context["uninstall"]="-t -h"
       _pythonz_context["cleanup"]="-a -h"
       _pythonz_context["list"]="-a -h"

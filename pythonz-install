@@ -44,7 +44,7 @@ parse_arguments $@
 
 if [[ ! -x $CURL ]] && [[ ! -x $FETCH ]] ; then
     echo "pythonz required curl or fetch. Neigher of them were not found in your path."
-    exit
+    exit 1
 fi
 
 for PYTHON in $PYTHONS ; do
@@ -63,7 +63,7 @@ for PYTHON in $PYTHONS ; do
 done
 if [[ $PYTHON_FOUND != '1' ]] ; then
     echo "pythonz requires Python 2.6, 2.7 or higher"
-    exit
+    exit 1
 fi
 
 systemwide_install=0
@@ -106,6 +106,5 @@ else
 fi
 if [[ $? == 1 ]] ; then
     echo "Failed to install pythonz."
-    exit
+    exit 1
 fi
-

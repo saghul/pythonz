@@ -1,4 +1,44 @@
 
+1.8.0
+=====
+* Exit pythonz-install with non-zero status
+* Fix system-wide installation
+* Add support for CPython 3.4.3
+* Add support for CPython 3.3.6
+* Add install instructions for OS X
+
+1.7.1
+=====
+* Add support for PyPy 2.5.0
+
+1.7.0
+=====
+* Add support for CPython 2.7.9
+* Make static builds by default on OSX too
+
+1.6.1
+=====
+* Add support for PyPy3 2.4.0
+* Simplify detecting file type
+* Fix locate command
+
+1.6.0
+=====
+* Add support for CPython 3.4.2
+* Add support for PyPy 2.4.0
+* Improved installation instructions
+* Add -C and --configure options to bash completion
+* Remove development branch
+
+1.5.1
+=====
+* Add support for CPython 2.7.8
+
+1.5.0
+=====
+* Add support for Stackless 3.2.5 and 3.3.5
+* Add ability to reinstall an already installed version
+
 1.4.1
 =====
 * Add support for PyPy3 2.3.1

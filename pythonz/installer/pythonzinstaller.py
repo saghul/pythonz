@@ -75,6 +75,7 @@ python %s/pythonz_main.py "$@"
         #copy all *.sh files to bash_completion.d directory
         for path in glob.glob(os.path.join(installer_root,"etc","bash_completion.d","*.sh")):
             shutil.copy( path, PATH_BASH_COMPLETION )
+
     @staticmethod
     def systemwide_install():
         profile = """\

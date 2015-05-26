@@ -110,12 +110,12 @@ class CPythonInstaller(Installer):
     supported_versions = ['2.4', '2.4.1', '2.4.2', '2.4.3', '2.4.4', '2.4.5', '2.4.6',
                           '2.5', '2.5.1', '2.5.2', '2.5.3', '2.5.4', '2.5.5', '2.5.6',
                           '2.6', '2.6.1', '2.6.2', '2.6.3', '2.6.4', '2.6.5', '2.6.6', '2.6.7', '2.6.8', '2.6.9',
-                          '2.7', '2.7.1', '2.7.2', '2.7.3', '2.7.4', '2.7.5', '2.7.6', '2.7.7',
+                          '2.7', '2.7.1', '2.7.2', '2.7.3', '2.7.4', '2.7.5', '2.7.6', '2.7.7', '2.7.8', '2.7.9', '2.7.10',
                           '3.0', '3.0.1',
                           '3.1', '3.1.1', '3.1.2', '3.1.3', '3.1.4', '3.1.5',
                           '3.2', '3.2.1', '3.2.2', '3.2.3', '3.2.4', '3.2.5',
-                          '3.3.0', '3.3.1', '3.3.2', '3.3.3', '3.3.4', '3.3.5',
-                          '3.4.0', '3.4.1']
+                          '3.3.0', '3.3.1', '3.3.2', '3.3.3', '3.3.4', '3.3.5', '3.3.6',
+                          '3.4.0', '3.4.1', '3.4.2', '3.4.3']
 
     def __init__(self, version, options):
         super(CPythonInstaller, self).__init__(version, options)
@@ -130,16 +130,17 @@ class CPythonInstaller(Installer):
                 self.configure_options.append('MACOSX_DEPLOYMENT_TARGET=%s' % target)
 
             # set build options
-            if options.framework and options.static:
-                logger.error("Can't specify both framework and static.")
+            if options.framework and options.shared:
+                logger.error("Can't specify both framework and shared.")
                 raise Exception
             if options.framework:
                 self.configure_options.append('--enable-framework=%s' % os.path.join(self.install_dir, 'Frameworks'))
-            elif not options.static:
-                self.configure_options.append('--enable-shared')
             if options.universal:
                 self.configure_options.append('--enable-universalsdk=/')
                 self.configure_options.append('--with-universal-archs=intel')
+        else:
+            if options.shared:
+                self.configure_options.append('--enable-shared')
 
     @classmethod
     def get_version_url(cls, version):
@@ -404,7 +405,9 @@ class PyPyInstaller(Installer):
                           '2.0', '2.0.1', '2.0.2',
                           '2.1',
                           '2.2', '2.2.1',
-                          '2.3', '2.3.1']
+                          '2.3', '2.3.1',
+                          '2.4.0',
+                          '2.5.0']
 
     @classmethod
     def get_version_url(cls, version):
@@ -451,7 +454,8 @@ class PyPyInstaller(Installer):
 
 
 class PyPy3Installer(PyPyInstaller):
-    supported_versions = ['2.3.1']
+    supported_versions = ['2.3.1',
+                          '2.4.0']
 
     @classmethod
     def get_version_url(cls, version):
@@ -465,7 +469,8 @@ class PyPy3Installer(PyPyInstaller):
 
 
 class JythonInstaller(Installer):
-    supported_versions = ['2.5.0', '2.5.1', '2.5.2', '2.5.3']
+    supported_versions = ['2.5.0', '2.5.1', '2.5.2', '2.5.3',
+                          '2.7.0']
 
     def __init__(self, version, options):
         super(JythonInstaller, self).__init__(version, options)

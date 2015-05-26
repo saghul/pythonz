@@ -3,10 +3,10 @@ import os
 import sys
 
 from pythonz.commands import Command
-from pythonz.define import PATH_DISTS, ROOT, PATH_BUILD, PYTHONZ_UPDATE_URL, PYTHONZ_DEV_UPDATE_URL
+from pythonz.define import PATH_DISTS, ROOT, PATH_BUILD, PYTHONZ_UPDATE_URL
 from pythonz.downloader import Downloader, DownloadError
 from pythonz.log import logger
-from pythonz.util import rm_r, extract_downloadfile, Link, unlink, Subprocess
+from pythonz.util import rm_r, extract_downloadfile, unlink, Subprocess
 
 
 class UpdateCommand(Command):
@@ -14,22 +14,8 @@ class UpdateCommand(Command):
     usage = "%prog"
     summary = "Update pythonz to the latest version"
 
-    def __init__(self):
-        super(UpdateCommand, self).__init__()
-        self.parser.add_option(
-            "--dev",
-            dest="dev",
-            action="store_true",
-            default=False,
-            help="Use the development branch."
-        )
-
     def run_command(self, options, args):
-        if options.dev:
-            download_url = PYTHONZ_DEV_UPDATE_URL
-        else:
-            download_url = PYTHONZ_UPDATE_URL
-        headinfo = Downloader.read_head_info(download_url)
+        headinfo = Downloader.read_head_info(PYTHONZ_UPDATE_URL)
         content_type = headinfo['content-type']
         filename = "pythonz-latest"
         distname = "%s.tgz" % filename
@@ -38,10 +24,10 @@ class UpdateCommand(Command):
         unlink(download_file)
         logger.info("Downloading %s as %s" % (distname, download_file))
         try:
-            Downloader.fetch(download_url, download_file)
+            Downloader.fetch(PYTHONZ_UPDATE_URL, download_file)
         except DownloadError:
             unlink(download_file)
-            logger.error("Failed to download. `%s`" % download_url)
+            logger.error("Failed to download. `%s`" % PYTHONZ_UPDATE_URL)
             sys.exit(1)
         except:
             unlink(download_file)
@@ -55,7 +41,7 @@ class UpdateCommand(Command):
         try:
             logger.info("Installing %s into %s" % (extract_dir, ROOT))
             s = Subprocess()
-            s.check_call([sys.executable, os.path.join(extract_dir,'pythonz_install.py'), '--upgrade'])
+            s.check_call([sys.executable, os.path.join(extract_dir, 'pythonz_install.py'), '--upgrade'])
         except:
             logger.error("Failed to update pythonz.")
             sys.exit(1)
