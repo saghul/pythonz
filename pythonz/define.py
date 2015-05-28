@@ -1,6 +1,8 @@
 
 import os
 
+from pythonz.log import logger
+
 # pythonz installer root path
 INSTALLER_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -19,7 +21,7 @@ elif ( HOME
 elif os.path.isdir(SYSTEMWIDE_PATH):
     ROOT = SYSTEMWIDE_PATH
 else:
-    print "No installation of pythonz found."
+    logger.error('No installation of pythonz found.')
     sys.exit(1)
 
 # directories
@@ -52,7 +54,7 @@ elif HOME:
 elif os.path.isdir(SYSTEMWIDE_PATH):
     PATH_HOME = SYSTEMWIDE_PATH
 else:
-    print "No home directory for pythonz found."
+    logger.error('No home directory for pythonz found.')
     sys.exit(1)
 
 # directories
