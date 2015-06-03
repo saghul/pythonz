@@ -1,4 +1,12 @@
 
+1.9.0
+=====
+* Add support for PyPy 2.5.1 and 2.6.0
+* Fix parsing versions of the form X.Y.ZZ
+* Changed locate command to error out when a version is not found
+* Add support for CPython 2.7.10 (6 days ago) <Chip Warden>
+* Add support for Jython 2.7
+
 1.8.0
 =====
 * Exit pythonz-install with non-zero status
