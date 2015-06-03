@@ -409,7 +409,8 @@ class PyPyInstaller(Installer):
                           '2.2', '2.2.1',
                           '2.3', '2.3.1',
                           '2.4.0',
-                          '2.5.0']
+                          '2.5.0', '2.5.1',
+                          '2.6.0']
 
     @classmethod
     def get_version_url(cls, version):
