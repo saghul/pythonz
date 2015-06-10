@@ -1,5 +1,6 @@
 
 import os
+import sys
 
 from pythonz.commands import Command
 from pythonz.define import PATH_PYTHONS
