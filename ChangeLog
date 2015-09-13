@@ -1,4 +1,9 @@
 
+1.10.0
+======
+* Add support for CPython 3.5.0
+* Add support for PyPy 2.6.1
+
 1.9.1
 =====
 * Add missing 'import sys' in locate command
