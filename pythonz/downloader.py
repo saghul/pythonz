@@ -1,7 +1,9 @@
-
 import sys
+from mmap import mmap, PROT_READ
+from hashlib import sha256
 
 from pythonz.util import PY3K
+from pythonz.log import logger
 
 if PY3K:
     from urllib.request import Request, urlopen, urlretrieve
@@ -79,3 +81,13 @@ class Downloader(object):
         except IOError:
             sys.stdout.write('\n')
             raise DownloadError('Failed to fetch %s from %s' % (filename, url))
+
+
+def validate_sha256(filename, sha256sum):
+    if sha256sum is not None:
+        with open(filename, 'rb') as f, mmap(f.fileno(), 0, prot=PROT_READ) as m:
+            return sha256(m).hexdigest() == sha256sum
+    else:
+        logger.warning('sha256sum unavailable, skipping verification.\nMake '
+                       "sure that the server you're downloading from is trusted")
+        return True
