@@ -8,6 +8,7 @@ import multiprocessing
 import re
 import subprocess
 
+from pythonz.installer.versions import versions
 from pythonz.util import symlink, makedirs, Package, is_url, Link,\
     unlink, is_html, Subprocess, rm_r, is_python26, is_python27,\
     extract_downloadfile, is_archive_file, path_to_fileurl, is_file,\
@@ -15,7 +16,7 @@ from pythonz.util import symlink, makedirs, Package, is_url, Link,\
     get_macosx_deployment_target, Version, is_python25, is_python24, is_python33
 from pythonz.define import PATH_BUILD, PATH_DISTS, PATH_PYTHONS, PATH_LOG, \
     PATH_PATCHES_ALL, PATH_PATCHES_OSX
-from pythonz.downloader import Downloader, DownloadError
+from pythonz.downloader import Downloader, DownloadError, validate_sha256
 from pythonz.log import logger
 
 
@@ -40,8 +41,6 @@ class PythonInstaller(object):
 
 
 class Installer(object):
-    supported_versions = []
-
     def __init__(self, version, options):
         # create directories
         makedirs(PATH_BUILD)
@@ -59,9 +58,10 @@ class Installer(object):
                 raise RuntimeError
             self.download_url = options.url
         else:
-            if version not in self.supported_versions:
-                logger.warning("Unsupported Python version: `%s`, trying with the following URL anyway: %s" % (version, self.get_version_url(version)))
             self.download_url = self.get_version_url(version)
+            if version not in self.supported_versions:
+                logger.warning("Unsupported Python version: `%s`, trying with the following URL anyway: %s" % (version, self.download_url))
+
         self.pkg = Package(version, options.type)
         self.install_dir = os.path.join(PATH_PYTHONS, self.pkg.name)
         self.build_dir = os.path.join(PATH_BUILD, self.pkg.name)
@@ -87,6 +87,10 @@ class Installer(object):
     def get_version_url(cls, version):
         raise NotImplementedError
 
+    @property
+    def expected_sha256(self):
+        return self.supported_versions.get(self.pkg.version)
+
     def download(self):
         if os.path.isfile(self.download_file):
             logger.info("Use the previously fetched %s" % (self.download_file))
@@ -102,6 +106,8 @@ class Installer(object):
             except:
                 unlink(self.download_file)
                 raise
+        if not validate_sha256(self.download_file, self.expected_sha256):
+            raise DownloadError("Corrupted download, the sha256 doesn't match")
 
     def install(self):
         raise NotImplementedError
@@ -109,16 +115,7 @@ class Installer(object):
 
 class CPythonInstaller(Installer):
     version_re = re.compile(r'(\d\.\d(\.\d+)?)(.*)')
-    supported_versions = ['2.4', '2.4.1', '2.4.2', '2.4.3', '2.4.4', '2.4.5', '2.4.6',
-                          '2.5', '2.5.1', '2.5.2', '2.5.3', '2.5.4', '2.5.5', '2.5.6',
-                          '2.6', '2.6.1', '2.6.2', '2.6.3', '2.6.4', '2.6.5', '2.6.6', '2.6.7', '2.6.8', '2.6.9',
-                          '2.7', '2.7.1', '2.7.2', '2.7.3', '2.7.4', '2.7.5', '2.7.6', '2.7.7', '2.7.8', '2.7.9', '2.7.10',
-                          '3.0', '3.0.1',
-                          '3.1', '3.1.1', '3.1.2', '3.1.3', '3.1.4', '3.1.5',
-                          '3.2', '3.2.1', '3.2.2', '3.2.3', '3.2.4', '3.2.5',
-                          '3.3.0', '3.3.1', '3.3.2', '3.3.3', '3.3.4', '3.3.5', '3.3.6',
-                          '3.4.0', '3.4.1', '3.4.2', '3.4.3',
-                          '3.5.0']
+    supported_versions = versions['cpython']
 
     def __init__(self, version, options):
         super(CPythonInstaller, self).__init__(version, options)
@@ -382,11 +379,7 @@ class CPythonInstaller(Installer):
 
 
 class StacklessInstaller(CPythonInstaller):
-    supported_versions = ['2.6.5',
-                          '2.7.2',
-                          '3.1.3',
-                          '3.2.2', '3.2.5',
-                          '3.3.5']
+    supported_versions = versions['stackless']
 
     def _patch_osx(self):
         super(StacklessInstaller, self)._patch_osx()
@@ -401,15 +394,7 @@ class StacklessInstaller(CPythonInstaller):
 
 
 class PyPyInstaller(Installer):
-    supported_versions = ['1.8',
-                          '1.9',
-                          '2.0', '2.0.1', '2.0.2',
-                          '2.1',
-                          '2.2', '2.2.1',
-                          '2.3', '2.3.1',
-                          '2.4.0',
-                          '2.5.0', '2.5.1',
-                          '2.6.0', '2.6.1']
+    supported_versions = versions['pypy']
 
     @classmethod
     def get_version_url(cls, version):
@@ -420,6 +405,18 @@ class PyPyInstaller(Installer):
             logger.warning("Linux binaries are dynamically linked, as is usual, and thus might not be usable due to the sad story of linux binary compatibility, check the PyPy website for more information")
             arch = {4: '', 8: '64'}[ctypes.sizeof(ctypes.c_size_t)]
             return 'https://bitbucket.org/pypy/pypy/downloads/pypy-%(version)s-linux%(arch)s.tar.bz2' % {'arch': arch, 'version': version}
+
+    @property
+    def expected_sha256(self):
+        platform_checksums = self.supported_versions.get(self.pkg.version)
+        if platform_checksums is not None:
+            if sys.platform == 'darwin':
+                return platform_checksums['darwin']
+            elif 'linux' in sys.platform:
+                arch = {4: '', 8: '64'}[ctypes.sizeof(ctypes.c_size_t)]
+                return platform_checksums['linux' + arch]
+            else:
+                raise ValueError('Unsupported platform: ' + sys.platform)
 
     def install(self):
         # get content type.
@@ -452,8 +449,7 @@ class PyPyInstaller(Installer):
 
 
 class PyPy3Installer(PyPyInstaller):
-    supported_versions = ['2.3.1',
-                          '2.4.0']
+    supported_versions = versions['pypy3']
 
     @classmethod
     def get_version_url(cls, version):
@@ -467,8 +463,7 @@ class PyPy3Installer(PyPyInstaller):
 
 
 class JythonInstaller(Installer):
-    supported_versions = ['2.5.0', '2.5.1', '2.5.2', '2.5.3',
-                          '2.7.0']
+    supported_versions = versions['jython']
 
     def __init__(self, version, options):
         super(JythonInstaller, self).__init__(version, options)
