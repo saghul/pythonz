@@ -1,5 +1,5 @@
 import sys
-from mmap import mmap, PROT_READ
+from mmap import mmap, ACCESS_READ
 from hashlib import sha256
 
 from pythonz.util import PY3K
@@ -85,7 +85,7 @@ class Downloader(object):
 
 def validate_sha256(filename, sha256sum):
     if sha256sum is not None:
-        with open(filename, 'rb') as f, mmap(f.fileno(), 0, prot=PROT_READ) as m:
+        with open(filename, 'rb') as f, mmap(f.fileno(), 0, access=ACCESS_READ) as m:
             return sha256(m).hexdigest() == sha256sum
     else:
         logger.warning('sha256sum unavailable, skipping verification.\nMake '
