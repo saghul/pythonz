@@ -19,6 +19,9 @@ from pythonz.downloader import Downloader, DownloadError
 from pythonz.log import logger
 
 
+class AlreadyInstalledError(Exception): pass
+
+
 class PythonInstaller(object):
     @staticmethod
     def get_installer(version, options):
@@ -73,8 +76,7 @@ class Installer(object):
             if options.reinstall:
                 shutil.rmtree(self.install_dir)
             else:
-                logger.error("You have already installed `%s`" % self.pkg.name)
-                raise RuntimeError
+                raise AlreadyInstalledError("You have already installed `%s`" % self.pkg.name)
 
         self.options = options
         self.logfile = os.path.join(PATH_LOG, 'build.log')
@@ -192,10 +194,6 @@ class CPythonInstaller(Installer):
         if is_html(self.content_type):
             # note: maybe got 404 or 503 http status code.
             logger.error("Invalid content-type: `%s`" % self.content_type)
-            return
-
-        if os.path.isdir(self.install_dir):
-            logger.info("You have already installed `%s`" % self.pkg.name)
             return
 
         self.download_and_extract()
@@ -436,10 +434,6 @@ class PyPyInstaller(Installer):
             logger.error("Invalid content-type: `%s`" % self.content_type)
             return
 
-        if os.path.isdir(self.install_dir):
-            logger.info("You have already installed `%s`" % self.pkg.name)
-            return
-
         self.download_and_extract()
         logger.info("Installing %s into %s" % (self.pkg.name, self.install_dir))
         shutil.copytree(self.build_dir, self.install_dir)
@@ -511,10 +505,6 @@ class JythonInstaller(Installer):
             logger.error("Invalid content-type: `%s`" % self.content_type)
             return
 
-        if os.path.isdir(self.install_dir):
-            logger.info("You have already installed `%s`" % self.pkg.name)
-            return
-
         self.download()
         logger.info("\nThis could take a while. You can run the following command on another shell to track the status:")
         logger.info("  tail -f %s\n" % self.logfile)
@@ -529,4 +519,3 @@ class JythonInstaller(Installer):
         install_dir = os.path.realpath(self.install_dir)
         bin_dir = os.path.join(install_dir, 'bin')
         symlink(os.path.join(bin_dir, 'jython'), os.path.join(bin_dir, 'python'))
-

@@ -2,7 +2,8 @@
 import sys
 
 from pythonz.commands import Command
-from pythonz.installer.pythoninstaller import PythonInstaller
+from pythonz.installer.pythoninstaller import PythonInstaller, AlreadyInstalledError
+from pythonz.log import logger
 
 
 class InstallCommand(Command):
@@ -95,10 +96,11 @@ class InstallCommand(Command):
             try:
                 p = PythonInstaller.get_installer(arg, options)
                 p.install()
+            except AlreadyInstalledError as e:
+                logger.info(e)
             except Exception:
                 import traceback
                 traceback.print_exc()
                 continue
 
 InstallCommand()
-
