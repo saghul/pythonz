@@ -16,7 +16,7 @@ from pythonz.util import symlink, makedirs, Package, is_url, Link,\
     get_macosx_deployment_target, Version, is_python25, is_python24, is_python33
 from pythonz.define import PATH_BUILD, PATH_DISTS, PATH_PYTHONS, PATH_LOG, \
     PATH_PATCHES_ALL, PATH_PATCHES_OSX
-from pythonz.downloader import Downloader, DownloadError, validate_sha256
+from pythonz.downloader import Downloader, DownloadError, sha256
 from pythonz.log import logger
 
 
@@ -100,22 +100,17 @@ class Installer(object):
         return self.supported_versions.get(self.pkg.version)
 
     def download(self):
-        if os.path.isfile(self.download_file):
+        if os.path.isfile(self.download_file) and sha256(self.download_file) == self.expected_sha256:
             logger.info("Use the previously fetched %s" % (self.download_file))
         else:
             base_url = Link(self.download_url).base_url
             logger.info("Downloading %s as %s" % (base_url, self.download_file))
             try:
-                Downloader.fetch(self.download_url, self.download_file)
+                Downloader.fetch(self.download_url, self.download_file, self.expected_sha256)
             except DownloadError:
-                unlink(self.download_file)
                 logger.error("Failed to download.\n%s" % (sys.exc_info()[1]))
                 sys.exit(1)
-            except:
-                unlink(self.download_file)
-                raise
-        if not validate_sha256(self.download_file, self.expected_sha256):
-            raise DownloadError("Corrupted download, the sha256 doesn't match")
+
 
     def install(self):
         raise NotImplementedError
