@@ -9,7 +9,8 @@ import time
 from pythonz.util import makedirs, rm_r
 from pythonz.define import PATH_BUILD, PATH_BIN, PATH_DISTS, PATH_PYTHONS,\
     PATH_ETC, PATH_SCRIPTS, PATH_SCRIPTS_PYTHONZ,\
-    PATH_SCRIPTS_PYTHONZ_COMMANDS, PATH_BIN_PYTHONZ, PATH_LOG,\
+    PATH_SCRIPTS_PYTHONZ_COMMANDS, PATH_BIN_PYTHONZ,\
+    PATH_LOG, PATH_PATCHES,\
     PATH_SCRIPTS_PYTHONZ_INSTALLER, PATH_HOME_ETC, ROOT,\
     PATH_BASH_COMPLETION
 
@@ -44,6 +45,11 @@ class PythonzInstaller(object):
             shutil.copy(path, PATH_SCRIPTS_PYTHONZ_COMMANDS)
         for path in glob.glob(os.path.join(installer_root,"installer","*.py")):
             shutil.copy(path, PATH_SCRIPTS_PYTHONZ_INSTALLER)
+
+        # create patches direcotry
+        DEST_PATCHES = os.path.join(PATH_SCRIPTS_PYTHONZ, 'patches')
+        rm_r(DEST_PATCHES)
+        shutil.copytree(PATH_PATCHES, DEST_PATCHES)
 
         # create a main file
         with open("%s/pythonz_main.py" % PATH_SCRIPTS, "w") as f:
