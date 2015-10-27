@@ -87,6 +87,12 @@ class InstallCommand(Command):
             default=False,
             help="Reinstall Python version, if already installed."
         )
+        self.parser.add_option(
+            "--external",
+            dest="external_path",
+            default="",
+            help="Install Python version in specified directory."
+        )
 
     def run_command(self, options, args):
         if not args:

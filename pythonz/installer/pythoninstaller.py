@@ -63,7 +63,15 @@ class Installer(object):
                 logger.warning("Unsupported Python version: `%s`, trying with the following URL anyway: %s" % (version, self.download_url))
 
         self.pkg = Package(version, options.type)
-        self.install_dir = os.path.join(PATH_PYTHONS, self.pkg.name)
+        if options.external_path:
+            if not os.path.isabs(options.external_path):
+                options.external_path = os.path.join(
+                    os.path.abspath(os.path.curdir),
+                    options.external_path)
+            self.install_dir = os.path.join(options.external_path,
+                                            self.pkg.name)
+        else:
+            self.install_dir = os.path.join(PATH_PYTHONS, self.pkg.name)
         self.build_dir = os.path.join(PATH_BUILD, self.pkg.name)
         filename = Link(self.download_url).filename
         self.download_file = os.path.join(PATH_DISTS, filename)
