@@ -63,11 +63,11 @@ class Installer(object):
                 logger.warning("Unsupported Python version: `%s`, trying with the following URL anyway: %s" % (version, self.get_version_url(version)))
             self.download_url = self.get_version_url(version)
         self.pkg = Package(version, options.type)
-        if options.oneshot_path:
-            if not os.path.isabs(options.oneshot_path):
+        if options.external_path:
+            if not os.path.isabs(options.external_path):
                 logger.error('Install path must be absolute.')
                 raise RuntimeError
-            self.install_dir = os.path.join(options.oneshot_path,
+            self.install_dir = os.path.join(options.external_path,
                                             self.pkg.name)
         else:
             self.install_dir = os.path.join(PATH_PYTHONS, self.pkg.name)

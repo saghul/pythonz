@@ -88,8 +88,8 @@ class InstallCommand(Command):
             help="Reinstall Python version, if already installed."
         )
         self.parser.add_option(
-            "--oneshot",
-            dest="oneshot_path",
+            "--external",
+            dest="external_path",
             default="",
             help="Install Python version in specified directory."
         )
