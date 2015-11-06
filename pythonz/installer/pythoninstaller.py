@@ -65,8 +65,9 @@ class Installer(object):
         self.pkg = Package(version, options.type)
         if options.external_path:
             if not os.path.isabs(options.external_path):
-                logger.error('Install path must be absolute.')
-                raise RuntimeError
+                options.external_path = os.path.join(
+                    os.path.abspath(os.path.curdir),
+                    options.external_path)
             self.install_dir = os.path.join(options.external_path,
                                             self.pkg.name)
         else:
