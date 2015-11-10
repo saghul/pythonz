@@ -115,7 +115,10 @@ versions = {
                   'darwin': '77f1d056484e40e0a8e2e2b2b489eedfe785605ef36b144ffce05f7b748f6acd'},
         '2.6.1': {'linux': 'd010b1f1aafdb01beb107f16843985508ce81698260ce830690686d9b2768c88',
                   'linux64': '78a48490d1b2dba8571156c2bf822324ca7dae6f6a56a4bbb96d3e8e8885367b',
-                  'darwin': '4a78ef76ec38a49a9de40225c337e89486fa09938c600df2bd2dd60110066f65'}
+                  'darwin': '4a78ef76ec38a49a9de40225c337e89486fa09938c600df2bd2dd60110066f65'},
+        '4.0.0': {'linux': '365600947775bc73a902a5b1d11f8b96cf49f07cdbbab28bb47240097b4bb4c5',
+                  'linux64': '30365cf4fa6cd8e9ff44126f06dcaebefda35c2543ddcf9b9e8516c29cabe726',
+                  'darwin': 'd9e590fe5b9461bbdff56c76636e844ef90a297f82d0d2e204866c8a21759a50'}
                 },
     'pypy3': {
         '2.3.1': {'linux': '7eddc6826e58c9c89e68b59ec8caf1596b76401517ad8d26ad5e18e0ffa45db9',
