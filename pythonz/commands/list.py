@@ -7,6 +7,9 @@ from pythonz.installer.pythoninstaller import CPythonInstaller, StacklessInstall
 from pythonz.log import logger
 
 
+PY_TYPES = ['cpython', 'stackless', 'pypy', 'pypy3', 'jython']
+
+
 class ListCommand(Command):
     name = "list"
     usage = "%prog [options]"
@@ -28,10 +31,18 @@ class ListCommand(Command):
             default=False,
             help='Show the path for all Python installations.'
         )
+        self.parser.add_option(
+            '-t', '--type',
+            dest='py_type',
+            choices=PY_TYPES,
+            default=[],
+            help=('Use with -a to list only certain Python types. '
+                  'Available choices: {0}'.format(PY_TYPES))
+        )
 
     def run_command(self, options, args):
         if options.all_versions:
-            self.all()
+            self.all(py_type=options.py_type)
         else:
             self.installed(path=options.path)
 
@@ -43,12 +54,18 @@ class ListCommand(Command):
             else:
                 logger.log('  %s' % d)
 
-    def all(self):
+    def all(self, py_type):
         logger.log('# Available Python versions')
-        for type, installer in zip(['cpython', 'stackless', 'pypy', 'pypy3', 'jython'], [CPythonInstaller, StacklessInstaller, PyPyInstaller, PyPy3Installer, JythonInstaller]):
-            logger.log('  # %s:' % type)
+        groups = zip(PY_TYPES,
+                     [CPythonInstaller, StacklessInstaller, PyPyInstaller,
+                      PyPy3Installer, JythonInstaller])
+
+        if py_type:
+            groups = filter(lambda (impl, _): impl in py_type, groups)
+
+        for type_, installer in groups:
+            logger.log('  # %s:' % type_)
             for version in installer.supported_versions:
                 logger.log('     %s' % version)
 
 ListCommand()
-
