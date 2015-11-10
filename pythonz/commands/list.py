@@ -9,7 +9,7 @@ from pythonz.log import logger
 
 class ListCommand(Command):
     name = "list"
-    usage = "%prog [options]"
+    usage = "%prog [options] [filter]"
     summary = "List the installed python versions"
 
     def __init__(self):
@@ -19,7 +19,8 @@ class ListCommand(Command):
             dest='all_versions',
             action='store_true',
             default=False,
-            help='Show the all available python versions.'
+            help=('Show the all available python versions. Optionally, show '
+                  'chosen implementations. e.g.: pythonz list -a pypy3')
         )
         self.parser.add_option(
             '-p', '--path',
@@ -31,7 +32,7 @@ class ListCommand(Command):
 
     def run_command(self, options, args):
         if options.all_versions:
-            self.all()
+            self.all(args)
         else:
             self.installed(path=options.path)
 
@@ -43,12 +44,18 @@ class ListCommand(Command):
             else:
                 logger.log('  %s' % d)
 
-    def all(self):
+    def all(self, implementations):
         logger.log('# Available Python versions')
-        for type, installer in zip(['cpython', 'stackless', 'pypy', 'pypy3', 'jython'], [CPythonInstaller, StacklessInstaller, PyPyInstaller, PyPy3Installer, JythonInstaller]):
-            logger.log('  # %s:' % type)
+        groups = zip(['cpython', 'stackless', 'pypy', 'pypy3', 'jython'],
+                     [CPythonInstaller, StacklessInstaller, PyPyInstaller,
+                      PyPy3Installer, JythonInstaller])
+
+        if implementations:
+            groups = filter(lambda (impl, _): impl in implementations, groups)
+
+        for type_, installer in groups:
+            logger.log('  # %s:' % type_)
             for version in installer.supported_versions:
                 logger.log('     %s' % version)
 
 ListCommand()
-
