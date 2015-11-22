@@ -139,7 +139,7 @@ List all the available jython versions
 
 ::
 
-   pythonz list -a jython
+   pythonz list -a -t jython
 
 Uninstall the specified python
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

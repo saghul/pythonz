@@ -7,9 +7,12 @@ from pythonz.installer.pythoninstaller import CPythonInstaller, StacklessInstall
 from pythonz.log import logger
 
 
+PY_TYPES = ['cpython', 'stackless', 'pypy', 'pypy3', 'jython']
+
+
 class ListCommand(Command):
     name = "list"
-    usage = "%prog [options] [filter]"
+    usage = "%prog [options]"
     summary = "List the installed python versions"
 
     def __init__(self):
@@ -19,8 +22,7 @@ class ListCommand(Command):
             dest='all_versions',
             action='store_true',
             default=False,
-            help=('Show the all available python versions. Optionally, show '
-                  'chosen implementations. e.g.: pythonz list -a pypy3')
+            help='Show the all available python versions.'
         )
         self.parser.add_option(
             '-p', '--path',
@@ -29,10 +31,18 @@ class ListCommand(Command):
             default=False,
             help='Show the path for all Python installations.'
         )
+        self.parser.add_option(
+            '-t', '--type',
+            dest='py_type',
+            choices=PY_TYPES,
+            default=[],
+            help=('Use with -a to list only certain Python types. '
+                  'Available choices: {0}'.format(PY_TYPES))
+        )
 
     def run_command(self, options, args):
         if options.all_versions:
-            self.all(args)
+            self.all(py_type=options.py_type)
         else:
             self.installed(path=options.path)
 
@@ -44,14 +54,14 @@ class ListCommand(Command):
             else:
                 logger.log('  %s' % d)
 
-    def all(self, implementations):
+    def all(self, py_type):
         logger.log('# Available Python versions')
-        groups = zip(['cpython', 'stackless', 'pypy', 'pypy3', 'jython'],
+        groups = zip(PY_TYPES,
                      [CPythonInstaller, StacklessInstaller, PyPyInstaller,
                       PyPy3Installer, JythonInstaller])
 
-        if implementations:
-            groups = filter(lambda (impl, _): impl in implementations, groups)
+        if py_type:
+            groups = filter(lambda (impl, _): impl in py_type, groups)
 
         for type_, installer in groups:
             logger.log('  # %s:' % type_)
