@@ -65,7 +65,7 @@ class ListCommand(Command):
 
         for type_, installer in groups:
             logger.log('  # %s:' % type_)
-            for version in installer.supported_versions:
+            for version in sorted(installer.supported_versions):
                 logger.log('     %s' % version)
 
 ListCommand()
