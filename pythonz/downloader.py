@@ -39,7 +39,6 @@ except ImportError:
                            "sure that the server you're downloading from is trusted")
             return True
 
-
     def urlretrieve(url, filename, reporthook, sha256sum):
         try:
             _urlretrieve(url, filename, reporthook)
@@ -48,7 +47,6 @@ except ImportError:
         except BaseException:
             os.unlink(filename)
             raise
-
 
 
 class ProgressBar(object):
@@ -108,7 +106,7 @@ class Downloader(object):
             return res.info()
 
     @classmethod
-    def fetch(cls, url, filename, expected_sha256):
+    def fetch(cls, url, filename, expected_sha256=None):
         b = ProgressBar()
         try:
             urlretrieve(url, filename, b.reporthook, sha256sum=expected_sha256)
