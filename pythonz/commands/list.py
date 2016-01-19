@@ -7,7 +7,14 @@ from pythonz.installer.pythoninstaller import CPythonInstaller, StacklessInstall
 from pythonz.log import logger
 
 
-PY_TYPES = ['cpython', 'stackless', 'pypy', 'pypy3', 'jython']
+PY_INSTALLERS = {'cpython': CPythonInstaller,
+                 'stackless': StacklessInstaller,
+                 'pypy': PyPyInstaller,
+                 'pypy3': PyPy3Installer,
+                 'jython': JythonInstaller}
+
+PY_TYPES = sorted(PY_INSTALLERS.keys())
+
 
 
 class ListCommand(Command):
@@ -56,16 +63,11 @@ class ListCommand(Command):
 
     def all(self, py_type):
         logger.log('# Available Python versions')
-        groups = zip(PY_TYPES,
-                     [CPythonInstaller, StacklessInstaller, PyPyInstaller,
-                      PyPy3Installer, JythonInstaller])
+        py_types = [ty for ty in PY_TYPES if py_type in ty] if py_type else PY_TYPES
 
-        if py_type:
-            groups = filter(lambda (impl, _): impl in py_type, groups)
-
-        for type_, installer in groups:
+        for type_ in py_types:
             logger.log('  # %s:' % type_)
-            for version in sorted(installer.supported_versions):
+            for version in sorted(PY_INSTALLERS[type_].supported_versions):
                 logger.log('     %s' % version)
 
 ListCommand()
