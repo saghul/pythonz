@@ -63,7 +63,7 @@ class ListCommand(Command):
 
     def all(self, py_type):
         logger.log('# Available Python versions')
-        py_types = [ty for ty in PY_TYPES if py_type in ty] if py_type else PY_TYPES
+        py_types = [py_type] if py_type else PY_TYPES
 
         for type_ in py_types:
             logger.log('  # %s:' % type_)
