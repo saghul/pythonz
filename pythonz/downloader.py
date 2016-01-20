@@ -66,7 +66,7 @@ class ProgressBar(object):
         return result
 
     def reporthook(self, blocknum, bs, size):
-        if size == -1:  # disable progress bar if size not known
+        if size in (-1, None):  # disable progress bar if size not known
             return
         current = (blocknum * bs * 100) / size
         if current > 100:
