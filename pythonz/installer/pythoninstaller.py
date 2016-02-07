@@ -123,8 +123,14 @@ class CPythonInstaller(Installer):
     def __init__(self, version, options):
         super(CPythonInstaller, self).__init__(version, options)
 
-        if Version(self.pkg.version) >= '3.1':
+        version = Version(self.pkg.version)
+
+        if version >= '3.1':
             self.configure_options.append('--with-computed-gotos')
+
+        # fix for #109
+        if version < '2.7':
+            self.configure_options.append('SVNVERSION="Unversioned directory"')
 
         if sys.platform == "darwin":
             # set configure options
