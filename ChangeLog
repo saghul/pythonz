@@ -1,4 +1,31 @@
 
+1.11.0
+======
+* Remove spurious install_dir checks and use a cleaner Exception when it already exists
+* Add sha256sum for every python package, and supporting code to check it before installation
+* Add ability to make external installations
+* Add support for PyPy 4.0.0 and 4.0.1
+* Use resumable-urlretrieve to resume interrupted downloads
+* Add list -a filtering by groups
+* Add support for CPython 2.7.11 and 3.5.1
+
+1.10.0
+======
+* Add support for CPython 3.5.0
+* Add support for PyPy 2.6.1
+
+1.9.1
+=====
+* Add missing 'import sys' in locate command
+
+1.9.0
+=====
+* Add support for PyPy 2.5.1 and 2.6.0
+* Fix parsing versions of the form X.Y.ZZ
+* Changed locate command to error out when a version is not found
+* Add support for CPython 2.7.10 (6 days ago) <Chip Warden>
+* Add support for Jython 2.7
+
 1.8.0
 =====
 * Exit pythonz-install with non-zero status

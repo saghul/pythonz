@@ -134,6 +134,13 @@ List all the available python versions for installing
 
   pythonz list -a
 
+List all the available jython versions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
+
+   pythonz list -a -t jython
+
 Uninstall the specified python
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -201,4 +208,3 @@ by Jesús Cea.
 Building Python with DTrace support::
 
   pythonz install --configure="--with-dtrace" 2.7.6
-

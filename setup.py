@@ -24,6 +24,7 @@ setup(name='pythonz',
       url                  = 'https://github.com/saghul/pythonz',
       license              = 'MIT',
       packages             = find_packages('pythonz'),
+      extras_require       = {':python_version>="3.5"': ['resumable-urlretrieve']},
       include_package_data = True,
       entry_points         = dict(console_scripts=['pythonz=pythonz:main',
                                                    'pythonz_install=pythonz.installer:install_pythonz']),
@@ -40,4 +41,3 @@ setup(name='pythonz',
         'Programming Language :: Python :: 3.2',
         'Programming Language :: Python :: 3.3',
       ])
-

@@ -1,13 +1,52 @@
-
 import sys
+import os
 
 from pythonz.util import PY3K
+from pythonz.log import logger
 
 if PY3K:
-    from urllib.request import Request, urlopen, urlretrieve
+    from urllib.request import Request, urlopen
 else:
-    from urllib import urlretrieve
     from urllib2 import urlopen, Request
+
+try:
+    from resumable import urlretrieve, DownloadError, sha256
+except ImportError:
+    from mmap import mmap as _mmap, ACCESS_READ
+    import hashlib
+    if PY3K:
+        from urllib.request import urlretrieve as _urlretrieve
+        mmap = _mmap
+    else:
+        from contextlib import closing
+        mmap = lambda *args, **kwargs: closing(_mmap(*args, **kwargs))
+        from urllib import urlretrieve as _urlretrieve
+
+    class DownloadError(Exception):
+        """Exception during download"""
+
+    def sha256(filename):
+        with open(filename, 'rb') as f:
+            with mmap(f.fileno(), 0, access=ACCESS_READ) as m:
+                return hashlib.sha256(m).hexdigest()
+
+
+    def validate_sha256(filename, sha256sum):
+        if sha256sum is not None:
+            return sha256(filename) == sha256sum
+        else:
+            logger.warning("sha256sum unavailable, skipping verification.\nMake "
+                           "sure that the server you're downloading from is trusted")
+            return True
+
+    def urlretrieve(url, filename, reporthook, sha256sum):
+        try:
+            _urlretrieve(url, filename, reporthook)
+            if not validate_sha256(filename, sha256sum):
+                raise DownloadError("Corrupted download, the sha256 doesn't match")
+        except BaseException:
+            os.unlink(filename)
+            raise
 
 
 class ProgressBar(object):
@@ -27,6 +66,8 @@ class ProgressBar(object):
         return result
 
     def reporthook(self, blocknum, bs, size):
+        if size in (-1, None):  # disable progress bar if size not known
+            return
         current = (blocknum * bs * 100) / size
         if current > 100:
             current = 100
@@ -41,10 +82,6 @@ class ProgressBar(object):
 class HEADRequest(Request):
     def get_method(self):
         return "HEAD"
-
-
-class DownloadError(Exception):
-    """Exception during download"""
 
 
 class Downloader(object):
@@ -71,11 +108,15 @@ class Downloader(object):
             return res.info()
 
     @classmethod
-    def fetch(cls, url, filename):
+    def fetch(cls, url, filename, expected_sha256=None):
         b = ProgressBar()
         try:
-            urlretrieve(url, filename, b.reporthook)
+            urlretrieve(url, filename, b.reporthook, sha256sum=expected_sha256)
             sys.stdout.write('\n')
+        except DownloadError:
+            if os.path.exists(filename):
+                os.unlink(filename)
+            raise
         except IOError:
             sys.stdout.write('\n')
             raise DownloadError('Failed to fetch %s from %s' % (filename, url))
