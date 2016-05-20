@@ -61,6 +61,7 @@ versions = {
         '3.4.1': '8d007e3ef80b128a292be101201e75dec5480e5632e994771e7c231d17720b66',
         '3.4.2': '44a3c1ef1c7ca3e4fd25242af80ed72da941203cb4ed1a8c1b724d9078965dd8',
         '3.4.3': '8b743f56e9e50bf0923b9e9c45dd927c071d7aa56cd46569d8818add8cf01147',
+        '3.4.4': None,
         '3.5.0': '584e3d5a02692ca52fce505e68ecd77248a6f2c99adf9db144a39087336b0fe0',
         '3.5.1': '687e067d9f391da645423c7eda8205bae9d35edc0c76ef5218dcbe4cc770d0d7'
     },
@@ -70,7 +71,7 @@ versions = {
         '3.1.3': '7aab20f509b5e3ad14a8e7c316401ac51377048ae85325ac3838a1494c019863',
         '3.2.2': '779700f12b451a350fe7af4cd2849842adc7006dc83fe14712dd1a0999277b07',
         '3.2.5': 'b021125e578ddd267d38feee9e1cbdb675f6aab247a2b88f4494abcf23babb05',
-        '3.3.5': '197b41ccd7ec998ff612c67df9b8eb827a58f4eda715ca034c43c94bf17d5c0f'
+        '3.3.5': '6558d1cb8c768ad95339fb9ca8b23106ce54c03ae67e9f75a84334d08489d240'
     },
     'pypy': {
         '1.8': {'linux': '9c293d8540780260718f8fd8dc433c97b614a31b115ccfe2d68df720ad7e55b1',
@@ -123,7 +124,19 @@ versions = {
                   'darwin': 'd9e590fe5b9461bbdff56c76636e844ef90a297f82d0d2e204866c8a21759a50'},
         '4.0.1': {'linux': '721920fcbb6aefc9a98e868e32b7f4ea5fd68b7f9305d08d0a2595327c9c0611',
                   'linux64': '0d6090cee59f4b9bab91ddbea76580d0c232b78dae65aaa9e8fa8d4449ba25b4',
-                  'darwin': '06be1299691f7ea558bf8e3bdf3d20debb8ba03cd7cadf04f2d6cbd5fd084430'}
+                  'darwin': '06be1299691f7ea558bf8e3bdf3d20debb8ba03cd7cadf04f2d6cbd5fd084430'},
+        '5.0.0': {'linux': None,
+                  'linux64': None,
+                  'darwin': None},
+        '5.0.1': {'linux': None,
+                  'linux64': None,
+                  'darwin': None},
+        '5.1.0': {'linux': None,
+                  'linux64': None,
+                  'darwin': None},
+        '5.1.1': {'linux': None,
+                  'linux64': None,
+                  'darwin': None},
                 },
     'pypy3': {
         '2.3.1': {'linux': '7eddc6826e58c9c89e68b59ec8caf1596b76401517ad8d26ad5e18e0ffa45db9',

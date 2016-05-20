@@ -35,8 +35,6 @@ except ImportError:
         if sha256sum is not None:
             return sha256(filename) == sha256sum
         else:
-            logger.warning("sha256sum unavailable, skipping verification.\nMake "
-                           "sure that the server you're downloading from is trusted")
             return True
 
     def urlretrieve(url, filename, reporthook, sha256sum):

@@ -1,4 +1,0 @@
-recursive-include pythonz/patches *
-recursive-include pythonz/etc *
-include pythonz_install.py
-

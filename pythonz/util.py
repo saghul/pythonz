@@ -16,7 +16,8 @@ if not PY3K:
     from urllib import quote as urlquote, unquote as urlunquote
     from urllib2 import urlparse
 else:
-    from urllib.parse import urlparse, quote as urlquote, unquote as urlunquote
+    from urllib import parse as urlparse
+    from urllib.parse import quote as urlquote, unquote as urlunquote
 
 from pythonz.define import PATH_PYTHONS
 from pythonz.log import logger
