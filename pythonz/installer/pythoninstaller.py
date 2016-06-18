@@ -243,6 +243,8 @@ class CPythonInstaller(Installer):
                 self._append_patch(patch_dir, ['patch-nosslv2-2.diff'])
             elif version < '2.6.9':
                 self._append_patch(patch_dir, ['patch-nosslv2-3.diff'])
+            else:
+                self._append_patch(patch_dir, ['patch-nosslv23.diff'])
         elif is_python27(version):
             if version < '2.7.2':
                 self._append_patch(common_patch_dir, ['patch-setup.py.diff'])
