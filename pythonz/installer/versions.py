@@ -139,6 +139,12 @@ versions = {
         '5.1.1': {'linux': None,
                   'linux64': None,
                   'darwin': None},
+        '5.3.0': {'linux': None,
+                  'linux64': None,
+                  'darwin': None},
+        '5.3.1': {'linux': None,
+                  'linux64': None,
+                  'darwin': None},
                 },
     'pypy3': {
         '2.3.1': {'linux': '7eddc6826e58c9c89e68b59ec8caf1596b76401517ad8d26ad5e18e0ffa45db9',

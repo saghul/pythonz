@@ -404,16 +404,22 @@ class StacklessInstaller(CPythonInstaller):
 
 class PyPyInstaller(Installer):
     supported_versions = versions['pypy']
+    base_url = 'https://bitbucket.org/pypy/pypy/downloads/'
 
     @classmethod
     def get_version_url(cls, version):
+        if version >= '5.3':
+            prefix = 'pypy2-v'
+        else:
+            prefix = 'pypy-'
         if sys.platform == 'darwin':
-            return 'https://bitbucket.org/pypy/pypy/downloads/pypy-%(version)s-osx64.tar.bz2' % {'version': version}
+            url = '%s%s-osx64.tar.bz2' % (prefix, version)
         else:
             # Linux
             logger.warning("Linux binaries are dynamically linked, as is usual, and thus might not be usable due to the sad story of linux binary compatibility, check the PyPy website for more information")
             arch = {4: '', 8: '64'}[ctypes.sizeof(ctypes.c_size_t)]
-            return 'https://bitbucket.org/pypy/pypy/downloads/pypy-%(version)s-linux%(arch)s.tar.bz2' % {'arch': arch, 'version': version}
+            url = '%(prefix)s%(version)s-linux%(arch)s.tar.bz2' % {'arch': arch, 'prefix': prefix, 'version': version}
+        return cls.base_url + url
 
     @property
     def expected_sha256(self):
