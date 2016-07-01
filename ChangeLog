@@ -1,4 +1,12 @@
 
+2.0.1
+=====
+
+* Add support for CPython 3.5.2 and 2.7.12
+* Add missing hash for CPython 3.4.4
+* Add support for PyPy 5.3.0 and 5.3.1
+* Add missing changelog entries
+
 2.0.0
 =====
 * Disable progress bar if size unknown
@@ -16,7 +24,6 @@
 * Fix using --file on Python 3
 * Add support for PyPy 5.X
 * Add support for CPython 3.4.4
-* Raised version
 
 1.11.0
 ======
