@@ -1,4 +1,30 @@
 
+2.0.1
+=====
+
+* Add support for CPython 3.5.2 and 2.7.12
+* Add missing hash for CPython 3.4.4
+* Add support for PyPy 5.3.0 and 5.3.1
+* Add missing changelog entries
+
+2.0.0
+=====
+* Disable progress bar if size unknown
+* Merge pull request #105 from inirudebwoy/fix_81
+* size could be None
+* Fix list command for Python3 and tweak its logic
+* Merge pull request #106 from berdario/fix_81
+* List command: only use exact match
+* Merge pull request #107 from berdario/fix_list
+* bypass snvrevision and Makefile problem
+* Merge pull request #112 from hackaugusto/issue109
+* Remove setup.py and MANIFEST.in
+* Remove warning when SHA256 hash is not available
+* Fix checksum for Stackless 3.3.5
+* Fix using --file on Python 3
+* Add support for PyPy 5.X
+* Add support for CPython 3.4.4
+
 1.11.0
 ======
 * Remove spurious install_dir checks and use a cleaner Exception when it already exists

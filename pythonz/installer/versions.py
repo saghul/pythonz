@@ -36,6 +36,7 @@ versions = {
         '2.7.9': 'c8bba33e66ac3201dabdc556f0ea7cfe6ac11946ec32d357c4c6f9b018c12c5b',
         '2.7.10': 'eda8ce6eec03e74991abb5384170e7c65fcd7522e409b8e83d7e6372add0f12a',
         '2.7.11': '82929b96fd6afc8da838b149107078c02fa1744b7e60999a8babbc0d3fa86fc6',
+        '2.7.12': '3cb522d17463dfa69a155ab18cffa399b358c966c0363d6c8b5b3bf1384da4b6',
         '3.0': '4d5d6ab2f893144a382ae1ea1de88a7825eb98111e26cfde627b9f3d9fd462b4',
         '3.0.1': '7d5f2feae9035f1d3d9e6bb7f092dbf374d6bb4b25abd0d2d11f13bba1cb04de',
         '3.1': '99a034cf574ea3c26412b0a0728126d7fd6ea9593d099d807a25d216ed031e6a',
@@ -61,9 +62,10 @@ versions = {
         '3.4.1': '8d007e3ef80b128a292be101201e75dec5480e5632e994771e7c231d17720b66',
         '3.4.2': '44a3c1ef1c7ca3e4fd25242af80ed72da941203cb4ed1a8c1b724d9078965dd8',
         '3.4.3': '8b743f56e9e50bf0923b9e9c45dd927c071d7aa56cd46569d8818add8cf01147',
-        '3.4.4': None,
+        '3.4.4': 'bc93e944025816ec360712b4c42d8d5f729eaed2b26585e9bc8844f93f0c382e',
         '3.5.0': '584e3d5a02692ca52fce505e68ecd77248a6f2c99adf9db144a39087336b0fe0',
-        '3.5.1': '687e067d9f391da645423c7eda8205bae9d35edc0c76ef5218dcbe4cc770d0d7'
+        '3.5.1': '687e067d9f391da645423c7eda8205bae9d35edc0c76ef5218dcbe4cc770d0d7',
+        '3.5.2': '1524b840e42cf3b909e8f8df67c1724012c7dc7f9d076d4feef2d3eff031e8a0'
     },
     'stackless': {
         '2.6.5': 'ac1956d7f9715cc56e92992d39b24f0869cd9955fd2b8cf52b163530194d07b1',
@@ -135,6 +137,12 @@ versions = {
                   'linux64': None,
                   'darwin': None},
         '5.1.1': {'linux': None,
+                  'linux64': None,
+                  'darwin': None},
+        '5.3.0': {'linux': None,
+                  'linux64': None,
+                  'darwin': None},
+        '5.3.1': {'linux': None,
                   'linux64': None,
                   'darwin': None},
                 },
