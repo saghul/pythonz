@@ -144,6 +144,8 @@ class CPythonInstaller(Installer):
                 raise Exception
             if options.framework:
                 self.configure_options.append('--enable-framework=%s' % os.path.join(self.install_dir, 'Frameworks'))
+            if options.shared:
+                self.configure_options.append('--enable-shared')
             if options.universal:
                 self.configure_options.append('--enable-universalsdk=/')
                 self.configure_options.append('--with-universal-archs=intel')
