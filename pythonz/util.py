@@ -48,7 +48,7 @@ def splitext(name):
 
 def is_archive_file(name):
     ext = splitext(name)[1].lower()
-    return ext in ('.zip', '.tar.gz', '.tar.bz2', '.tgz', '.tar')
+    return ext in ('.zip', '.tar.gz', '.tar.bz2', '.tgz', '.tar', '.jar')
 
 def is_html(content_type):
     return content_type and content_type.startswith('text/html')
