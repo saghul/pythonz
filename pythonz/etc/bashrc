@@ -1,13 +1,25 @@
 # settings
-PATH_ROOT="$PYTHONZ_ROOT"
-if [ -z "${PATH_ROOT}" ] ; then
+if [[ -d "$PYTHONZ_ROOT" ]] ; then
+    PATH_ROOT="$PYTHONZ_ROOT"
+elif [[ -d "$HOME/.pythonz" ]]; then
     PATH_ROOT="$HOME/.pythonz"
+elif [[ -d "/usr/local/pythonz" ]] ; then
+    PATH_ROOT="/usr/local/pythonz"
+else
+    echo "No installation of pythonz found."
+    exit 1
 fi
 PATH_ETC="$PATH_ROOT/etc"
 
-PATH_HOME="$PYTHONZ_HOME"
-if [ -z "${PATH_HOME}" ] ; then
+if [[ -d "$PYTHONZ_HOME" ]] ; then
+    PATH_HOME="$PYTHONZ_HOME"
+elif [[ -d "$HOME" ]]; then
     PATH_HOME="$HOME/.pythonz"
+elif [[ -d "/usr/local/pythonz" ]] ; then
+    PATH_HOME="/usr/local/pythonz"
+else
+    echo "No home directory for pythonz found."
+    exit 1
 fi
 PATH_HOME_ETC="$PATH_HOME/etc"
 

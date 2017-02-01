@@ -43,7 +43,7 @@ parse_arguments()
 parse_arguments $@
 
 if [[ ! -x $CURL ]] && [[ ! -x $FETCH ]] ; then
-    echo "pythonz required curl or fetch. Neigher of them were not found in your path."
+    echo "pythonz required curl or fetch. Neither of them were not found in your path."
     exit 1
 fi
 

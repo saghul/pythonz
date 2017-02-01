@@ -1,13 +1,28 @@
 
 import os
 
+from pythonz.log import logger
+
 # pythonz installer root path
 INSTALLER_ROOT = os.path.dirname(os.path.abspath(__file__))
 
+HOME = os.environ.get('HOME')
+SYSTEMWIDE_PATH = '/usr/local/pythonz'
+
 # Root
 # pythonz root path
-SYSTEMWIDE_PATH = '/usr/local/pythonz'
-ROOT = os.environ.get('PYTHONZ_ROOT') or os.path.join(os.environ['HOME'], '.pythonz') if not os.path.abspath(os.path.dirname(__file__)).startswith(SYSTEMWIDE_PATH) else SYSTEMWIDE_PATH
+PYTHONZ_ROOT = os.environ.get('PYTHONZ_ROOT')
+if   ( PYTHONZ_ROOT
+       and os.path.isdir(PYTHONZ_ROOT) ):
+    ROOT = PYTHONZ_ROOT
+elif ( HOME
+       and os.path.isdir(os.path.join(HOME, '.pythonz')) ):
+    ROOT = os.path.join(HOME, '.pythonz')
+elif os.path.isdir(SYSTEMWIDE_PATH):
+    ROOT = SYSTEMWIDE_PATH
+else:
+    logger.error('No installation of pythonz found.')
+    sys.exit(1)
 
 # directories
 PATH_PYTHONS = os.path.join(ROOT, 'pythons')
@@ -30,7 +45,17 @@ PATH_BIN_PYTHONZ = os.path.join(PATH_BIN, 'pythonz')
 
 # Home
 # pythonz home path
-PATH_HOME = os.environ.get('PYTHONZ_HOME') or os.path.join(os.environ['HOME'], '.pythonz')
+PYTHONZ_HOME = os.environ.get('PYTHONZ_HOME')
+if   ( PYTHONZ_HOME
+       and os.path.isdir(PYTHONZ_HOME) ):
+    PATH_HOME = PYTHONZ_HOME
+elif HOME:
+    PATH_HOME = os.path.join(HOME, '.pythonz')
+elif os.path.isdir(SYSTEMWIDE_PATH):
+    PATH_HOME = SYSTEMWIDE_PATH
+else:
+    logger.error('No home directory for pythonz found.')
+    sys.exit(1)
 
 # directories
 PATH_HOME_ETC = os.path.join(PATH_HOME, 'etc')
