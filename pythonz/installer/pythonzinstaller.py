@@ -47,8 +47,9 @@ class PythonzInstaller(object):
             shutil.copy(path, PATH_SCRIPTS_PYTHONZ_INSTALLER)
 
         # create patches direcotry
-        rm_r(PATH_PATCHES)
-        shutil.copytree(os.path.join(installer_root,"patches"), PATH_PATCHES)
+        DEST_PATCHES = os.path.join(PATH_SCRIPTS_PYTHONZ, 'patches')
+        rm_r(DEST_PATCHES)
+        shutil.copytree(PATH_PATCHES, DEST_PATCHES)
 
         # create a main file
         with open("%s/pythonz_main.py" % PATH_SCRIPTS, "w") as f:
@@ -110,4 +111,3 @@ fi
 
             with open('/etc/profile', 'w') as f:
                 f.write(''.join(output))
-

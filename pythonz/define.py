@@ -21,7 +21,8 @@ PATH_SCRIPTS = os.path.join(ROOT, 'scripts')
 PATH_SCRIPTS_PYTHONZ = os.path.join(PATH_SCRIPTS, 'pythonz')
 PATH_SCRIPTS_PYTHONZ_COMMANDS = os.path.join(PATH_SCRIPTS_PYTHONZ, 'commands')
 PATH_SCRIPTS_PYTHONZ_INSTALLER = os.path.join(PATH_SCRIPTS_PYTHONZ, 'installer')
-PATH_PATCHES = os.path.join(ROOT, 'patches')
+
+PATH_PATCHES = os.path.join(INSTALLER_ROOT, 'patches')
 PATH_PATCHES_ALL = os.path.join(PATH_PATCHES, 'all')
 PATH_PATCHES_OSX = os.path.join(PATH_PATCHES, 'osx')
 
@@ -37,4 +38,3 @@ PATH_HOME_ETC = os.path.join(PATH_HOME, 'etc')
 
 # pythonz download
 PYTHONZ_UPDATE_URL = 'https://github.com/saghul/pythonz/archive/master.tar.gz'
-
