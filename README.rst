@@ -75,12 +75,15 @@ RPM family (CentOS, RHEL...)
 
 If you need tkinter support, add **tk-devel**.
 
-OSX
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+macOS
+^^^^^
+
+Apple stopped including the OpenSSL development headers in OS X El Captian and macOS Sierra. You will need to install OpenSSL with Homebrew (or MacPorts).
 
 ::
 
   xcode-select --install
+  brew install openssl
 
 Usage
 -----
