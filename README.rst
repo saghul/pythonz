@@ -4,11 +4,11 @@ pythonz: a Python installation manager
 Overview
 --------
 
-``pythonz`` is a program to automate the building and installation of Python in the users $HOME. This is
-a fork of the original project, `pythonbrew <https://github.com/utahta/pythonbrew>`_.
+``pythonz`` is a program to automate the building and installation of Python versions in the user's ``$HOME``. This is
+a fork of the original project, ``pythonbrew <https://github.com/utahta/pythonbrew>``_.
 
 The original project seems to be unmaintained, and it also has some extra features which I don't really
-need, so I made this for to make something a bit simpler that works for *me*. You may also find it
+need, so I made this fork to make something a bit simpler that works for *me*. You may also find it
 useful.
 
 CPython, Stackless, PyPy and Jython are supported.
@@ -24,7 +24,7 @@ or::
 
   fetch -o - https://raw.github.com/saghul/pythonz/master/pythonz-install | bash
 
-After that, pythonz installs itself to ``~/.pythonz``.
+After that, ``pythonz`` installs itself to ``~/.pythonz``.
 
 Please add the following line to the end of your ``~/.bashrc``::
 
@@ -186,7 +186,7 @@ Recommended way to use a pythonz-installed version of Python
 For Python <= 3.2
 ^^^^^^^^^^^^^^^^^
 
-Use `virtualenv`, e.g.::
+Use ``virtualenv``, e.g.::
 
   mkvirtualenv -p $(pythonz locate 2.7.3) python2.7.3
 
@@ -195,11 +195,11 @@ For more information about virtualenv, checkout `its documentation <http://www.v
 For Python >= 3.3
 ^^^^^^^^^^^^^^^^^
 
-Use `pyvenv` directly from Python, e.g.::
+Use ``pyvenv`` directly from Python, e.g.::
 
   /usr/local/pythonz/pythons/CPython-3.4.1/bin/pyvenv pyvenv
 
-For more information about pyvenv, checkout `its documentation <https://docs.python.org/3/library/venv.html>`_.
+For more information about ``pyvenv``, checkout `its documentation <https://docs.python.org/3/library/venv.html>`_.
 
 DTrace support
 --------------
