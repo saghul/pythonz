@@ -5,7 +5,7 @@ Overview
 --------
 
 ``pythonz`` is a program to automate the building and installation of Python versions in the user's ``$HOME``. This is
-a fork of the original project, ```pythonbrew <https://github.com/utahta/pythonbrew>`_``.
+a fork of the original project, `pythonbrew <https://github.com/utahta/pythonbrew>`_.
 
 The original project seems to be unmaintained, and it also has some extra features which I don't really
 need, so I made this fork to make something a bit simpler that works for *me*. You may also find it
