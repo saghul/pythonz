@@ -4,7 +4,7 @@ pythonz: a Python installation manager
 Overview
 --------
 
-pythonz is a program to automate the building and installation of Python in the users $HOME. This is
+``pythonz`` is a program to automate the building and installation of Python in the users $HOME. This is
 a fork of the original project, `pythonbrew <https://github.com/utahta/pythonbrew>`_.
 
 The original project seems to be unmaintained, and it also has some extra features which I don't really
@@ -16,7 +16,7 @@ CPython, Stackless, PyPy and Jython are supported.
 Installation
 ------------
 
-The recommended way to download and install pythonz is to run these statements in your shell::
+The recommended way to download and install ``pythonz`` is to run these statements in your shell::
 
   curl -kL https://raw.github.com/saghul/pythonz/master/pythonz-install | bash
 
@@ -30,7 +30,7 @@ Please add the following line to the end of your ``~/.bashrc``::
 
   [[ -s $HOME/.pythonz/etc/bashrc ]] && source $HOME/.pythonz/etc/bashrc
 
-If you need to install pythonz into somewhere else, you can do that by setting a ``PYTHONZ_ROOT`` environment variable::
+If you need to install ``pythonz`` into somewhere else, you can do that by setting a ``PYTHONZ_ROOT`` environment variable::
 
   export PYTHONZ_ROOT=/path/to/pythonz
   curl -kLO https://raw.github.com/saghul/pythonz/master/pythonz-install
@@ -40,11 +40,11 @@ If you need to install pythonz into somewhere else, you can do that by setting a
 For Systemwide (Multi-User) installation
 ----------------------------------------
 
-If the install script is run as root, pythonz will automatically install into ``/usr/local/pythonz``.
+If the install script is run as root, ``pythonz`` will automatically install into ``/usr/local/pythonz``.
 
-pythonz will be automatically configured for every user on the system if you install it as root.
+``pythonz`` will be automatically configured for every user on the system if you install it as root.
 
-After installing it, where you would normally use `sudo`, non-root users will need to use `sudo-pythonz`::
+After installing it, where you would normally use ``sudo``, non-root users will need to use ``sudo-pythonz``::
 
   sudo-pythonz install 2.7.3
 
@@ -53,7 +53,7 @@ Before installing Pythons via Pythonz
 
 You might want to install some optional dependencies, for functionality that
 is often expected to be included in a Python build (it can be a bummer to discover these missing and
-have to rebuild your python setup). These include the following, ordered by (very roughly guessed)
+have to rebuild your Python setup). These include the following, ordered by (very roughly guessed)
 probability that you will need them::
 
 Debian family (Ubuntu...)
@@ -107,7 +107,7 @@ To get help on each individual command
   pythonz help <command>
 
 
-Install some pythons
+Install some Pythons
 ^^^^^^^^^^^^^^^^^^^^
 
 ::
@@ -123,28 +123,28 @@ Install some pythons
   pythonz install 2.7.3 3.2.3
   pythonz install -t pypy3 2.3.1
 
-List the installed pythons
+List the installed Pythons
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
   pythonz list
 
-List all the available python versions for installing
+List all the available Python versions for installing
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
   pythonz list -a
 
-List all the available jython versions
+List all the available Jython versions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
    pythonz list -a -t jython
 
-Uninstall the specified python
+Uninstall the specified Python
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
@@ -159,15 +159,15 @@ Remove stale source folders and archives
 
   pythonz cleanup
 
-Upgrade pythonz to the latest version
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Upgrade ``pythonz`` to the latest version
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
   pythonz update
 
-Check the installed pythonz version
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Check the installed ``pythonz`` version
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
