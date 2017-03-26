@@ -48,13 +48,13 @@ After installing it, where you would normally use ``sudo``, non-root users will 
 
   sudo-pythonz install 2.7.3
 
-Before installing Pythons via Pythonz
--------------------------------------
+Before installing Python versions via ``pythonz``
+-------------------------------------------------
 
 You might want to install some optional dependencies, for functionality that
 is often expected to be included in a Python build (it can be a bummer to discover these missing and
 have to rebuild your Python setup). These include the following, ordered by (very roughly guessed)
-probability that you will need them::
+probability that you will need them:
 
 Debian family (Ubuntu...)
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -63,7 +63,7 @@ Debian family (Ubuntu...)
 
   sudo apt-get install build-essential zlib1g-dev libbz2-dev libssl-dev libreadline-dev libncurses5-dev libsqlite3-dev libgdbm-dev libdb-dev libexpat-dev libpcap-dev liblzma-dev libpcre3-dev
 
-If you need tkinter support, add **tk-dev**.
+If you need tkinter support, add ``tk-dev``.
 
 RPM family (CentOS, RHEL...)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -73,17 +73,24 @@ RPM family (CentOS, RHEL...)
   yum groupinstall "Development tools"
   yum install zlib-devel bzip2-devel openssl-devel readline-devel ncurses-devel sqlite-devel gdbm-devel db4-devel expat-devel libpcap-devel xz-devel pcre-devel
 
-If you need tkinter support, add **tk-devel**.
+If you need tkinter support, add ``tk-devel``.
 
 macOS
 ^^^^^
 
-Apple stopped including the OpenSSL development headers in OS X El Captian and macOS Sierra. You will need to install OpenSSL with Homebrew (or MacPorts).
+Apple stopped including the OpenSSL development headers in OS X El Captian and macOS Sierra. You will need to install OpenSSL with Homebrew (or MacPorts). This document assumes usage of Homebrew.
 
 ::
 
   xcode-select --install
   brew install openssl
+
+You should then add variables for ``CPPFLAGS`` and ``LDFLAGS`` to your shell environment. This allows ``pythonz`` to find the OpenSSL installed by Homebrew.
+
+::
+
+  export CPPFLAGS="-I/usr/local/opt/openssl/include"
+  export LDFLAGS="-L/usr/local/opt/openssl/lib"
 
 Usage
 -----
@@ -107,8 +114,8 @@ To get help on each individual command
   pythonz help <command>
 
 
-Install some Pythons
-^^^^^^^^^^^^^^^^^^^^
+Install some Python versions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
@@ -123,8 +130,8 @@ Install some Pythons
   pythonz install 2.7.3 3.2.3
   pythonz install -t pypy3 2.3.1
 
-List the installed Pythons
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+List the installed Python versions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
@@ -190,7 +197,7 @@ Use ``virtualenv``, e.g.::
 
   mkvirtualenv -p $(pythonz locate 2.7.3) python2.7.3
 
-For more information about virtualenv, checkout `its documentation <http://www.virtualenv.org/en/latest/>`_.
+For more information about ``virtualenv``, check out `the virtualenv documentation <http://www.virtualenv.org/en/latest/>`_.
 
 For Python >= 3.3
 ^^^^^^^^^^^^^^^^^
@@ -199,7 +206,7 @@ Use ``pyvenv`` directly from Python, e.g.::
 
   /usr/local/pythonz/pythons/CPython-3.4.1/bin/pyvenv pyvenv
 
-For more information about ``pyvenv``, checkout `its documentation <https://docs.python.org/3/library/venv.html>`_.
+For more information about ``pyvenv``, check out `the pyvenv documentation <https://docs.python.org/3/library/venv.html>`_.
 
 DTrace support
 --------------
