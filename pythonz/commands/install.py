@@ -24,7 +24,7 @@ class InstallCommand(Command):
             dest="force",
             action="store_true",
             default=False,
-            help="Force installation of python even if tests fail."
+            help="Force installation of Python even if tests fail."
         )
         self.parser.add_option(
             "--run-tests",
@@ -34,16 +34,16 @@ class InstallCommand(Command):
             help="Run `make test` after compiling."
         )
         self.parser.add_option(
-            "--url",
+            "-u", "--url",
             dest="url",
             default=None,
-            help="URL used to download the specified python version."
+            help="URL used to download the specified Python version."
         )
         self.parser.add_option(
-            "--file",
+            "-F", "--file",
             dest="file",
             default=None,
-            help="File pinting to the python version to be installed."
+            help="File pointing to the Python version to be installed."
         )
         self.parser.add_option(
             "-v", "--verbose",
@@ -64,14 +64,14 @@ class InstallCommand(Command):
             dest="framework",
             action="store_true",
             default=False,
-            help="Build Framework. (OSX only)"
+            help="Build Framework (macOS only)."
         )
         self.parser.add_option(
             "--universal",
             dest="universal",
             action="store_true",
             default=False,
-            help="Build for both 32 & 64 bit Intel. (OSX only)"
+            help="Build for both 32 & 64 bit Intel (macOS only)."
         )
         self.parser.add_option(
             "--shared",
