@@ -4,11 +4,11 @@ pythonz: a Python installation manager
 Overview
 --------
 
-pythonz is a program to automate the building and installation of Python in the users $HOME. This is
+``pythonz`` is a program to automate the building and installation of Python versions in the user's ``$HOME``. This is
 a fork of the original project, `pythonbrew <https://github.com/utahta/pythonbrew>`_.
 
 The original project seems to be unmaintained, and it also has some extra features which I don't really
-need, so I made this for to make something a bit simpler that works for *me*. You may also find it
+need, so I made this fork to make something a bit simpler that works for *me*. You may also find it
 useful.
 
 CPython, Stackless, PyPy and Jython are supported.
@@ -16,7 +16,7 @@ CPython, Stackless, PyPy and Jython are supported.
 Installation
 ------------
 
-The recommended way to download and install pythonz is to run these statements in your shell::
+The recommended way to download and install ``pythonz`` is to run these statements in your shell::
 
   curl -kL https://raw.github.com/saghul/pythonz/master/pythonz-install | bash
 
@@ -24,13 +24,13 @@ or::
 
   fetch -o - https://raw.github.com/saghul/pythonz/master/pythonz-install | bash
 
-After that, pythonz installs itself to ``~/.pythonz``.
+After that, ``pythonz`` installs itself to ``~/.pythonz``.
 
 Please add the following line to the end of your ``~/.bashrc``::
 
   [[ -s $HOME/.pythonz/etc/bashrc ]] && source $HOME/.pythonz/etc/bashrc
 
-If you need to install pythonz into somewhere else, you can do that by setting a ``PYTHONZ_ROOT`` environment variable::
+If you need to install ``pythonz`` into somewhere else, you can do that by setting a ``PYTHONZ_ROOT`` environment variable::
 
   export PYTHONZ_ROOT=/path/to/pythonz
   curl -kLO https://raw.github.com/saghul/pythonz/master/pythonz-install
@@ -40,21 +40,21 @@ If you need to install pythonz into somewhere else, you can do that by setting a
 For Systemwide (Multi-User) installation
 ----------------------------------------
 
-If the install script is run as root, pythonz will automatically install into ``/usr/local/pythonz``.
+If the install script is run as root, ``pythonz`` will automatically install into ``/usr/local/pythonz``.
 
-pythonz will be automatically configured for every user on the system if you install it as root.
+``pythonz`` will be automatically configured for every user on the system if you install it as root.
 
-After installing it, where you would normally use `sudo`, non-root users will need to use `sudo-pythonz`::
+After installing it, where you would normally use ``sudo``, non-root users will need to use ``sudo-pythonz``::
 
   sudo-pythonz install 2.7.3
 
-Before installing Pythons via Pythonz
--------------------------------------
+Before installing Python versions via ``pythonz``
+-------------------------------------------------
 
 You might want to install some optional dependencies, for functionality that
 is often expected to be included in a Python build (it can be a bummer to discover these missing and
-have to rebuild your python setup). These include the following, ordered by (very roughly guessed)
-probability that you will need them::
+have to rebuild your Python setup). These include the following, ordered by (very roughly guessed)
+probability that you will need them:
 
 Debian family (Ubuntu...)
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -63,7 +63,7 @@ Debian family (Ubuntu...)
 
   sudo apt-get install build-essential zlib1g-dev libbz2-dev libssl-dev libreadline-dev libncurses5-dev libsqlite3-dev libgdbm-dev libdb-dev libexpat-dev libpcap-dev liblzma-dev libpcre3-dev
 
-If you need tkinter support, add **tk-dev**.
+If you need tkinter support, add ``tk-dev``.
 
 RPM family (CentOS, RHEL...)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -73,14 +73,24 @@ RPM family (CentOS, RHEL...)
   yum groupinstall "Development tools"
   yum install zlib-devel bzip2-devel openssl-devel readline-devel ncurses-devel sqlite-devel gdbm-devel db4-devel expat-devel libpcap-devel xz-devel pcre-devel
 
-If you need tkinter support, add **tk-devel**.
+If you need tkinter support, add ``tk-devel``.
 
-OSX
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+macOS
+^^^^^
+
+Apple stopped including the OpenSSL development headers in OS X El Captian and macOS Sierra. You will need to install OpenSSL with Homebrew (or MacPorts). This document assumes usage of Homebrew.
 
 ::
 
   xcode-select --install
+  brew install openssl
+
+You should then add variables for ``CPPFLAGS`` and ``LDFLAGS`` to your shell environment. This allows ``pythonz`` to find the OpenSSL installed by Homebrew.
+
+::
+
+  export CPPFLAGS="-I/usr/local/opt/openssl/include"
+  export LDFLAGS="-L/usr/local/opt/openssl/lib"
 
 Usage
 -----
@@ -104,8 +114,8 @@ To get help on each individual command
   pythonz help <command>
 
 
-Install some pythons
-^^^^^^^^^^^^^^^^^^^^
+Install some Python versions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
@@ -120,28 +130,28 @@ Install some pythons
   pythonz install 2.7.3 3.2.3
   pythonz install -t pypy3 2.3.1
 
-List the installed pythons
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+List the installed Python versions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
   pythonz list
 
-List all the available python versions for installing
+List all the available Python versions for installing
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
   pythonz list -a
 
-List all the available jython versions
+List all the available Jython versions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
    pythonz list -a -t jython
 
-Uninstall the specified python
+Uninstall the specified Python
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
@@ -156,15 +166,15 @@ Remove stale source folders and archives
 
   pythonz cleanup
 
-Upgrade pythonz to the latest version
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Upgrade ``pythonz`` to the latest version
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
   pythonz update
 
-Check the installed pythonz version
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Check the installed ``pythonz`` version
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
@@ -183,20 +193,20 @@ Recommended way to use a pythonz-installed version of Python
 For Python <= 3.2
 ^^^^^^^^^^^^^^^^^
 
-Use `virtualenv`, e.g.::
+Use ``virtualenv``, e.g.::
 
   mkvirtualenv -p $(pythonz locate 2.7.3) python2.7.3
 
-For more information about virtualenv, checkout `its documentation <http://www.virtualenv.org/en/latest/>`_.
+For more information about ``virtualenv``, check out `the virtualenv documentation <http://www.virtualenv.org/en/latest/>`_.
 
 For Python >= 3.3
 ^^^^^^^^^^^^^^^^^
 
-Use `pyvenv` directly from Python, e.g.::
+Use ``pyvenv`` directly from Python, e.g.::
 
   /usr/local/pythonz/pythons/CPython-3.4.1/bin/pyvenv pyvenv
 
-For more information about pyvenv, checkout `its documentation <https://docs.python.org/3/library/venv.html>`_.
+For more information about ``pyvenv``, check out `the pyvenv documentation <https://docs.python.org/3/library/venv.html>`_.
 
 DTrace support
 --------------

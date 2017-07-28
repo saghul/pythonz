@@ -70,7 +70,12 @@ versions = {
         '3.5.1': '687e067d9f391da645423c7eda8205bae9d35edc0c76ef5218dcbe4cc770d0d7',
         '3.5.2': '1524b840e42cf3b909e8f8df67c1724012c7dc7f9d076d4feef2d3eff031e8a0',
         '3.5.3': 'd8890b84d773cd7059e597dbefa510340de8336ec9b9e9032bf030f19291565a',
+<<<<<<< HEAD
         '3.6.0': 'aa472515800d25a3739833f76ca3735d9f4b2fe77c3cb21f69275e0cce30cb2b'
+=======
+        '3.6.0': 'aa472515800d25a3739833f76ca3735d9f4b2fe77c3cb21f69275e0cce30cb2b',
+        '3.6.1': 'aa50b0143df7c89ce91be020fe41382613a817354b33acdc6641b44f8ced3828'
+>>>>>>> upstream/master
     },
     'stackless': {
         '2.6.5': 'ac1956d7f9715cc56e92992d39b24f0869cd9955fd2b8cf52b163530194d07b1',
