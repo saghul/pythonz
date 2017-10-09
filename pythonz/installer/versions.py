@@ -38,6 +38,7 @@ versions = {
         '2.7.11': '82929b96fd6afc8da838b149107078c02fa1744b7e60999a8babbc0d3fa86fc6',
         '2.7.12': '3cb522d17463dfa69a155ab18cffa399b358c966c0363d6c8b5b3bf1384da4b6',
         '2.7.13': 'a4f05a0720ce0fd92626f0278b6b433eee9a6173ddf2bced7957dfb599a5ece1',
+        '2.7.14': '304c9b202ea6fbd0a4a8e0ad3733715fbd4749f2204a9173a58ec53c32ea73e8',
         '3.0': '4d5d6ab2f893144a382ae1ea1de88a7825eb98111e26cfde627b9f3d9fd462b4',
         '3.0.1': '7d5f2feae9035f1d3d9e6bb7f092dbf374d6bb4b25abd0d2d11f13bba1cb04de',
         '3.1': '99a034cf574ea3c26412b0a0728126d7fd6ea9593d099d807a25d216ed031e6a',
@@ -72,7 +73,8 @@ versions = {
         '3.5.3': 'd8890b84d773cd7059e597dbefa510340de8336ec9b9e9032bf030f19291565a',
         '3.6.0': 'aa472515800d25a3739833f76ca3735d9f4b2fe77c3cb21f69275e0cce30cb2b',
         '3.6.1': 'aa50b0143df7c89ce91be020fe41382613a817354b33acdc6641b44f8ced3828',
-        '3.6.2': '7919489310a5f17f7acbab64d731e46dca0702874840dadce8bd4b2b3b8e7a82'
+        '3.6.2': '7919489310a5f17f7acbab64d731e46dca0702874840dadce8bd4b2b3b8e7a82',
+        '3.6.3': 'ab6193af1921b30f587b302fe385268510e80187ca83ca82d2bfe7ab544c6f91'
     },
     'stackless': {
         '2.6.5': 'ac1956d7f9715cc56e92992d39b24f0869cd9955fd2b8cf52b163530194d07b1',
@@ -196,8 +198,9 @@ versions = {
         '5.3.1': {
             'linux': None,
             'linux64': None,
-            'darwin': None},
+            'darwin': None
         },
+    },
     'pypy3': {
         '2.3.1': {
             'linux': '7eddc6826e58c9c89e68b59ec8caf1596b76401517ad8d26ad5e18e0ffa45db9',
