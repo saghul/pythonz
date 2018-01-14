@@ -1,4 +1,5 @@
 # settings
+PATH_WITHOUT_PYTHONZ=$PATH
 PATH_ROOT="$PYTHONZ_ROOT"
 if [ -z "${PATH_ROOT}" ] ; then
     PATH_ROOT="$HOME/.pythonz"
