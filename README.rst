@@ -202,11 +202,11 @@ For more information about ``virtualenv``, check out `the virtualenv documentati
 For Python >= 3.3
 ^^^^^^^^^^^^^^^^^
 
-Use ``pyvenv`` directly from Python, e.g.::
+Use ``venv`` directly from Python, e.g.::
 
-  /usr/local/pythonz/pythons/CPython-3.4.1/bin/pyvenv pyvenv
+  /usr/local/pythonz/pythons/CPython-3.4.1/bin/python3 -m venv python3.4.1
 
-For more information about ``pyvenv``, check out `the pyvenv documentation <https://docs.python.org/3/library/venv.html>`_.
+For more information about ``venv``, check out `the venv documentation <https://docs.python.org/3/library/venv.html>`_.
 
 DTrace support
 --------------
