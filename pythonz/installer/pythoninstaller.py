@@ -132,6 +132,13 @@ class CPythonInstaller(Installer):
         if version < '2.7':
             self.configure_options.append('SVNVERSION="Unversioned directory"')
 
+        # fix for #127
+        if sys.platform.startswith('linux'):
+            if version >= '2.5' and version < '3.0':
+                self.configure_options.append('--enable-unicode=ucs4')
+            else if version >= '3.0' and version < '3.3':
+                self.configure_options.append('--with-wide-unicode')
+
         if sys.platform == "darwin":
             # set configure options
             target = get_macosx_deployment_target()
