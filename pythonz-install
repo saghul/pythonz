@@ -2,7 +2,7 @@
 
 shopt -s extglob
 
-PYTHONS="`command -v python` /usr/bin/python /usr/bin/python2"
+PYTHONS="`command -v python` /usr/bin/python /usr/bin/python2 /usr/bin/python3"
 CURL=`command -v curl`
 FETCH=`command -v fetch`
 
