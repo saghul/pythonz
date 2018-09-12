@@ -20,7 +20,7 @@ PYTHONZ_COMPLETION="$PATH_ETC/bash_completion.d/pythonz_completion.sh"
 # functions
 __pythonz_set_path()
 {
-    export PATH=$PATH_ROOT/bin:$PATH
+    [[ ":$PATH:" = *":$PATH_ROOT/bin:"* ]] || PATH=$PATH_ROOT/bin:$PATH
 }
 
 __pythonz_reload()
