@@ -62,6 +62,12 @@ Debian family (Ubuntu...)
 ::
 
   sudo apt-get install build-essential zlib1g-dev libbz2-dev libssl-dev libreadline-dev libncurses5-dev libsqlite3-dev libgdbm-dev libdb-dev libexpat-dev libpcap-dev liblzma-dev libpcre3-dev
+  if errors on compiling last version of cpython do :
+sudo apt-get install build-essential python-dev python-setuptools python-pip python-smbus
+sudo apt-get install libncursesw5-dev libgdbm-dev libc6-dev
+sudo apt-get install zlib1g-dev libsqlite3-dev tk-dev
+sudo apt-get install libssl-dev openssl
+sudo apt-get install libffi-dev
 
 If you need tkinter support, add ``tk-dev``.
 
