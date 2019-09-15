@@ -136,7 +136,7 @@ class CPythonInstaller(Installer):
         if sys.platform.startswith('linux'):
             if version >= '2.5' and version < '3.0':
                 self.configure_options.append('--enable-unicode=ucs4')
-            else if version >= '3.0' and version < '3.3':
+            elif version >= '3.0' and version < '3.3':
                 self.configure_options.append('--with-wide-unicode')
 
         if sys.platform == "darwin":
