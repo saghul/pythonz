@@ -95,6 +95,7 @@ versions = {
         '3.7.2': 'f09d83c773b9cc72421abba2c317e4e6e05d919f9bcf34468e192b6a6c8e328d',
         '3.7.3': 'd62e3015f2f89c970ac52343976b406694931742fbde2fed8d1ce8ebb4e1f8ff',
         '3.7.4': 'd63e63e14e6d29e17490abbe6f7d17afb3db182dbd801229f14e55f4157c4ba3',
+        '3.7.5': '8ecc681ea0600bbfb366f2b173f727b205bb825d93d2f0b286bc4e58d37693da',
         '3.8.0': 'f1069ad3cae8e7ec467aa98a6565a62a48ef196cb8f1455a245a08db5e1792df'
     },
     'stackless': {
