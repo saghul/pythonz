@@ -46,7 +46,7 @@ If the install script is run as root, ``pythonz`` will automatically install int
 
 After installing it, where you would normally use ``sudo``, non-root users will need to use ``sudo-pythonz``::
 
-  sudo-pythonz install 2.7.3
+  sudo-pythonz install 3.8.0
 
 Before installing Python versions via ``pythonz``
 -------------------------------------------------
@@ -61,7 +61,7 @@ Debian family (Ubuntu...)
 
 ::
 
-  sudo apt-get install build-essential zlib1g-dev libbz2-dev libssl-dev libreadline-dev libncurses5-dev libsqlite3-dev libgdbm-dev libdb-dev libexpat-dev libpcap-dev liblzma-dev libpcre3-dev
+  sudo apt-get install build-essential zlib1g-dev libbz2-dev libssl-dev libreadline-dev libncurses5-dev libsqlite3-dev libgdbm-dev libdb-dev libexpat-dev libpcap-dev liblzma-dev libpcre3-dev libffi-dev
 
 If you need tkinter support, add ``tk-dev``.
 
@@ -71,7 +71,7 @@ RPM family (CentOS, RHEL...)
 ::
 
   yum groupinstall "Development tools"
-  yum install zlib-devel bzip2-devel openssl-devel readline-devel ncurses-devel sqlite-devel gdbm-devel db4-devel expat-devel libpcap-devel xz-devel pcre-devel
+  yum install zlib-devel bzip2-devel openssl-devel readline-devel ncurses-devel sqlite-devel gdbm-devel db4-devel expat-devel libpcap-devel xz-devel pcre-devel libffi-devel
 
 If you need tkinter support, add ``tk-devel``.
 
