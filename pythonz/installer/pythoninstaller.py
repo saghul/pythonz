@@ -117,7 +117,7 @@ class Installer(object):
 
 
 class CPythonInstaller(Installer):
-    version_re = re.compile(r'(\d\.\d(\.\d+)?)(.*)')
+    version_re = re.compile(r'(\d\.\d\d?(\.\d+)?)(.*)')
     supported_versions = versions['cpython']
 
     def __init__(self, version, options):
