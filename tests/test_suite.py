@@ -9,7 +9,7 @@ import shutil
 
 PYTHONZ_ROOT = '/tmp/pythonz.test'
 TESTPY_VERSION = (
-    ('cpython', ['2.6.8', '2.7.3', '3.3.0']),
+    ('cpython', ['2.6.8', '2.7.3', '3.3.0', '3.10.0']),
     ('stackless', ['2.7.2', '3.2.2']),
     ('pypy', ['1.9']),
     ('jython', ['2.5.3']),
