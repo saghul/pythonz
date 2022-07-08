@@ -60,7 +60,7 @@ if __name__ == "__main__":
         # create entry point file
         with open(PATH_BIN_PYTHONZ, "w") as f:
             f.write("""#!/usr/bin/env bash
-python %s/pythonz_main.py "$@"
+$(which python || which python3) %s/pythonz_main.py "$@"
 """ % PATH_SCRIPTS)
 
         # mode 0755
